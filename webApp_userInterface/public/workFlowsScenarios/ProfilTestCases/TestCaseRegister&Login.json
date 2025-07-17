@@ -1,0 +1,26 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Mathieu",
+      "last_name": "Tremblay",
+      "email": "mathieu.tremblay@example.ca",
+      "phone": "+15145557890",
+      "password": "MonMot2PasseFort!"
+    },
+    "address": {
+      "street": "456 Avenue Laurier Est",
+      "city": "Quebec",
+      "postal_code": "G1R 2L4",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "mathieu.tremblay@example.ca",
+      "password": "MonMot2PasseFort!"
+    }
+  }
+]

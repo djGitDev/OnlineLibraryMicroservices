@@ -1,0 +1,44 @@
+### IDE ###
+# Fichiers spécifiques à IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+*.ids
+*.orig
+*.rej
+*.bak
+*.swp
+*.classpath
+*.project
+*.settings/
+*.springBeans
+*.sts4-cache/
+.DS_Store
+
+
+### Java ###
+# Fichiers de compilation
+target/
+build/
+out/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+### Logs ###
+*.log
+logs/
+
+### Docker ###
+docker-compose.override.yml
+.env
+docker-data/
+
+### Système ###
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini

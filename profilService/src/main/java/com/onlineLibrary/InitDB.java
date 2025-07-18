@@ -97,11 +97,4 @@ public final class InitDB {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            InitDB.initialize();
-        } catch (SQLException e) {
-            System.err.println("[InitDB] Échec de l'initialisation : " + e.getMessage());
-        }
-    }
 }

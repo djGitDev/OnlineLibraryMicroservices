@@ -51,6 +51,20 @@ services:
       - app-network
     depends_on:
       - dbProfil
+
+  inventary:
+    build: ./inventaryService
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://dbInventary:5432/InventaryServiceDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mypass
+    networks:
+      - app-network
+    depends_on:
+      - dbInventary
    
 
   dbProfil:
@@ -65,7 +79,7 @@ services:
     ports:
       - "5432:5432"  # Exposition du port pour accès externe
     volumes:
-      - pgData:/var/lib/postgresql/dataProfil
+      - pgProfilData:/var/lib/postgresql/dataProfil
     networks:
       - app-network
     healthcheck:
@@ -74,11 +88,31 @@ services:
       timeout: 5s
       retries: 5
 
-   
+  dbInventary:
+    image: postgres:17-alpine
+    container_name: db-inventary
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: InventaryServiceDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgInventaryData:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d InventaryServiceDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  pgData:
+  pgProfilData:
+  pgInventaryData:

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/profil")
-@CrossOrigin(origins = "http://localhost:8080") // Autorise votre frontend React
 public class ProfilRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfilRestController.class);

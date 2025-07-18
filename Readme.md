@@ -6,15 +6,15 @@
 
 
 
-- [Prerequisites](#-prerequisites)
+- [Prerequisites](#prerequisites)
 
-- [Usage](#-usage)
+- [Usage](#usage)
 
-- [Available Scripts](#-available-scripts)
+- [Available Scripts](#available-scripts)
 
   
 
-## ⚙️ Prerequisites
+## Prerequisites
 
 ### System Requirements
 - Windows 10/11 64-bit
@@ -27,16 +27,13 @@
 
 ###  Installation
 
-1. **Enable WSL 2** (Run as Administrator):
+   **Enable WSL 2** (Run as Administrator):
    ```powershell
    wsl --install
    Install Docker Desktop:
+   ```
 
-
-
-
-
-## 📌Usage
+## Usage
 
 ### Prerequisites
 - Docker Desktop installed and running
@@ -62,12 +59,7 @@
    Navigate to: http://localhost:80
    ```
 
-   
-
-
-
-## 🛠️ Available Scripts 
-
+## Available Scripts 
 
 
 #### 🚀Docker Clean & Deploy Script
@@ -85,7 +77,6 @@ Execute at project root (where docker-compose.yml is located)
 ```
 
 
-
 #### 🐞 Debugging Container Logs Script
 
 PowerShell script that displays logs from all running Docker containers.
@@ -99,7 +90,6 @@ PowerShell script that displays logs from all running Docker containers.
 
 - Clean formatting with separators
 
-  
 
 ```powershell
 Execute at project root (where script is located)

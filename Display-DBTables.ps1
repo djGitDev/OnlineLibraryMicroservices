@@ -16,6 +16,20 @@ $containers = @(
         User = "postgres";
         Password = "mypass"
     }
+    @{
+        Name = "db-order";
+        Port = 5434;
+        DB = "OrderServiceDB";
+        User = "postgres";
+        Password = "mypass"
+    }
+    @{
+        Name = "db-payment";
+        Port = 5435;
+        DB = "PaymentServiceDB";
+        User = "postgres";
+        Password = "mypass"
+    }
 )
 
 # Fonction pour lister les tables
@@ -24,7 +38,7 @@ function Get-PGTables {
         $container
     )
     
-    Write-Host "`n[${$container.Name}] Connexion à la base ${$container.DB}..." -ForegroundColor Cyan
+    Write-Host "`n[${$container.Name}] Connexion a la base ${$container.DB}..." -ForegroundColor Cyan
     
     try {
         $query = @"
@@ -37,7 +51,7 @@ ORDER BY table_schema, table_name;
         $result = docker exec $container.Name psql -U $container.User -d $container.DB -c $query 2>&1
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Tables trouvées dans ${$container.DB}:" -ForegroundColor Green
+            Write-Host "Tables trouvees dans ${$container.DB}:" -ForegroundColor Green
             $result | Where-Object { $_ -match "\w+\.\w+" } | ForEach-Object {
                 Write-Host "  $_" -ForegroundColor Yellow
             }
@@ -60,7 +74,7 @@ foreach ($container in $containers) {
         Start-Sleep -Seconds 2  # Pause entre les conteneurs
     }
     else {
-        Write-Host "`n[${$container.Name}] Conteneur non trouvé ou non démarré (status: $status)" -ForegroundColor Red
+        Write-Host "`n[${$container.Name}] Conteneur non trouvé ou non demarre (status: $status)" -ForegroundColor Red
     }
 }
 

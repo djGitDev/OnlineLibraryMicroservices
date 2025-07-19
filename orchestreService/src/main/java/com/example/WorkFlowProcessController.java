@@ -16,7 +16,7 @@ public class WorkFlowProcessController {
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowProcessController.class);
 
     @Autowired
-    private WorkflowMicroservicesClients microserviceClient;
+    private WorkflowMicroservicesClient microserviceClient;
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<JsonArray> orchestrate(@RequestBody JsonArray inputArray) {

@@ -65,7 +65,34 @@ services:
       - app-network
     depends_on:
       - dbInventary
-   
+
+  payment:
+    build: ./paymentService
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://dbPayment:5432/PaymentServiceDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mypass
+    networks:
+      - app-network
+    depends_on:
+      - dbPayment
+
+  order:
+    build: ./orderService
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://dbOrder:5432/OrderServiceDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mypass
+    networks:
+      - app-network
+    depends_on:
+      - dbOrder
 
   dbProfil:
     image: postgres:17-alpine
@@ -79,7 +106,7 @@ services:
     ports:
       - "5432:5432"  # Exposition du port pour accès externe
     volumes:
-      - pgProfilData:/var/lib/postgresql/dataProfil
+      - pgProfilData:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -108,6 +135,48 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5 
+  dbPayment:
+    image: postgres:17-alpine
+    container_name: db-payment
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: PaymentServiceDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgPaymentData:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d PaymentServiceDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+
+  dbOrder:
+    image: postgres:17-alpine
+    container_name: db-order
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: OrderServiceDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgOrderData:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d OrderServiceDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+
 
 networks:
   app-network:
@@ -116,3 +185,6 @@ networks:
 volumes:
   pgProfilData:
   pgInventaryData:
+  pgOrderData:
+  pgPaymentData:
+

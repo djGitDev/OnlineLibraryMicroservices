@@ -14,6 +14,18 @@ $containers = @(
         User = "postgres";
         Password = "mypass"
     }
+     @{
+        Name = "db-order";
+        DB = "OrderServiceDB";
+        User = "postgres";
+        Password = "mypass"
+    }
+    @{
+        Name = "db-payment";
+        DB = "PaymentServiceDB";
+        User = "postgres";
+        Password = "mypass"
+    }
 )
 
 # Fonction pour lister et inspecter toutes les tables

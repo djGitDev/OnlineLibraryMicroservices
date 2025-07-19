@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.google.gson.JsonObject;
 
 @FeignClient(name = "workflow-service", url = "${workflow-service.url}")
-public interface WorkflowMicroservicesClients {
+public interface WorkflowMicroservicesClient {
 
     @PostMapping(path = "/api/profil/register", consumes = "application/json")
     ResponseEntity<JsonObject> callRegister(@RequestBody JsonObject body);

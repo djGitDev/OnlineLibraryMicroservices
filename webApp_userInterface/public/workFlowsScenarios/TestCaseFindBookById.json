@@ -1,0 +1,6 @@
+[
+  {
+    "action": "find_book_by_id",
+    "book_id": 3
+  }
+]

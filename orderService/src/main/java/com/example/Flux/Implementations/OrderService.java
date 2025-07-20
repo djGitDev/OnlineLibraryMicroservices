@@ -1,6 +1,7 @@
 package com.example.Flux.Implementations;
 
 import com.example.Flux.Interfaces.*;
+import com.example.Flux.Interfaces.ProfilMicroservicesClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,7 @@ public class OrderService implements IOrderService {
     @Override
     public JsonObject placeOrder(int userId,boolean autoDelivery) throws Exception {
 
-        JsonObject body = new JsonObject();
-        body.addProperty("bookId", userId);
-        ResponseEntity<JsonObject> respense = profilMicroservicesClient.callGetUserProfil(body);
+        ResponseEntity<JsonObject> respense = profilMicroservicesClient.callGetUserProfil(userId);
         JsonObject jsonUserProfil= respense.getBody().getAsJsonObject();
         JsonObject response = orderEntityService.createOrder(userId,jsonUserProfil);
         if(autoDelivery){

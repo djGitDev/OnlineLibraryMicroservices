@@ -71,8 +71,8 @@ public class InventaryRestController {
         }
     }
 
-    @GetMapping("/search/isbn")
-    public ResponseEntity<JsonObject> getBookByIsbn(@RequestParam String isbn) {
+    @GetMapping("/research/{isbn}")
+    public ResponseEntity<JsonObject> getBookByIsbn( @PathVariable String isbn) {
         try {
             logger.info("Searching book by ISBN: {}", isbn);
             JsonObject response = bookService.findBookByIsbn(isbn);

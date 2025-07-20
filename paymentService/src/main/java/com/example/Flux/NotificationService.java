@@ -21,9 +21,7 @@ public class NotificationService implements INotificationService {
 
     @Override
     public JsonObject notifyUser(int userId, int orderId, int cardId,double totalPrice) throws Exception {
-        JsonObject body = new JsonObject();
-        body.addProperty("userId", userId);
-        ResponseEntity<JsonObject> response = profilMicroservicesClient.callGetUserData(body);
+        ResponseEntity<JsonObject> response = profilMicroservicesClient.callGetUserData(userId);
         JsonObject notificationResult = response.getBody().getAsJsonObject();
         return notificationBuilder.buildPaymentNotification(notificationResult,orderId,cardId,totalPrice);
     }

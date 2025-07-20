@@ -1,0 +1,48 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Camille",
+      "last_name": "Lemoine",
+      "email": "camille.lemoine@example.ca",
+      "phone": "+15145557788",
+      "password": "DeleteAll123!"
+    },
+    "address": {
+      "street": "420 Rue Saint-Urbain",
+      "city": "Montreal",
+      "postal_code": "H2Y 2Z1",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "camille.lemoine@example.ca",
+      "password": "DeleteAll123!"
+    }
+  },
+  {
+        "action": "find_book_by_id",
+        "book_id": 1
+  },
+  {
+    "action": "add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 1,
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "action": "clear_books",
+    "books": [
+      {
+        "book_id": 1,
+        "quantity": 2
+      }
+    ]
+  }
+]

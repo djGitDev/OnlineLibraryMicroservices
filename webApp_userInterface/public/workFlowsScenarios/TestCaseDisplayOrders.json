@@ -1,0 +1,90 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Alice",
+      "last_name": "Martin",
+      "email": "alice.martin@example.ca",
+      "phone": "+15145550001",
+      "password": "AliceOrder123!"
+    },
+    "address": {
+      "street": "123 Rue Sainte-Catherine",
+      "city": "Montreal",
+      "postal_code": "H2X 3Y7",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "alice.martin@example.ca",
+      "password": "AliceOrder123!"
+    }
+  },
+  {
+    "action": "find_book_by_id",
+    "book_id": 2
+  },
+  {
+    "action": "add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 2,
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "action": "place_order"
+  },
+
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Bruno",
+      "last_name": "Dupuis",
+      "email": "bruno.dupuis@example.ca",
+      "phone": "+15145550002",
+      "password": "BrunoOrder123!"
+    },
+    "address": {
+      "street": "456 Boulevard Saint-Laurent",
+      "city": "Montreal",
+      "postal_code": "H2Y 1Z9",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "bruno.dupuis@example.ca",
+      "password": "BrunoOrder123!"
+    }
+  },
+  {
+    "action": "find_book_by_id",
+    "book_id": 1
+  },
+  {
+    "action": "add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 1,
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "action": "place_order"
+  },
+  {
+    "action": "deliver_order"
+  },
+
+  {
+    "action": "display_orders_delivred_and_not"
+  }
+]

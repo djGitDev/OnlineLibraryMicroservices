@@ -10,7 +10,7 @@ function App() {
     const backendUrl = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL || 'http://localhost:8080/api/workflow';
 
     useEffect(() => {
-        fetch("/workFlowsScenarios/ProfilTestCases/files.json")
+        fetch("/workFlowsScenarios/files.json")
             .then((res) => res.json())
             .then((data) => setFiles(data))
             .catch((err) => console.error("Error loading file list:", err));
@@ -18,7 +18,7 @@ function App() {
 
     useEffect(() => {
         if (selectedFile) {
-            fetch(`/workFlowsScenarios/ProfilTestCases/${selectedFile}`)
+            fetch(`/workFlowsScenarios/${selectedFile}`)
                 .then((res) => res.json())
                 .then((data) => setContent(data))
                 .catch((err) => {

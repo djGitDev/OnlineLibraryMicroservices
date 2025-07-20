@@ -1,14 +1,18 @@
 package com.example.ControllerRestOrderApi;
 
 import com.example.Flux.Interfaces.IOrderService;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order")
@@ -22,7 +26,7 @@ public class OrderRestController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/{userId}/clear-cart")
+    @DeleteMapping("/{userId}/clear-cart")
     public ResponseEntity<JsonObject> clearCart(@PathVariable int userId) {
         try {
             logger.info("Clearing cart for user: {}", userId);
@@ -34,7 +38,7 @@ public class OrderRestController {
         }
     }
 
-    @PostMapping("/{userId}/clear-books")
+    @DeleteMapping("/{userId}/clear-books")
     public ResponseEntity<JsonObject> clearBooks(
             @PathVariable int userId,
             @RequestBody JsonObject requestBody) {
@@ -46,10 +50,10 @@ public class OrderRestController {
     @PostMapping("/{userId}/place-order")
     public ResponseEntity<JsonObject> placeOrder(
             @PathVariable int userId,
-            @RequestParam(defaultValue = "true") boolean autoDelivery) {
+            @RequestParam(defaultValue = "true") boolean isAutoDelivery) {
         try {
-            logger.info("Placing order for user: {}, autoDelivery: {}", userId, autoDelivery);
-            JsonObject result = orderService.placeOrder(userId, autoDelivery);
+            logger.info("Placing order for user: {}, autoDelivery: {}", userId, isAutoDelivery);
+            JsonObject result = orderService.placeOrder(userId, isAutoDelivery);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error placing order for user: {}", userId, e);
@@ -75,9 +79,11 @@ public class OrderRestController {
     public ResponseEntity<JsonObject> addSearchedItems(
             @PathVariable int userId,
             @RequestBody JsonObject requestBody,
-            @RequestParam Map<Integer, Double> bookPrices) {
+            @RequestParam("prices") String pricesJson) {
+
         try {
             logger.info("Adding searched items for user: {}", userId);
+            Map<Integer, Double> bookPrices = deserializePrices(pricesJson);
             JsonObject result = orderService.addSearchedItemsToCart(userId, requestBody, bookPrices);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -86,7 +92,7 @@ public class OrderRestController {
         }
     }
 
-    @GetMapping("/carts/{cartId}/total")
+    @GetMapping("/carts/{cartId}/total-price")
     public ResponseEntity<JsonObject> getCartTotal(@PathVariable int cartId) {
         try {
             logger.info("Getting total for cart: {}", cartId);
@@ -102,5 +108,16 @@ public class OrderRestController {
         JsonObject error = new JsonObject();
         error.addProperty("error", e.getMessage());
         return ResponseEntity.internalServerError().body(error);
+    }
+
+    private Map<Integer, Double> deserializePrices(String json) {
+        Type type = new TypeToken<Map<String, Double>>(){}.getType();
+        Map<String, Double> stringKeyMap = new Gson().fromJson(json, type);
+
+        return stringKeyMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> Integer.parseInt(e.getKey()),
+                        Map.Entry::getValue
+                ));
     }
 }

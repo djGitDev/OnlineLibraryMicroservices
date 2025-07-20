@@ -1,9 +1,9 @@
 package com.example.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import feign.codec.Encoder;
 import feign.gson.GsonEncoder;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -41,10 +41,11 @@ public class GsonConfig {
         }
     }
 
-    // Configuration client (Feign)
     @Configuration
+    @EnableFeignClients(basePackages = "com.example.MicroservicesClients")
     public static class FeignConfig {
         private final Gson gson;
+
 
         public FeignConfig(Gson gson) {
             this.gson = gson;
@@ -54,5 +55,7 @@ public class GsonConfig {
         public Encoder feignEncoder() {
             return new GsonEncoder(gson); // Utilise l'instance configurée
         }
+
     }
+
 }

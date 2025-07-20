@@ -3,6 +3,7 @@ package com.example.Flux.Implementations;
 
 import com.example.Entities.*;
 import com.example.Flux.Interfaces.*;
+import com.example.Flux.Interfaces.InventaryMicroservicesClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.example.Persistance.Interfaces.IOrderEntityRepository;
@@ -49,12 +50,8 @@ public class OrderEntityService implements IOrderEntityService {
         for (CartItem item : cartItems) {
             int bookId = item.getBookId();
             int quantity = item.getQuantity();
-            JsonObject body = new JsonObject();
-            body.addProperty("bookId", bookId);
-            body.addProperty("quantity", quantity);
-            ResponseEntity<JsonObject> respense = microserviceClient.callDecreaseBookQuantity(body);
-            JsonObject bookInfo = respense.getBody().getAsJsonObject();
-            JsonObject j = new JsonObject();
+            microserviceClient.callDecreaseBookQuantity(bookId,quantity);
+
         }
         if (cartItems.isEmpty()) {
             throw new Exception("Le panier est vide, impossible de créer une commande.");

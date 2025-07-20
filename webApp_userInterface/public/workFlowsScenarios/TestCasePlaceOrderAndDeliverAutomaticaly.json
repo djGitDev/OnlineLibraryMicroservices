@@ -1,0 +1,50 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Élodie",
+      "last_name": "Tremblay",
+      "email": "elodie.t9@protonmail.com",
+      "phone": "+15149998877",
+      "password": "SecurePwd456$"
+    },
+    "address": {
+      "street": "2022 Boul. René-Lévesque",
+      "city": "Québec",
+      "postal_code": "G1V 2L3",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "elodie.t9@protonmail.com",
+      "password": "SecurePwd456$"
+    }
+  },
+   {
+        "action": "find_book_by_id",
+        "book_id": 2
+    },
+     {
+          "action": "find_book_by_id",
+          "book_id": 3
+      },
+  {
+    "action": "add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 2,
+        "quantity": 3
+      },
+      {
+        "book_id": 3,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "action": "place_order_with_auto_delivery"
+  }
+]

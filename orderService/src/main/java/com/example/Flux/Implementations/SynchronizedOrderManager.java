@@ -1,5 +1,6 @@
-package com.example.ApiExterneOrder;
+package com.example.Flux.Implementations;
 
+import com.example.Flux.Interfaces.ISynchronizedOrderManager;
 import com.google.gson.JsonObject;
 import java.util.Collections;
 import java.util.List;

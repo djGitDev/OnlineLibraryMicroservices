@@ -71,7 +71,7 @@ public class ProfilRestController {
         }
     }
 
-    @GetMapping(path = "/{userId}/data", produces = "application/json")
+    @GetMapping(path = "/data/{userId}", produces = "application/json")
     public ResponseEntity<JsonObject> getUserData(@PathVariable int userId) {
         logger.info("Récupération des données pour l'utilisateur ID: {}", userId);
         try {

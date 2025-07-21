@@ -1,7 +1,8 @@
 package com.example.Flux.Implementations;
 
+import com.example.Persistance.Interfaces.IOrderLineRepository;
 import com.google.gson.JsonObject;
-import com.example.ApiExterneOrder.ISynchronizedOrderManager;
+import com.example.Flux.Interfaces.ISynchronizedOrderManager;
 import com.example.Entities.Delivery;
 import com.example.Flux.Interfaces.IDeliveryService;
 import com.example.Persistance.Interfaces.IDeliveryRepository;
@@ -11,11 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeliveryService implements IDeliveryService {
 
+    private IOrderLineRepository orderLineRepository;
     private IDeliveryRepository deliveryRepository;
 
     @Autowired
-    public DeliveryService(IDeliveryRepository deliveryRepository) {
+    public DeliveryService(IDeliveryRepository deliveryRepository,IOrderLineRepository orderLineRepository) {
         this.deliveryRepository = deliveryRepository;
+        this.orderLineRepository = orderLineRepository;
     }
 
     @Override
@@ -29,6 +32,7 @@ public class DeliveryService implements IDeliveryService {
 
     @Override
     public JsonObject deliverOrder(int orderId) {
+        orderLineRepository.updateDeliveryStatusToDelivered(orderId);
         return deliveryRepository.deliverOrder(orderId);
     }
 

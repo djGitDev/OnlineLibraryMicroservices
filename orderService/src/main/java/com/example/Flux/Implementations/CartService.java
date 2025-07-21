@@ -157,9 +157,7 @@ public class CartService implements ICartService {
             int bookId = book.get("book_id").getAsInt();
             int quantity = book.get("quantity").getAsInt();
             double bookPrice = searchedBooksIds.get(bookId);
-            JsonObject body = new JsonObject();
-            body.addProperty("bookId", bookId);
-            ResponseEntity<JsonObject> respense = microserviceClient.callFindBookById(body);
+            ResponseEntity<JsonObject> respense = microserviceClient.callFindBookById(bookId);
             JsonObject jsonBook = respense.getBody().getAsJsonObject();
             JsonObject bookInInventary = jsonBook.getAsJsonObject("book");
             int quantityAvailable = bookInInventary.get("quantity").getAsInt();

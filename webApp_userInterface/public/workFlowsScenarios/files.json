@@ -1,0 +1,15 @@
+[
+  "TestCaseRegister&Login.json",
+  "TestCaseFindBookById.json",
+  "TestCaseFindBookByIsbn.json",
+  "TestCaseGetAllBooks.json",
+  "TestCaseDecreaseBookQuantityInStock.json",
+  "TestCaseAddBooksFromInventaryToCartThenClearCart.json",
+  "TestCaseAddTwoCartItemsWithSameBookIdsThanClear.json",
+  "TestClearBooksFromCart.json",
+  "TestCaseClearAllBooksFromCart.json",
+  "TestCasePlaceOrderAfterAddingBooks.json",
+  "TestCasePlaceOrderAndDeliverAutomaticaly.json",
+  "purchaseFlowTestCase.json",
+  "TestCaseDisplayOrders.json"
+]

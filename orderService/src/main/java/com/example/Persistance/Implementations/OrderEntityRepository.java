@@ -24,9 +24,7 @@ public class OrderEntityRepository implements IOrderEntityRepository {
         RETURNING id;
         """;
 
-    private static final String SQL_CHECK_USER = """
-        SELECT 1 FROM users WHERE id = ?;
-        """;
+
     @Autowired
     public OrderEntityRepository(IDBConnection dbConnection) {
         this.dbConnection = dbConnection;
@@ -34,13 +32,10 @@ public class OrderEntityRepository implements IOrderEntityRepository {
 
     @Override
     public int save(Order order) throws Exception {
-        // D'abord vérifier que l'utilisateur existe
-        validateUserExists(order.getUserId());
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_ORDER)) {
 
-            // CORRECTION: Utiliser getUserId() au lieu de getId()
             stmt.setInt(1, order.getUserId());
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -93,7 +88,7 @@ public class OrderEntityRepository implements IOrderEntityRepository {
         WHERE user_id = ? 
         ORDER BY order_date DESC, id DESC 
         LIMIT 1
-    """;
+        """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -113,17 +108,4 @@ public class OrderEntityRepository implements IOrderEntityRepository {
         }
     }
 
-    private void validateUserExists(int userId) throws SQLException {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_USER)) {
-
-            stmt.setInt(1, userId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next()) {
-                    throw new SQLException("L'utilisateur avec ID " + userId + " n'existe pas");
-                }
-            }
-        }
-    }
 }

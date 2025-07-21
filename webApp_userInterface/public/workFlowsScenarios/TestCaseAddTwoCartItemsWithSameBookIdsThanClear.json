@@ -1,0 +1,50 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Émilie",
+      "last_name": "Gagnon",
+      "email": "emilie.gagnon@example.ca",
+      "phone": "+14385554422",
+      "password": "SecurePass!2025"
+    },
+    "address": {
+      "street": "321 Boulevard René-Lévesque",
+      "city": "Laval",
+      "postal_code": "H7N 5M4",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "emilie.gagnon@example.ca",
+      "password": "SecurePass!2025"
+    }
+  },
+  {
+      "action": "find_book_by_isbn",
+      "isbn": "1111743273565"
+  },
+  {
+        "action": "find_book_by_id",
+        "book_id": 1
+  },
+  {
+    "action":"add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 1,
+        "quantity": 2
+      },
+      {
+        "book_id": 1,
+        "quantity": 4
+      }
+    ]
+  },
+  {
+      "action": "clear_cart"
+  }
+]

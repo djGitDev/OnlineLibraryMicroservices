@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 
 # Configuration
-$DELAY_SECONDS = 5
+$DELAY_SECONDS = 1
 
 # Récupérer tous les IDs des conteneurs en cours d'exécution
 $containerIds = docker ps -q

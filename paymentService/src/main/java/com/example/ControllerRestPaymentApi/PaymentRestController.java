@@ -21,10 +21,10 @@ public class PaymentRestController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/{userId}/process/{cartId}")
+    @PostMapping("/{cartId}/process/{userId}")
     public ResponseEntity<JsonObject> processPayment(
-            @PathVariable int userId,
             @PathVariable int cartId,
+            @PathVariable int userId,
             @RequestParam(defaultValue = "true") boolean autoDelivery) {
         try {
             logger.info("Processing payment for user: {}, cart: {}, autoDelivery: {}",

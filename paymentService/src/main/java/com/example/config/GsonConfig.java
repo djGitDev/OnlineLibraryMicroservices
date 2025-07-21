@@ -63,10 +63,7 @@ public class GsonConfig {
         public Encoder feignEncoder() {
             return new GsonEncoder(gson); // Utilise l'instance configurée
         }
-        @Bean
-        public Decoder feignDecoder(Gson gson) {
-            return new GsonDecoder(gson);
-        }
+
     }
     @Configuration
     public class BeanConfig {

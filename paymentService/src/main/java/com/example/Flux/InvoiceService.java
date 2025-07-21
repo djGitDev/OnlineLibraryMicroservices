@@ -24,9 +24,7 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public JsonObject generateInvoice(int cartId) throws Exception {
-        JsonObject body = new JsonObject();
-        body.addProperty("cartId", cartId);
-        ResponseEntity<JsonObject> response = orderMicroservicesClient.callGetTotalPriceCart(body);
+        ResponseEntity<JsonObject> response = orderMicroservicesClient.callGetTotalPriceCart(cartId);
         JsonObject jsonTotalPrice =  response.getBody().getAsJsonObject();
         double totalPrice = jsonTotalPrice.get("total_price").getAsDouble();
         Invoice invoice = new Invoice(now(), totalPrice);

@@ -1,0 +1,7 @@
+[
+  {
+      "action": "decrease_book_quantity",
+      "book_id": 3,
+      "quantity" : 2
+  }
+]

@@ -26,10 +26,7 @@ public class PaymentService implements IPaymentService {
     public JsonObject processPaiement(int cartId,int userId) throws Exception {
         JsonObject invoiceResult = invoiceService.generateInvoice(cartId);
         double totalPrice = invoiceResult.get("total_price").getAsDouble();
-        JsonObject body = new JsonObject();
-        body.addProperty("userId", userId);
-        body.addProperty("isAutoDelivery", true);
-        ResponseEntity<JsonObject> response = orderMicroservicesClient.callPlaceOrder(body);
+        ResponseEntity<JsonObject> response = orderMicroservicesClient.callPlaceOrder(userId,true);
         JsonObject orderResult = response.getBody();
         int orderId = orderResult.get("orderId").getAsInt();
         return notificationService.notifyUser(userId,orderId,cartId,totalPrice);

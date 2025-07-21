@@ -3,16 +3,19 @@ package com.example.Flux.Interfaces;
 import com.google.gson.JsonObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "services-inventary", url = "${services-inventary.url}")
 public interface InventaryMicroservicesClient {
 
-    @PostMapping(path = "/api/books/find", consumes = "application/json")
-    ResponseEntity<JsonObject> callFindBookById(@RequestBody JsonObject body);
+    @GetMapping(
+            value = "/api/books/{book_id}",
+            produces = "application/json"
+    )
+    ResponseEntity<JsonObject> callFindBookById(@PathVariable("book_id") int bookId);
 
-    @PostMapping(path = "/api/books/quantity", consumes = "application/json")
-    ResponseEntity<JsonObject> callDecreaseBookQuantity(@RequestBody JsonObject body);
+    @PutMapping(path = "/api/books/{book_id}/quantity", consumes = "application/json")
+    ResponseEntity<JsonObject> callDecreaseBookQuantity(@PathVariable("book_id") int bookId,
+                                                        @RequestParam int quantity);
 
 }

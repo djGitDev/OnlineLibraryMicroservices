@@ -1,0 +1,54 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Julien",
+      "last_name": "Benoit",
+      "email": "julien.benoit3@example.ca",
+      "phone": "+15145558899",
+      "password": "OrderNow123!"
+    },
+    "address": {
+      "street": "1000 Rue de la Gauchetière",
+      "city": "Montreal",
+      "postal_code": "H3B 4W5",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "julien.benoit3@example.ca",
+      "password": "OrderNow123!"
+    }
+  },
+
+  {
+          "action": "find_book_by_id",
+          "book_id": 1
+      },
+       {
+            "action": "find_book_by_id",
+            "book_id": 2
+        },
+  {
+    "action": "add_to_cart_from_research",
+    "books": [
+      {
+        "book_id": 1,
+        "quantity": 2
+      },
+      {
+        "book_id": 2,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "action": "place_order"
+  },
+  {
+    "action": "deliver_order"
+  }
+]

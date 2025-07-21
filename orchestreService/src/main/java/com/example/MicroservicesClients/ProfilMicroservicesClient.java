@@ -1,13 +1,14 @@
-package com.example;
+package com.example.MicroservicesClients;
 
+import com.example.config.GsonConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.google.gson.JsonObject;
 
-@FeignClient(name = "workflow-service", url = "${workflow-service.url}")
-public interface WorkflowMicroservicesClient {
+@FeignClient(name = "profil-service", url = "${profil-service.url}", configuration = GsonConfig.FeignConfig.class)
+public interface ProfilMicroservicesClient {
 
     @PostMapping(path = "/api/profil/register", consumes = "application/json")
     ResponseEntity<JsonObject> callRegister(@RequestBody JsonObject body);

@@ -1,14 +1,12 @@
 package com.example.config;
 
-import com.example.ApiExterneOrder.ISynchronizedOrderManager;
-import com.example.ApiExterneOrder.SynchronizedOrderManager;
+import com.example.Flux.Interfaces.ISynchronizedOrderManager;
+import com.example.Flux.Implementations.SynchronizedOrderManager;
 import com.example.Persistance.Implementations.*;
 import com.example.Persistance.Interfaces.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import feign.codec.Decoder;
 import feign.codec.Encoder;
-import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
@@ -61,10 +59,6 @@ public class GsonConfig {
         @Bean
         public Encoder feignEncoder() {
             return new GsonEncoder(gson); // Utilise l'instance configurée
-        }
-        @Bean
-        public Decoder feignDecoder(Gson gson) {
-            return new GsonDecoder(gson);
         }
     }
 

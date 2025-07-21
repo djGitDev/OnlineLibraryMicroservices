@@ -30,7 +30,7 @@ public interface OrderMicroservicesClient {
             value = "/api/order/{userId}/clear-cart",
             produces = "application/json"
     )
-    ResponseEntity<JsonObject>  callClearCart(@PathVariable("userId") int userId);
+    ResponseEntity<JsonObject> callClearCart(@PathVariable("userId") int userId);
 
     @DeleteMapping(
             value = "/api/order/{userId}/clear-books",
@@ -49,4 +49,18 @@ public interface OrderMicroservicesClient {
             @PathVariable("userId") int userId,
             @RequestParam("isAutoDelivery") boolean isAutoDelivery
     );
+    @GetMapping(
+            value = "/api/order/display-all",
+            consumes = "application/json"
+    )
+    ResponseEntity<JsonObject> callDisplayAllOrders();
+
+
+    @PostMapping(
+            value = "/api/order/{orderId}/deliver",
+            produces = "application/json"
+    )
+    ResponseEntity<JsonObject> callDeliveryOrder(@PathVariable("orderId") int orderId);
+
+
 }

@@ -83,4 +83,40 @@ public class OrderLineRepository implements IOrderLineRepository {
 
         return response;
     }
+
+    public JsonObject updateDeliveryStatusToDelivered(int orderId) {
+        JsonObject response = new JsonObject();
+        final String DELIVERED_STATUS = "Livrée";
+
+        String sql = """
+        UPDATE order_lines 
+        SET delivery_status = ?, 
+            delivery_date = CASE 
+                WHEN delivery_date IS NULL THEN CURRENT_DATE 
+                ELSE delivery_date 
+            END
+        WHERE order_id = ? AND delivery_status != ?
+    """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, DELIVERED_STATUS);
+            stmt.setInt(2, orderId);
+            stmt.setString(3, DELIVERED_STATUS);
+
+            int affectedRows = stmt.executeUpdate();
+
+            response.addProperty("status", "success");
+            response.addProperty("updated_lines", affectedRows);
+            response.addProperty("message",
+                    affectedRows + " ligne(s) marquée(s) comme livrée(s)");
+
+        } catch (Exception e) {
+            response.addProperty("status", "error");
+            response.addProperty("message", "Échec de la mise à jour : " + e.getMessage());
+        }
+
+        return response;
+    }
 }

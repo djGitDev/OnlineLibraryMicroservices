@@ -13,4 +13,5 @@ public interface IOrderService {
     JsonObject displayAllOrders();
     JsonObject addSearchedItemsToCart(int lastUserId, JsonObject jsonObject, Map<Integer,Double> searchedBooksIds) throws Exception;
     JsonObject getTotalPriceCart(int cartId) throws Exception;
+    JsonObject displayOrders();
 }

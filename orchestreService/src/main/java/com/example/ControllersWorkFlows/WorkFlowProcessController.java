@@ -163,6 +163,12 @@ public class WorkFlowProcessController {
 
                         logger.info("Livre trouvé - ID: {}, Prix: {}", idBook, priceBook);
                         break;
+
+                    case "get_all_books" :
+                        ResponseEntity<JsonObject> responseGetBooks = inventaryMicroserviceClient.callGetBooks();
+                        result = responseGetBooks.getBody();
+                        break;
+
                     case "decrease_book_quantity" :
                         ResponseEntity<JsonObject> responseDecreaseQuantity = inventaryMicroserviceClient.callDecreaseBookQuantity(extractBookIdFromJson(task), task.get("quantity").getAsInt());
                         result = responseDecreaseQuantity.getBody();
@@ -199,12 +205,26 @@ public class WorkFlowProcessController {
                         orderIds.add(result.get("orderId").getAsInt());
                         break;
 
+                    case "place_order_with_delivery" :
+                        ResponseEntity<JsonObject> responseOrderDelivered =  orderMicroserviceClient.callPlaceOrder(getLastUserId(), true);
+                        result = responseOrderDelivered.getBody();
+                        orderIds.add(result.get("orderId").getAsInt());
+                        break;
+
                     case "process_payment" :
-                        System.out.println(getLastUserId());
-                        System.out.println(currentCartId);
 
                         ResponseEntity<JsonObject> responsePayment = paymentMicroserviceClient.callProcessPaiement(currentCartId,getLastUserId(),true);
                         result = responsePayment.getBody();
+                        break;
+
+                    case "display_orders_delivred_and_not" :
+                        ResponseEntity<JsonObject> responseOrders = orderMicroserviceClient.callDisplayAllOrders();
+                        result = responseOrders.getBody();
+                        break;
+
+                    case "deliver_order" :
+                        ResponseEntity<JsonObject> responseDeliver = orderMicroserviceClient.callDeliveryOrder(getLastOrderId());
+                        result = responseDeliver.getBody();
                         break;
 
                     default:
@@ -233,6 +253,12 @@ public class WorkFlowProcessController {
         if (userIds.isEmpty())
             throw new Exception("Aucun utilisateur connecté.");
         return userIds.get(userIds.size() - 1);
+    }
+
+    private static int getLastOrderId() throws Exception {
+        if (orderIds.isEmpty())
+            throw new Exception("Aucune commande enregistrée.");
+        return orderIds.get(orderIds.size() - 1);
     }
 
     private static int extractBookIdFromJson(JsonObject jsonObject) {

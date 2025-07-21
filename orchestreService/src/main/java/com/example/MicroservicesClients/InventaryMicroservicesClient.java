@@ -33,4 +33,12 @@ public interface InventaryMicroservicesClient {
     ResponseEntity<JsonObject> callDecreaseBookQuantity(
             @PathVariable("id") int id,
             @RequestParam("quantity") int quantity
-    );}
+    );
+
+    @GetMapping(
+            value = "/api/books",
+            produces = "application/json"
+    )
+    ResponseEntity<JsonObject> callGetBooks();
+
+}

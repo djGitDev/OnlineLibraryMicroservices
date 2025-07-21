@@ -104,6 +104,18 @@ public class OrderRestController {
         }
     }
 
+    @GetMapping("/display-all")
+    public ResponseEntity<JsonObject> displayAllOrders() {
+
+        try {
+            JsonObject result = orderService.displayOrders();
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error getting orders");
+            return errorResponse(e);
+        }
+    }
+
     private ResponseEntity<JsonObject> errorResponse(Exception e) {
         JsonObject error = new JsonObject();
         error.addProperty("error", e.getMessage());

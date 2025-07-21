@@ -1,7 +1,7 @@
 package com.example.config;
 
-import com.example.ApiExterneOrder.ISynchronizedOrderManager;
-import com.example.ApiExterneOrder.SynchronizedOrderManager;
+import com.example.Flux.Interfaces.ISynchronizedOrderManager;
+import com.example.Flux.Implementations.SynchronizedOrderManager;
 import com.example.Persistance.Implementations.*;
 import com.example.Persistance.Interfaces.*;
 import com.google.gson.Gson;

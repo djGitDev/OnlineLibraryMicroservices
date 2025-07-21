@@ -45,6 +45,6 @@
     ]
   },
   {
-    "action": "place_order_with_auto_delivery"
+    "action": "place_order_with_delivery"
   }
 ]

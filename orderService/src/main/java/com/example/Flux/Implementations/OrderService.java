@@ -67,5 +67,10 @@ public class OrderService implements IOrderService {
         return cartService.getTotalPrice(cartId);
     }
 
+    @Override
+    public JsonObject displayOrders() {
+        return orderEntityService.displayOrders();
+    }
+
 
 }

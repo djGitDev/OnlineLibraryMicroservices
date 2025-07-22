@@ -1,7 +1,8 @@
 package com.onlineLibrary.order.Flux.Implementations;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.CartItem;
 import com.onlineLibrary.order.Entities.OrderLine;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderLineService;
 import com.onlineLibrary.order.Persistance.Interfaces.IOrderLineRepository;
@@ -24,11 +25,14 @@ public class OrderLineService implements IOrderLineService {
 
 
     @Override
-    public List<OrderLine> convertCartItemsToOrderLines(List<CartItem> cartItems, int orderId) throws Exception {
+    public List<OrderLine> convertCartItemsToOrderLines(JsonArray cartItems, int orderId) throws Exception {
         List<OrderLine> orderLines = new ArrayList<>();
 
-        for (CartItem item : cartItems) {
-            OrderLine orderLine = new OrderLine(orderId,item.getBookId(),item.getQuantity());
+        for (JsonElement item : cartItems) {
+            JsonObject itemObj = item.getAsJsonObject();
+            int bookId = itemObj.get("bookId").getAsInt();
+            int quantity = itemObj.get("quantity").getAsInt();
+            OrderLine orderLine = new OrderLine(orderId,bookId,quantity);
             orderLine.setStatutLivraison("En attente de livraison");
             orderLine.setDateLivraisonEffective(LocalDateTime.now().plusSeconds(10));
             int orderLineId = orderLineRepository.save(orderId,orderLine);

@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "services-order", url = "${services-order.url}")
 public interface OrderMicroservicesClient {
 
-    @GetMapping(path = "/api/order/carts/{cartId}/total-price", consumes = "application/json")
-    ResponseEntity<JsonObject> callGetTotalPriceCart(@PathVariable("cartId") int cartId);
-
 
     @PostMapping(
             value = "/api/order/{userId}/place-order",

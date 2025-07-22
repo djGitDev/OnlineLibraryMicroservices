@@ -1,10 +1,7 @@
 
 package com.onlineLibrary.orchestre.ControllersWorkFlows;
 
-import com.onlineLibrary.orchestre.Flux.Handlers.InventaryHandler;
-import com.onlineLibrary.orchestre.Flux.Handlers.OrderHandler;
-import com.onlineLibrary.orchestre.Flux.Handlers.PaymentHandler;
-import com.onlineLibrary.orchestre.Flux.Handlers.ProfilHandler;
+import com.onlineLibrary.orchestre.Flux.Handlers.*;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -24,17 +21,25 @@ public class WorkFlowProcessController {
 
     private ProfilHandler profilHandler;
     private InventaryHandler inventaryHandler;
+    private CartHandler cartHandler;
     private OrderHandler orderHandler;
     private PaymentHandler paymentHandler;
     private WorkFlowStateManager workFlowStateManager;
 
-    @Autowired
-    public void setProfilHandler(ProfilHandler profilHandler) {}
+    
 
     @Autowired
-    public WorkFlowProcessController(ProfilHandler profilHandler, InventaryHandler inventaryHandler, OrderHandler orderHandler, PaymentHandler paymentHandler,WorkFlowStateManager workFlowStateManager) {
+    public WorkFlowProcessController(
+            ProfilHandler profilHandler,
+            InventaryHandler inventaryHandler,
+            CartHandler cartHandler,
+            OrderHandler orderHandler,
+            PaymentHandler paymentHandler,
+            WorkFlowStateManager workFlowStateManager
+    ) {
         this.profilHandler = profilHandler;
         this.inventaryHandler = inventaryHandler;
+        this.cartHandler = cartHandler;
         this.orderHandler = orderHandler;
         this.paymentHandler = paymentHandler;
         this.workFlowStateManager = workFlowStateManager;
@@ -113,14 +118,14 @@ public class WorkFlowProcessController {
                     result = inventaryHandler.handleDecreaseBookQuantity(task);
                     break;
                 case "add_to_cart_from_research":
-                    result = orderHandler.handleAddToCartFromResearch(task);
+                    result = cartHandler.handleAddToCartFromResearch(task);
                     workFlowStateManager.setCurrentCartId(result.get("cartId").getAsInt());
                     break;
                 case "clear_cart":
-                    result = orderHandler.handleClearCart();
+                    result = cartHandler.handleClearCart();
                     break;
                 case "clear_books":
-                    result = orderHandler.handleClearBooks(task);
+                    result = cartHandler.handleClearBooks(task);
                     break;
                 case "place_order":
                     result = orderHandler.handlePlaceOrder();

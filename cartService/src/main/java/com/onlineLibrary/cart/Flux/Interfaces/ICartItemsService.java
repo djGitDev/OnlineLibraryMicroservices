@@ -1,7 +1,7 @@
-package com.onlineLibrary.order.Flux.Interfaces;
+package com.onlineLibrary.cart.Flux.Interfaces;
 
 import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.CartItem;
+import com.onlineLibrary.cart.Entities.CartItem;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,9 +1,9 @@
-package com.onlineLibrary.order.Flux.Implementations;
+package com.onlineLibrary.cart.Flux.Implementations;
 
 import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.CartItem;
-import com.onlineLibrary.order.Flux.Interfaces.ICartItemsService;
-import com.onlineLibrary.order.Persistance.Interfaces.ICartItemRepository;
+import com.onlineLibrary.cart.Entities.CartItem;
+import com.onlineLibrary.cart.Flux.Interfaces.ICartItemsService;
+import com.onlineLibrary.cart.Persistance.Interfaces.ICartItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,6 @@ public class CartItemService implements ICartItemsService {
     public Optional<CartItem> cartItemExists(int cartId, int bookId) throws Exception {
         return cartItemRepository.findByCartIdAndBookId(cartId,bookId);
     }
-
-
 
 
     @Override

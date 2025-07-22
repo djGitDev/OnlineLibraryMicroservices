@@ -1,6 +1,5 @@
 package com.onlineLibrary.orchestre.Flux.Handlers;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.orchestre.Flux.MicroservicesClients.OrderMicroservicesClient;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
@@ -25,23 +24,6 @@ public class OrderHandler {
 
     }
 
-
-    public JsonObject handleAddToCartFromResearch(JsonObject task) throws Exception {
-        String serializedPrices = new Gson().toJson(workFlowStateManager.getSearchedBooksIdsWithPrice());
-        ResponseEntity<JsonObject> responseAddBooks = orderMicroserviceClient.addSearchedItems(workFlowStateManager.getLastUserId(), task, serializedPrices);
-        JsonObject responseBody = responseAddBooks.getBody();
-        return responseBody;
-    }
-
-    public JsonObject handleClearCart() throws Exception {
-        ResponseEntity<JsonObject> responseClearCart = orderMicroserviceClient.callClearCart(workFlowStateManager.getLastUserId());
-        return responseClearCart.getBody();
-    }
-
-    public JsonObject handleClearBooks(JsonObject task) throws Exception {
-        ResponseEntity<JsonObject> responseClearBooks = orderMicroserviceClient.callClearBooks(workFlowStateManager.getLastUserId(), task);
-        return responseClearBooks.getBody();
-    }
 
     public JsonObject handlePlaceOrder() throws Exception {
         ResponseEntity<JsonObject> responseOrder = orderMicroserviceClient.callPlaceOrder(workFlowStateManager.getLastUserId(), false);

@@ -1,6 +1,9 @@
-package com.onlineLibrary.orchestre.Config;
+package com.onlineLibrary.cart.config;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.onlineLibrary.cart.Persistance.Implementations.PostgresDBConnection;
+import com.onlineLibrary.cart.Persistance.Interfaces.IDBConnection;
 import feign.codec.Encoder;
 import feign.gson.GsonEncoder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -41,11 +44,11 @@ public class GsonConfig {
         }
     }
 
+    // Configuration client (Feign)
     @Configuration
-    @EnableFeignClients(basePackages = "com.onlineLibrary.orchestre.Flux.MicroservicesClients")
+    @EnableFeignClients(basePackages = "com.onlineLibrary.cart.Flux.Interfaces")
     public static class FeignConfig {
         private final Gson gson;
-
 
         public FeignConfig(Gson gson) {
             this.gson = gson;
@@ -55,6 +58,18 @@ public class GsonConfig {
         public Encoder feignEncoder() {
             return new GsonEncoder(gson); // Utilise l'instance configurée
         }
+    }
+
+
+    @Configuration
+    public class BeanConfig {
+
+
+        @Bean
+        public IDBConnection dbConnection() {
+            return new PostgresDBConnection();
+        }
+
 
     }
 

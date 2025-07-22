@@ -1,8 +1,8 @@
-package com.onlineLibrary.order.Persistance.Implementations;
+package com.onlineLibrary.cart.Persistance.Implementations;
 
-import com.onlineLibrary.order.Entities.CartItem;
-import com.onlineLibrary.order.Persistance.Interfaces.ICartItemRepository;
-import com.onlineLibrary.order.Persistance.Interfaces.IDBConnection;
+import com.onlineLibrary.cart.Entities.CartItem;
+import com.onlineLibrary.cart.Persistance.Interfaces.ICartItemRepository;
+import com.onlineLibrary.cart.Persistance.Interfaces.IDBConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

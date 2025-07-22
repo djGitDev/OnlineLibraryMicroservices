@@ -1,4 +1,4 @@
-package com.onlineLibrary.order;
+package com.onlineLibrary.cart;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,46 +58,26 @@ public final class InitDB {
 
     private static void executeDDL(Statement stmt) throws SQLException {
         String[] ddlScripts = {
-
-                // Orders table -
+                // Carts table - CORRIGÉ (virgule en trop après user_id)
                 """
-    CREATE TABLE IF NOT EXISTS orders (
+    CREATE TABLE IF NOT EXISTS carts (
        id SERIAL PRIMARY KEY,
-       user_id INT NOT NULL,
-       order_date DATE NOT NULL
+       user_id INT NOT NULL
     );
     """,
 
-                // Order lines table -
+                // Cart items table - CORRIGÉ (bonne syntaxe)
                 """
-    CREATE TABLE IF NOT EXISTS order_lines (
-       id SERIAL PRIMARY KEY,
-       order_id INT NOT NULL,
-       book_id INT NOT NULL,
-       quantity INT NOT NULL CHECK (quantity > 0),
-       delivery_status VARCHAR(50) DEFAULT 'Pending',
-       delivery_date DATE,
-       FOREIGN KEY (order_id) REFERENCES orders(id)
-    );
-    """,
-
-                // Deliveries table -
-                """
-    CREATE TABLE IF NOT EXISTS deliveries (
-       id SERIAL PRIMARY KEY,
-       order_id INTEGER NOT NULL,
-       street VARCHAR(255) NOT NULL,
-       city VARCHAR(255) NOT NULL,
-       postal_code VARCHAR(50) NOT NULL,
-       province VARCHAR(100) NOT NULL,
-       country VARCHAR(100) NOT NULL,
-       scheduled_date DATE NOT NULL,
-       actual_date DATE,
-       status VARCHAR(50) NOT NULL,
-       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-       FOREIGN KEY (order_id) REFERENCES orders(id)
+    CREATE TABLE IF NOT EXISTS cart_items (
+         id SERIAL PRIMARY KEY,
+         cart_id INT NOT NULL,
+         book_id INT NOT NULL,
+         quantity INT NOT NULL CHECK (quantity > 0),
+         book_price DOUBLE PRECISION NOT NULL CHECK (book_price > 0),
+         FOREIGN KEY (cart_id) REFERENCES carts(id)
     );
     """
+
         };
 
         for (String ddl : ddlScripts) {

@@ -1,16 +1,17 @@
 package com.onlineLibrary.order.Flux.Implementations;
 
 
+import com.google.gson.JsonElement;
 import com.onlineLibrary.order.Entities.*;
 import com.onlineLibrary.order.Flux.Interfaces.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.order.Persistance.Interfaces.IOrderEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -19,15 +20,22 @@ public class OrderEntityService implements IOrderEntityService {
 
 
     private InventaryMicroservicesClient microserviceClient;
-    private ICartService cartService;
+    private CartMicroservicesClient cartMicroservicesClient;
+
     private IOrderLineService orderLineService;
     private IDeliveryService deliveryService;
     private IOrderEntityRepository orderEntityRepository;
 
     @Autowired
-    public OrderEntityService(InventaryMicroservicesClient microserviceClient, ICartService cartService,IOrderLineService orderLineService,IDeliveryService deliveryService,IOrderEntityRepository orderEntityRepository) {
+    public OrderEntityService
+            (InventaryMicroservicesClient microserviceClient,
+             CartMicroservicesClient cartMicroservicesClient,
+             IOrderLineService orderLineService,
+             IDeliveryService deliveryService,
+             IOrderEntityRepository orderEntityRepository
+            ) {
         this.microserviceClient = microserviceClient;
-        this.cartService = cartService;
+        this.cartMicroservicesClient = cartMicroservicesClient;
         this.orderLineService = orderLineService;
         this.deliveryService = deliveryService;
         this.orderEntityRepository = orderEntityRepository;
@@ -36,36 +44,32 @@ public class OrderEntityService implements IOrderEntityService {
 
     @Override
     public JsonObject createOrder(int userId, JsonObject jsonUserProfil) throws Exception {
-        Optional<Cart> cartOptional = cartService.getCart(userId);
+        ResponseEntity<JsonObject>  cart = cartMicroservicesClient.callGetCart(userId);
+        JsonObject responseCart = cart.getBody();
+        ResponseEntity<JsonObject>  cartItems = cartMicroservicesClient.callGetItems(responseCart.get("cartId").getAsInt());
+        JsonObject responseCartItems = cartItems.getBody();
+        JsonArray itemsArray = responseCartItems.getAsJsonArray("items");
+        for (JsonElement element : itemsArray) {
+            JsonObject itemObj = element.getAsJsonObject();
 
-        if (!cartOptional.isPresent()) {
-            throw new Exception("Aucun panier trouvé pour l'utilisateur : " + userId);
-        }
-
-        Cart cart = cartOptional.get();
-        List<CartItem> cartItems = cartService.getItems(cart.getId());
-
-        for (CartItem item : cartItems) {
-            int bookId = item.getBookId();
-            int quantity = item.getQuantity();
+            int bookId = itemObj.get("bookId").getAsInt();
+            int quantity = itemObj.get("quantity").getAsInt();
             microserviceClient.callDecreaseBookQuantity(bookId,quantity);
-
-        }
-        if (cartItems.isEmpty()) {
-            throw new Exception("Le panier est vide, impossible de créer une commande.");
         }
 
         // Création de la commande
         Order order = new Order(userId);
         int orderId = orderEntityRepository.save(order);
-        List<OrderLine> orderLines = orderLineService.convertCartItemsToOrderLines(cartItems, orderId);
+        List<OrderLine> orderLines = orderLineService.convertCartItemsToOrderLines(itemsArray, orderId);
         order.setLignes(orderLines);
 
         // Planification de la livraison
-        Delivery delivery = deliveryService.planifierLivraison(order.getId(), jsonUserProfil);
+        Delivery delivery = deliveryService.scheduleDelivery(order.getId(), jsonUserProfil);
 
         // Nettoyage du panier
-        JsonObject cartClearedInfo = cartService.clearCart(userId);
+        ResponseEntity<JsonObject> responseCartClearedInfo = cartMicroservicesClient.callClearCart(userId);
+        JsonObject cartClearedInfo = responseCartClearedInfo.getBody();
+
 
         // Construction de la réponse JSON
         JsonObject response = new JsonObject();

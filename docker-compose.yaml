@@ -94,6 +94,20 @@ services:
     depends_on:
       - dbOrder
 
+  cart:
+    build: ./cartService
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://dbOrder:5432/CartServiceDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mypass
+    networks:
+      - app-network
+    depends_on:
+      - dbCart    
+
   dbProfil:
     image: postgres:17-alpine
     container_name: db-profil
@@ -102,9 +116,9 @@ services:
       POSTGRES_DB: ProfilServiceDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256  # Méthode d'authentification sécurisée
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
     ports:
-      - "5432:5432"  # Exposition du port pour accès externe
+      - "5432:5432"  
     volumes:
       - pgProfilData:/var/lib/postgresql/data
     networks:
@@ -177,6 +191,27 @@ services:
       timeout: 5s
       retries: 5 
 
+  dbCart:
+    image: postgres:17-alpine
+    container_name: db-cart
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: CartServiceDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgCartData:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d CartServiceDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5     
+
 
 networks:
   app-network:
@@ -187,4 +222,6 @@ volumes:
   pgInventaryData:
   pgOrderData:
   pgPaymentData:
+  pgCartData:
+
 

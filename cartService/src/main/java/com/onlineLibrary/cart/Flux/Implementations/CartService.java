@@ -1,13 +1,13 @@
-package com.onlineLibrary.order.Flux.Implementations;
+package com.onlineLibrary.cart.Flux.Implementations;
 
-import com.onlineLibrary.order.Flux.Interfaces.InventaryMicroservicesClient;
+import com.onlineLibrary.cart.Flux.Interfaces.InventaryMicroservicesClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.Cart;
-import com.onlineLibrary.order.Entities.CartItem;
-import com.onlineLibrary.order.Flux.Interfaces.ICartItemsService;
-import com.onlineLibrary.order.Flux.Interfaces.ICartService;
-import com.onlineLibrary.order.Persistance.Interfaces.ICartRepository;
+import com.onlineLibrary.cart.Entities.Cart;
+import com.onlineLibrary.cart.Entities.CartItem;
+import com.onlineLibrary.cart.Flux.Interfaces.ICartItemsService;
+import com.onlineLibrary.cart.Flux.Interfaces.ICartService;
+import com.onlineLibrary.cart.Persistance.Interfaces.ICartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -127,18 +127,26 @@ public class CartService implements ICartService {
         return response;
     }
 
+//    @Override
+//    public Optional<Cart> getCart(int userId) throws Exception {
+//        return cartRepository.findByUserId(userId);
+//    }
+
     @Override
-    public Optional<Cart> getCart(int userId) throws Exception {
-        return cartRepository.findByUserId(userId);
+    public JsonObject getCart(int userId) throws Exception {
+        Optional<Cart> optionalCart = cartRepository.findByUserId(userId);
+        Cart cart = optionalCart.get();
+        return convertCartToJson(cart);
     }
 
     @Override
-    public List<CartItem> getItems(int id) throws Exception {
-        return cartItemService.getItems(id);
+    public JsonObject getItems(int id) throws Exception {
+        List<CartItem> cartItems = cartItemService.getItems(id);
+        return convertCartItemsToJson(id, cartItems);
     }
 
     @Override
-    public JsonObject addSearchedItems(int userId, JsonArray books, Map<Integer, Double> searchedBooksIds) throws Exception {
+    public JsonObject addSearchedItemsToCart(int userId, JsonArray books, Map<Integer, Double> searchedBooksIds) throws Exception {
         Optional<Cart> optionalCart = cartRepository.findByUserId(userId);
         Cart cart;
         if (optionalCart.isPresent()) {
@@ -197,5 +205,28 @@ public class CartService implements ICartService {
     @Override
     public JsonObject getTotalPrice(int cartId) throws Exception {
         return cartItemService.getTotalPrice(cartId);
+    }
+
+    private JsonObject convertCartToJson(Cart cart) {
+        JsonObject json = new JsonObject();
+        json.addProperty("cartId", cart.getId());
+        return json;
+    }
+
+    public JsonObject convertCartItemsToJson(int cartId, List<CartItem> cartItems) {
+        JsonArray itemsArray = new JsonArray();
+
+        for (CartItem item : cartItems) {
+            JsonObject itemJson = new JsonObject();
+            itemJson.addProperty("bookId", item.getBookId());
+            itemJson.addProperty("quantity", item.getQuantity());
+            itemsArray.add(itemJson);
+        }
+
+        JsonObject result = new JsonObject();
+        result.addProperty("cartId", cartId);
+        result.add("items", itemsArray);
+
+        return result;
     }
 }

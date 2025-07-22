@@ -1,41 +1,28 @@
 package com.onlineLibrary.order.Flux.Implementations;
-
-import com.onlineLibrary.order.Flux.Interfaces.ICartService;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderEntityService;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderService;
 import com.onlineLibrary.order.Flux.Interfaces.ProfilMicroservicesClient;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 
 @Service
 public class OrderService implements IOrderService {
 
     private ProfilMicroservicesClient profilMicroservicesClient;
-    private ICartService cartService;
     private IOrderEntityService orderEntityService;
 
     @Autowired
-    public OrderService(ProfilMicroservicesClient microserviceClient, ICartService cartService,IOrderEntityService orderEntityService) {
+    public OrderService
+            (ProfilMicroservicesClient microserviceClient,
+             IOrderEntityService orderEntityService
+            ) {
         this.profilMicroservicesClient = microserviceClient;
-        this.cartService = cartService;
         this.orderEntityService = orderEntityService;
     }
 
-    @Override
-    public JsonObject clearCart(int userId) throws Exception {
-        return cartService.clearCart(userId);
-    }
-
-    @Override
-    public JsonObject clearBooks(int userId, JsonObject data ) {
-        JsonArray books = data.getAsJsonArray("books");
-        return cartService.clearBooks(userId, books);
-    }
 
     @Override
     public JsonObject placeOrder(int userId,boolean autoDelivery) throws Exception {
@@ -59,15 +46,6 @@ public class OrderService implements IOrderService {
         return orderEntityService.displayOrders();
     }
 
-    @Override
-    public JsonObject addSearchedItemsToCart(int userId, JsonObject data , Map<Integer,Double> searchedBooksIds) throws Exception {
-        JsonArray books = data.getAsJsonArray("books");
-        return cartService.addSearchedItems(userId, books,searchedBooksIds);    }
-
-    @Override
-    public JsonObject getTotalPriceCart(int cartId) throws Exception {
-        return cartService.getTotalPrice(cartId);
-    }
 
     @Override
     public JsonObject displayOrders() {

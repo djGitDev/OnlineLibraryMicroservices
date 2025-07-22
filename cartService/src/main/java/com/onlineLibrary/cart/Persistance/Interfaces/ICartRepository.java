@@ -1,6 +1,6 @@
-package com.onlineLibrary.order.Persistance.Interfaces;
+package com.onlineLibrary.cart.Persistance.Interfaces;
 
-import com.onlineLibrary.order.Entities.Cart;
+import com.onlineLibrary.cart.Entities.Cart;
 
 import java.util.Optional;
 

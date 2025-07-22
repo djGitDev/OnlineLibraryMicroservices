@@ -22,7 +22,7 @@ public class DeliveryService implements IDeliveryService {
     }
 
     @Override
-    public Delivery planifierLivraison(int orderId, JsonObject adresse) throws Exception {
+    public Delivery scheduleDelivery(int orderId, JsonObject adresse) throws Exception {
          Delivery delivery = new Delivery(orderId);
          delivery.setAdresse(adresse);
          int deliveryId = deliveryRepository.save(delivery);

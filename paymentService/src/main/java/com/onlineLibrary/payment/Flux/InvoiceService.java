@@ -12,19 +12,20 @@ import static java.time.LocalDate.now;
 @Service
 public class InvoiceService implements IInvoiceService {
 
-    private OrderMicroservicesClient  orderMicroservicesClient;
+    private CartMicroservicesClient  cartMicroservicesClient;
+
     private IInvoiceRepository invoiceRepository;
 
     @Autowired
-    public InvoiceService(OrderMicroservicesClient  orderMicroservicesClient, IInvoiceRepository invoiceRepository) {
-        this.orderMicroservicesClient = orderMicroservicesClient;
+    public InvoiceService(CartMicroservicesClient  cartMicroservicesClient, IInvoiceRepository invoiceRepository) {
+        this.cartMicroservicesClient = cartMicroservicesClient;
         this.invoiceRepository = invoiceRepository;
     }
 
 
     @Override
     public JsonObject generateInvoice(int cartId) throws Exception {
-        ResponseEntity<JsonObject> response = orderMicroservicesClient.callGetTotalPriceCart(cartId);
+        ResponseEntity<JsonObject> response = cartMicroservicesClient.callGetTotalPriceCart(cartId);
         JsonObject jsonTotalPrice =  response.getBody().getAsJsonObject();
         double totalPrice = jsonTotalPrice.get("total_price").getAsDouble();
         Invoice invoice = new Invoice(now(), totalPrice);

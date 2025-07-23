@@ -1,26 +1,26 @@
 <#
 .SYNOPSIS
-    Nettoie un conteneur Docker et son image en spécifiant directement l'ID et le nom de l'image
+    Cleans up a Docker container and its image by directly specifying the ID and image name
 #>
 
-# Affiche les conteneurs actifs avec leurs images
+# Display running containers with their images
 docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Names}}"
 
-# Demande les infos nécessaires
-$containerId = Read-Host "`nEntrez l'ID du conteneur a supprimer"
-$imageName = Read-Host "Entrez le nom de l'image à supprimer (laisser vide pour ignorer)"
+# Prompt for required information
+$containerId = Read-Host "`nEnter the container ID to remove"
+$imageName = Read-Host "Enter the image name to remove (leave empty to skip)"
 
-# Arrête et supprime le conteneur
+# Stop and remove the container
 docker stop $containerId
 docker rm $containerId
 
-# Supprime l'image si spécifiée
+# Remove the image if specified
 if ($imageName) {
     docker rmi $imageName
 }
 
-Write-Host "`nOperation terminee :" -ForegroundColor Green
-Write-Host "- Conteneur $containerId supprime"
+Write-Host "`nOperation completed:" -ForegroundColor Green
+Write-Host "- Container $containerId removed"
 if ($imageName) {
-    Write-Host "- Image $imageName supprimee"
+    Write-Host "- Image $imageName removed"
 }

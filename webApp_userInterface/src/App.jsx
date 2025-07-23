@@ -7,7 +7,7 @@ function App() {
     const [content, setContent] = useState(null);
     const [apiResponse, setApiResponse] = useState(null); // Nouvel état pour la réponse API
     const [isProcessing, setIsProcessing] = useState(false); // État pour le loading
-    const backendUrl = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL || 'http://localhost:8080/api/workflow';
+    const backendUrl = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL || 'http://localhost:80/api/workflow';
 
     useEffect(() => {
         fetch("/workFlowsScenarios/files.json")

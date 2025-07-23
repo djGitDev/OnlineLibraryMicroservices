@@ -1,26 +1,24 @@
-# Script de nettoyage Docker simplifié
-Write-Host "Nettoyage Docker en cours..." -ForegroundColor Yellow
+# Simplified Docker cleanup script
+Write-Host "Docker cleanup in progress..." -ForegroundColor Yellow
 
-# 1. Nettoyer les volumes
+# 1. Clean up volumes
 docker volume prune -f
 
-# 2. Arrêter tous les conteneurs
+# 2. Stop all containers
 docker stop $(docker ps -aq)
 
-# 3. Supprimer tous les conteneurs
+# 3. Remove all containers
 docker rm $(docker ps -aq)
 
-Write-Host "Nettoyage des conteuneurs en execution terminé!" -ForegroundColor Green
+Write-Host "Container cleanup completed!" -ForegroundColor Green
 
-#4. lancer docker compose
+# 4. Start docker compose
 docker compose up -d
 
-#5. afficher lles conteneurs en mode running
+# 5. Show running containers
 Write-Host "Running containers" -ForegroundColor Green
-
 docker ps
 
-#6. afficher les conteuneurs arretes
+# 6. Show stopped containers
 Write-Host "Stopped containers" -ForegroundColor Red
-
 docker ps -a --filter "status=exited"

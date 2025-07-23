@@ -10,8 +10,8 @@ public class OrderLine {
     private int orderId;
     private int bookId;
     private int quantity;
-    private String statutLivraison = "En attente de livraison";
-    private LocalDate dateLivraisonEffective;
+    private String DeliveryStatut = "PENDING DELIVERY";
+    private LocalDate EffectifDeliveryDate;
 
     public OrderLine() {
     }
@@ -22,11 +22,11 @@ public class OrderLine {
         this.quantity = quantity;
     }
 
-    public int getLivreId() {
+    public int getBookId() {
         return bookId;
     }
 
-    public int getQuantite() {
+    public int getQuantity() {
         return quantity;
     }
 
@@ -34,19 +34,19 @@ public class OrderLine {
         this.quantity = quantity;
     }
 
-    public String getStatutLivraison() {
-        return statutLivraison;
+    public String getDeliveryStatut() {
+        return DeliveryStatut;
     }
 
-    public void setStatutLivraison(String statutLivraison) {
-        this.statutLivraison = statutLivraison;
+    public void setDeliveryStatut(String deliveryStatut) {
+        this.DeliveryStatut = deliveryStatut;
     }
 
-    public LocalDate getDateLivraisonEffective() {
-        return dateLivraisonEffective;
+    public LocalDate getEffectifDeliveryDate() {
+        return EffectifDeliveryDate;
     }
 
-    public void setDateLivraisonEffective(LocalDateTime localDateTime) {
+    public void setEffectifDeliveryDate(LocalDateTime localDateTime) {
         localDateTime = localDateTime;
     }
 

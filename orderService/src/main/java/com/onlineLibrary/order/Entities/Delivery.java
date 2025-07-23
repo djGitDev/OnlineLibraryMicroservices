@@ -9,7 +9,7 @@ public class Delivery {
     private int id;
     private int orderId;
     private LocalDate datePrevue;
-    private LocalDate dateEffective;
+    private LocalDate EffectifDate;
     private String statut = "PENDING"; // Prévue,Livrée
     private String street;
     private String city;
@@ -43,7 +43,7 @@ public class Delivery {
 
 
     public LocalDate getActualDate() {
-        return dateEffective;
+        return EffectifDate;
     }
 
 

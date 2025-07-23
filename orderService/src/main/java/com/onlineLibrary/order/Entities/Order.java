@@ -9,7 +9,7 @@ public class Order {
 
     private int id;
     private int userId;
-    private LocalDate dateCommande;
+    private LocalDate orderDate;
     private List<OrderLine> lignes = new ArrayList<>();
 
 
@@ -18,7 +18,7 @@ public class Order {
 
     public Order(int userId) {
         this.userId = userId;
-        this.dateCommande = LocalDate.now(); // Date du jour automatiquement
+        this.orderDate = LocalDate.now(); // Date du jour automatiquement
     }
 
     public int getId() {

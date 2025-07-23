@@ -1,4 +1,3 @@
-
 package com.onlineLibrary.order.Persistance.Implementations;
 
 import com.onlineLibrary.order.Persistance.Interfaces.IDBConnection;
@@ -26,31 +25,29 @@ public class PostgresDBConnection implements IDBConnection {
 
 
             if (input == null) {
-                System.err.println("❌ ERREUR: Fichier application.properties introuvable dans le classpath!");
-                throw new RuntimeException("Fichier application.properties introuvable dans les ressources !");
+                System.err.println("❌ ERROR: application.properties file not found in the classpath!");
+                throw new RuntimeException("application.properties file not found in resources!");
             }
 
             props.load(input);
 
-            // Debug des propriétés lues
-            System.out.println("📋 Propriétés lues:");
+            // Debug loaded properties
+            System.out.println("📋 Loaded properties:");
             props.forEach((k, v) -> System.out.println("  " + k + " = " + v));
 
             this.url = props.getProperty("spring.datasource.url");
             this.username = props.getProperty("spring.datasource.username");
             this.password = props.getProperty("spring.datasource.password");
 
-
-
             if (url == null || username == null || password == null) {
-                throw new RuntimeException("Configuration de base de données incomplète dans application.properties");
+                throw new RuntimeException("Incomplete database configuration in application.properties");
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Erreur de lecture du fichier de configuration : " + e.getMessage(), e);
+            throw new RuntimeException("Error reading configuration file: " + e.getMessage(), e);
         }
 
-        System.out.println("✅ PostgresDBConnection initialisé avec succès");
+        System.out.println("✅ PostgresDBConnection successfully initialized");
     }
 
     @Override
@@ -65,7 +62,7 @@ public class PostgresDBConnection implements IDBConnection {
                 throw e;
             }
         } else {
-            System.out.println("ℹ Utilisation de la connexion existante");
+            System.out.println("ℹ Using existing connection");
         }
 
         return connection;
@@ -76,9 +73,9 @@ public class PostgresDBConnection implements IDBConnection {
         if (connection != null && !connection.isClosed()) {
             connection.close();
             connection = null;
-            System.out.println("✅ Connexion fermée.");
+            System.out.println("✅ Connection closed.");
         } else {
-            System.out.println("ℹ Aucune connexion active à fermer");
+            System.out.println("ℹ No active connection to close");
         }
     }
 }

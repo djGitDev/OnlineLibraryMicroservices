@@ -15,17 +15,17 @@ public final class InitDB {
     }
 
     private InitDB() {
-        throw new AssertionError("Cette classe ne doit pas être instanciée");
+        throw new AssertionError("This class should not be initilized");
     }
 
     private static void loadProperties() {
         try (InputStream input = InitDB.class.getResourceAsStream(PROPERTIES_FILE)) {
             if (input == null) {
-                throw new RuntimeException("Fichier " + PROPERTIES_FILE + " non trouvé");
+                throw new RuntimeException("File " + PROPERTIES_FILE + " not founder");
             }
             props.load(input);
         } catch (IOException e) {
-            throw new RuntimeException("Erreur de lecture du fichier de configuration", e);
+            throw new RuntimeException("Error reading config file", e);
         }
     }
 
@@ -33,7 +33,7 @@ public final class InitDB {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            throw new ExceptionInInitializerError("Driver PostgreSQL non trouvé");
+            throw new ExceptionInInitializerError("Driver PostgreSQL not found");
         }
     }
 
@@ -43,16 +43,16 @@ public final class InitDB {
         String password = props.getProperty("spring.datasource.password");
 
         if (url == null || username == null || password == null) {
-            throw new SQLException("Configuration DB incomplète dans application.properties");
+            throw new SQLException("incomplete DB configuration in application.properties");
         }
 
-        System.out.println("[InitDB] Initialisation de la base de données...");
+        System.out.println("[InitDB] Init database..");
 
         try (Connection conn = DriverManager.getConnection(url, username, password);
              Statement stmt = conn.createStatement()) {
 
             executeDDL(stmt);
-            System.out.println("[InitDB] Base initialisée avec succès");
+            System.out.println("[InitDB] database initialized");
         }
     }
 

@@ -57,25 +57,25 @@ public class OrderEntityService implements IOrderEntityService {
             microserviceClient.callDecreaseBookQuantity(bookId,quantity);
         }
 
-        // Création de la commande
+        // create order
         Order order = new Order(userId);
         int orderId = orderEntityRepository.save(order);
         List<OrderLine> orderLines = orderLineService.convertCartItemsToOrderLines(itemsArray, orderId);
         order.setLignes(orderLines);
 
-        // Planification de la livraison
+        // plan delivery
         Delivery delivery = deliveryService.scheduleDelivery(order.getId(), jsonUserProfil);
 
-        // Nettoyage du panier
+        // clean cart
         ResponseEntity<JsonObject> responseCartClearedInfo = cartMicroservicesClient.callClearCart(userId);
         JsonObject cartClearedInfo = responseCartClearedInfo.getBody();
 
 
-        // Construction de la réponse JSON
+        // build JSON response
         JsonObject response = new JsonObject();
         response.addProperty("orderId", orderId);
         response.addProperty("deliveryId", delivery.getId());
-        response.add("cartClearedInfo", cartClearedInfo); // Ajoute tout l'objet JSON de confirmation
+        response.add("cartClearedInfo", cartClearedInfo);
 
         return response;
     }

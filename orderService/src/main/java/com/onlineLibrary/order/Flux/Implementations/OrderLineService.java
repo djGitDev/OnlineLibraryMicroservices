@@ -33,8 +33,8 @@ public class OrderLineService implements IOrderLineService {
             int bookId = itemObj.get("bookId").getAsInt();
             int quantity = itemObj.get("quantity").getAsInt();
             OrderLine orderLine = new OrderLine(orderId,bookId,quantity);
-            orderLine.setStatutLivraison("En attente de livraison");
-            orderLine.setDateLivraisonEffective(LocalDateTime.now().plusSeconds(10));
+            orderLine.setDeliveryStatut("PENDING DELIVERY");
+            orderLine.setEffectifDeliveryDate(LocalDateTime.now().plusSeconds(10));
             int orderLineId = orderLineRepository.save(orderId,orderLine);
             orderLine.setId(orderLineId);
             orderLines.add(orderLine);

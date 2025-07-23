@@ -26,26 +26,6 @@ public class OrderRestController {
         this.orderService = orderService;
     }
 
-//    @DeleteMapping("/{userId}/clear-cart")
-//    public ResponseEntity<JsonObject> clearCart(@PathVariable int userId) {
-//        try {
-//            logger.info("Clearing cart for user: {}", userId);
-//            JsonObject result = orderService.clearCart(userId);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error clearing cart for user: {}", userId, e);
-//            return errorResponse(e);
-//        }
-//    }
-//
-//    @DeleteMapping("/{userId}/clear-books")
-//    public ResponseEntity<JsonObject> clearBooks(
-//            @PathVariable int userId,
-//            @RequestBody JsonObject requestBody) {
-//        logger.info("Clearing specific books for user: {}", userId);
-//        JsonObject result = orderService.clearBooks(userId, requestBody);
-//        return ResponseEntity.ok(result);
-//    }
 
     @PostMapping("/{userId}/place-order")
     public ResponseEntity<JsonObject> placeOrder(
@@ -74,35 +54,7 @@ public class OrderRestController {
         JsonObject result = orderService.displayAllOrders();
         return ResponseEntity.ok(result);
     }
-
-//    @PostMapping("/{userId}/add-searched-items")
-//    public ResponseEntity<JsonObject> addSearchedItems(
-//            @PathVariable int userId,
-//            @RequestBody JsonObject requestBody,
-//            @RequestParam("prices") String pricesJson) {
-//
-//        try {
-//            logger.info("Adding searched items for user: {}", userId);
-//            Map<Integer, Double> bookPrices = deserializePrices(pricesJson);
-//            JsonObject result = orderService.addSearchedItemsToCart(userId, requestBody, bookPrices);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error adding searched items for user: {}", userId, e);
-//            return errorResponse(e);
-//        }
-//    }
-
-//    @GetMapping("/carts/{cartId}/total-price")
-//    public ResponseEntity<JsonObject> getCartTotal(@PathVariable int cartId) {
-//        try {
-//            logger.info("Getting total for cart: {}", cartId);
-//            JsonObject result = orderService.getTotalPriceCart(cartId);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error getting cart total for cart: {}", cartId, e);
-//            return errorResponse(e);
-//        }
-//    }
+    
 
     @GetMapping("/display-all")
     public ResponseEntity<JsonObject> displayAllOrders() {

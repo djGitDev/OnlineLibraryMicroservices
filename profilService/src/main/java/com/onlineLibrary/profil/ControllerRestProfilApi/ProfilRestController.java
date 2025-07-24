@@ -1,7 +1,9 @@
 package com.onlineLibrary.profil.ControllerRestProfilApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.profil.Flux.IProfilServiceDispatcher;
 import com.onlineLibrary.profil.UtilProfil.BeansInjectionFactory;
+import com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils;
 import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/profil")
@@ -23,13 +28,15 @@ public class ProfilRestController {
         this.dispatcher = factory.getProfilServiceDispatcher();
     }
 
-    @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<JsonObject> registerUser(@RequestBody JsonObject data) {
-        logger.info("Début de l'enregistrement utilisateur - Données reçues: {}", data);
+    @PostMapping(path = "/register")
+    public ResponseEntity<JsonNode> registerUser(@RequestBody JsonNode dataJacksson) throws Exception {
+        logger.info("Début de l'enregistrement utilisateur - Données reçues: {}", dataJacksson);
         try {
-            JsonObject result = dispatcher.handleRegistration(data);
-            logger.info("Enregistrement réussi - Résultat: {}", result);
-            ResponseEntity<JsonObject> response = ResponseEntity
+            JsonObject data = jacksonToGson(dataJacksson);
+            JsonObject resultGson = dispatcher.handleRegistration(data);
+            logger.info("Enregistrement réussi - Résultat: {}", resultGson);
+            JsonNode result = gsonToJackson(resultGson);
+            ResponseEntity<JsonNode> response = ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(result);
             debugResponse(response);
@@ -37,28 +44,33 @@ public class ProfilRestController {
             return response;
         } catch (Exception e) {
             logger.error("Échec de l'enregistrement - Erreur: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(errorJson(e));
+            return ResponseEntity.internalServerError().body(errorResponse(e).getBody());
         }
     }
 
-    @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<JsonObject> authentifyUser(@RequestBody JsonObject data) {
-        logger.info("Tentative de connexion - Données reçues: {}", data);
+    @PostMapping(path = "/login")
+    public ResponseEntity<JsonNode> authentifyUser(@RequestBody JsonNode dataJacksson) throws Exception {
+        logger.info("Tentative de connexion - Données reçues: {}", dataJacksson);
         try {
-            JsonObject result = dispatcher.handleLogin(data);
-            logger.info("Connexion réussie - Résultat: {}", result);
+            JsonObject data = jacksonToGson(dataJacksson);
+            JsonObject resultGson = dispatcher.handleLogin(data);
+            logger.info("Connexion réussie - Résultat: {}", resultGson);
+            JsonNode result = gsonToJackson(resultGson);
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.warn("Échec de la connexion - Erreur: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorJson(e));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse(e).getBody());
         }
     }
 
-    @GetMapping(path = "/{userId}", produces = "application/json")
-    public ResponseEntity<JsonObject> getUserProfil(@PathVariable int userId) {
+    @GetMapping(path = "/{userId}")
+    public ResponseEntity<JsonNode> getUserProfil(@PathVariable int userId) throws Exception {
         logger.info("Récupération du profil pour l'utilisateur ID: {}", userId);
         try {
-            JsonObject result = dispatcher.getProfile(userId);
+            JsonObject resultGson = dispatcher.getProfile(userId);
+            JsonNode result = gsonToJackson(resultGson);
+
             if (result == null) {
                 logger.warn("Profil non trouvé pour l'utilisateur ID: {}", userId);
                 return ResponseEntity.notFound().build();
@@ -67,15 +79,17 @@ public class ProfilRestController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération du profil - ID: {} - Erreur: {}", userId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(errorJson(e));
+            return ResponseEntity.internalServerError().body(errorResponse(e).getBody());
         }
     }
 
-    @GetMapping(path = "/data/{userId}", produces = "application/json")
-    public ResponseEntity<JsonObject> getUserData(@PathVariable int userId) {
+    @GetMapping(path = "/data/{userId}")
+    public ResponseEntity<JsonNode> getUserData(@PathVariable int userId) throws Exception {
         logger.info("Récupération des données pour l'utilisateur ID: {}", userId);
         try {
-            JsonObject result = dispatcher.getUserData(userId);
+            JsonObject resultGson = dispatcher.getUserData(userId);
+            JsonNode result = gsonToJackson(resultGson);
+
             if (result == null) {
                 logger.warn("Données non trouvées pour l'utilisateur ID: {}", userId);
                 return ResponseEntity.notFound().build();
@@ -84,15 +98,15 @@ public class ProfilRestController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des données - ID: {} - Erreur: {}", userId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(errorJson(e));
+            return ResponseEntity.internalServerError().body(errorResponse(e).getBody());
         }
     }
 
-    private JsonObject errorJson(Exception e) {
-        logger.debug("Création de la réponse d'erreur: {}", e.getMessage());
-        JsonObject json = new JsonObject();
-        json.addProperty("error", e.getMessage());
-        return json;
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 
     private void debugResponse(ResponseEntity<?> response) {

@@ -1,6 +1,8 @@
 package com.onlineLibrary.inventary.ControllerRestInventaryApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils;
 import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.inventary.Flux.IBookService;
@@ -8,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/books")
@@ -22,10 +27,12 @@ public class InventaryRestController {
     }
 
     @PostMapping
-    public ResponseEntity<JsonObject> addBooks(@RequestBody JsonObject booksJson) {
+    public ResponseEntity<JsonNode> addBooks(@RequestBody JsonNode booksJackson) throws Exception {
         try {
-            logger.info("Received request to add books: {}", booksJson);
-            JsonObject response = bookService.addManyBooks(booksJson);
+            logger.info("Received request to add books: {}", booksJackson);
+            JsonObject booksJson = jacksonToGson(booksJackson);
+            JsonObject resultGson = bookService.addManyBooks(booksJson);
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error adding books", e);
@@ -34,10 +41,11 @@ public class InventaryRestController {
     }
 
     @GetMapping
-    public ResponseEntity<JsonObject> getAllBooks() {
+    public ResponseEntity<JsonNode> getAllBooks() throws Exception {
         try {
             logger.info("Fetching all books");
-            JsonObject response = bookService.getBooks();
+            JsonObject resultGson = bookService.getBooks();
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching books", e);
@@ -46,12 +54,13 @@ public class InventaryRestController {
     }
 
     @PutMapping("/{id}/quantity")
-    public ResponseEntity<JsonObject> updateQuantity(
+    public ResponseEntity<JsonNode> updateQuantity(
             @PathVariable int id,
-            @RequestParam int quantity) {
+            @RequestParam int quantity) throws Exception {
         try {
             logger.info("Updating quantity for book ID {} with quantity {}", id, quantity);
-            JsonObject response = bookService.decreaseBookQuantity(id, quantity);
+            JsonObject resultGson = bookService.decreaseBookQuantity(id, quantity);
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error updating quantity for book ID {}", id, e);
@@ -60,10 +69,11 @@ public class InventaryRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<JsonObject> getBookById(@PathVariable int id) {
+    public ResponseEntity<JsonNode> getBookById(@PathVariable int id) throws Exception {
         try {
             logger.info("Fetching book by ID: {}", id);
-            JsonObject response = bookService.getBookById(id);
+            JsonObject resultGson = bookService.getBookById(id);
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching book by ID {}", id, e);
@@ -72,10 +82,11 @@ public class InventaryRestController {
     }
 
     @GetMapping("/research/{isbn}")
-    public ResponseEntity<JsonObject> getBookByIsbn( @PathVariable String isbn) {
+    public ResponseEntity<JsonNode> getBookByIsbn( @PathVariable String isbn) throws Exception {
         try {
             logger.info("Searching book by ISBN: {}", isbn);
-            JsonObject response = bookService.findBookByIsbn(isbn);
+            JsonObject resultGson = bookService.findBookByIsbn(isbn);
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error searching book by ISBN {}", isbn, e);
@@ -84,10 +95,11 @@ public class InventaryRestController {
     }
 
     @GetMapping("/search/title")
-    public ResponseEntity<JsonObject> getBookByTitle(@RequestParam String title) {
+    public ResponseEntity<JsonNode> getBookByTitle(@RequestParam String title) throws Exception {
         try {
             logger.info("Searching book by title: {}", title);
-            JsonObject response = bookService.findBookByTitle(title);
+            JsonObject resultGson = bookService.findBookByTitle(title);
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error searching book by title {}", title, e);
@@ -96,10 +108,11 @@ public class InventaryRestController {
     }
 
     @GetMapping("/unavailable")
-    public ResponseEntity<JsonObject> getUnavailableBooks() {
+    public ResponseEntity<JsonNode> getUnavailableBooks() throws Exception {
         try {
             logger.info("Fetching unavailable books");
-            JsonObject response = bookService.findUnavailableBooks();
+            JsonObject resultGson = bookService.findUnavailableBooks();
+            JsonNode response = gsonToJackson(resultGson);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching unavailable books", e);
@@ -107,9 +120,10 @@ public class InventaryRestController {
         }
     }
 
-    private ResponseEntity<JsonObject> errorResponse(Exception e) {
-        JsonObject error = new JsonObject();
-        error.addProperty("error", e.getMessage());
-        return ResponseEntity.internalServerError().body(error);
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 }

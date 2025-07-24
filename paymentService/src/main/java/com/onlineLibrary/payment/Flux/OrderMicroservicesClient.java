@@ -1,6 +1,6 @@
 package com.onlineLibrary.payment.Flux;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.*;
 public interface OrderMicroservicesClient {
 
 
-    @PostMapping(
-            value = "/api/order/{userId}/place-order",
-            produces = "application/json"
-    )
-    ResponseEntity<JsonObject> callPlaceOrder(@PathVariable("userId") int userId,
-                                              @RequestParam("isAutoDelivery") boolean isAutoDelivery);
+    @PostMapping(path = "/api/order/{userId}/place-order")
+    ResponseEntity<JsonNode> callPlaceOrder(@PathVariable("userId") int userId,
+                                            @RequestParam("isAutoDelivery") boolean isAutoDelivery);
 }

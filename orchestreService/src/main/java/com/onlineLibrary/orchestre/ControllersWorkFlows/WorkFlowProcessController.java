@@ -1,6 +1,7 @@
 
 package com.onlineLibrary.orchestre.ControllersWorkFlows;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.onlineLibrary.orchestre.Flux.Handlers.*;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,9 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.arrayNodeToJsonArray;
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jsonArrayToArrayNode;
 
 
 @RestController
@@ -48,11 +52,11 @@ public class WorkFlowProcessController {
 
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<JsonArray> orchestrate(@RequestBody JsonArray inputArray) {
-        logger.info("Starting request processing - Received array of {} elements", inputArray.size());
-        System.out.println("[DEBUG] Request received: " + inputArray);
-
-        JsonArray resultsArray = new JsonArray();
+    public ResponseEntity<ArrayNode> orchestrate(@RequestBody ArrayNode inputArrayJackson) throws Exception {
+        logger.info("Starting request processing - Received array of {} elements", inputArrayJackson.size());
+        System.out.println("[DEBUG] Request received: " + inputArrayJackson);
+        JsonArray inputArray = arrayNodeToJsonArray(inputArrayJackson);
+        JsonArray resultsArrayGson = new JsonArray();
         logger.debug("Initializing results array");
 
         for (int i = 0; i < inputArray.size(); i++) {
@@ -67,7 +71,7 @@ public class WorkFlowProcessController {
                 System.out.println("[WARN] Missing action for element " + i);
 
                 result.addProperty("error", "Missing action");
-                resultsArray.add(result);
+                resultsArrayGson.add(result);
                 continue;
             }
 
@@ -75,12 +79,13 @@ public class WorkFlowProcessController {
             logger.debug("Element {}: Detected action - {}", i, action);
             System.out.println("[INFO] Action: " + action);
             result = processAction(action, task);
-            resultsArray.add(result);
+            resultsArrayGson.add(result);
             logger.debug("Result added for element {}: {}", i, result);
         }
 
-        logger.info("Processing completed - Returning {} results", resultsArray.size());
-        System.out.println("[DEBUG] Final results: " + resultsArray);
+        logger.info("Processing completed - Returning {} results", resultsArrayGson.size());
+        System.out.println("[DEBUG] Final results: " + resultsArrayGson);
+        ArrayNode resultsArray = jsonArrayToArrayNode(resultsArrayGson);
         return ResponseEntity.ok(resultsArray);
     }
 

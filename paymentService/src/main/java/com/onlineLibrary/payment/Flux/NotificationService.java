@@ -1,9 +1,12 @@
 package com.onlineLibrary.payment.Flux;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import static com.onlineLibrary.payment.Util.ConvertJsonUtils.jacksonToGson;
 
 @Service
 public class NotificationService implements INotificationService {
@@ -21,8 +24,8 @@ public class NotificationService implements INotificationService {
 
     @Override
     public JsonObject notifyUser(int userId, int orderId, int cardId,double totalPrice) throws Exception {
-        ResponseEntity<JsonObject> response = profilMicroservicesClient.callGetUserData(userId);
-        JsonObject notificationResult = response.getBody().getAsJsonObject();
+        ResponseEntity<JsonNode> responseJackson = profilMicroservicesClient.callGetUserData(userId);
+        JsonObject notificationResult = jacksonToGson(responseJackson.getBody()).getAsJsonObject();
         return notificationBuilder.buildPaymentNotification(notificationResult,orderId,cardId,totalPrice);
     }
 }

@@ -1,4 +1,5 @@
 package com.onlineLibrary.order.Flux.Implementations;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderEntityService;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderService;
 import com.onlineLibrary.order.Flux.Interfaces.ProfilMicroservicesClient;
@@ -6,6 +7,8 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import static com.onlineLibrary.order.Util.ConvertJsonUtils.jacksonToGson;
 
 
 @Service
@@ -27,8 +30,8 @@ public class OrderService implements IOrderService {
     @Override
     public JsonObject placeOrder(int userId,boolean autoDelivery) throws Exception {
 
-        ResponseEntity<JsonObject> respense = profilMicroservicesClient.callGetUserProfil(userId);
-        JsonObject jsonUserProfil= respense.getBody().getAsJsonObject();
+        ResponseEntity<JsonNode> respenseJackson = profilMicroservicesClient.callGetUserProfil(userId);
+        JsonObject jsonUserProfil= jacksonToGson(respenseJackson.getBody()).getAsJsonObject();
         JsonObject response = orderEntityService.createOrder(userId,jsonUserProfil);
         if(autoDelivery){
             orderEntityService.scheduleAutoDelivery(userId);

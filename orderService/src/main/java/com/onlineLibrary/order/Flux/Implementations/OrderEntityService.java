@@ -1,6 +1,7 @@
 package com.onlineLibrary.order.Flux.Implementations;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
 import com.onlineLibrary.order.Entities.*;
 import com.onlineLibrary.order.Flux.Interfaces.*;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.onlineLibrary.order.Util.ConvertJsonUtils.jacksonToGson;
 
 
 @Service
@@ -44,10 +47,10 @@ public class OrderEntityService implements IOrderEntityService {
 
     @Override
     public JsonObject createOrder(int userId, JsonObject jsonUserProfil) throws Exception {
-        ResponseEntity<JsonObject>  cart = cartMicroservicesClient.callGetCart(userId);
-        JsonObject responseCart = cart.getBody();
-        ResponseEntity<JsonObject>  cartItems = cartMicroservicesClient.callGetItems(responseCart.get("cartId").getAsInt());
-        JsonObject responseCartItems = cartItems.getBody();
+        ResponseEntity<JsonNode>  cartJackson = cartMicroservicesClient.callGetCart(userId);
+        JsonObject responseCart = jacksonToGson(cartJackson.getBody());
+        ResponseEntity<JsonNode>  cartItemsJackson = cartMicroservicesClient.callGetItems(responseCart.get("cartId").getAsInt());
+        JsonObject responseCartItems = jacksonToGson(cartItemsJackson.getBody());
         JsonArray itemsArray = responseCartItems.getAsJsonArray("items");
         for (JsonElement element : itemsArray) {
             JsonObject itemObj = element.getAsJsonObject();
@@ -67,8 +70,8 @@ public class OrderEntityService implements IOrderEntityService {
         Delivery delivery = deliveryService.scheduleDelivery(order.getId(), jsonUserProfil);
 
         // clean cart
-        ResponseEntity<JsonObject> responseCartClearedInfo = cartMicroservicesClient.callClearCart(userId);
-        JsonObject cartClearedInfo = responseCartClearedInfo.getBody();
+        ResponseEntity<JsonNode> responseCartClearedInfoJackson = cartMicroservicesClient.callClearCart(userId);
+        JsonObject cartClearedInfo = jacksonToGson(responseCartClearedInfoJackson.getBody());
 
 
         // build JSON response

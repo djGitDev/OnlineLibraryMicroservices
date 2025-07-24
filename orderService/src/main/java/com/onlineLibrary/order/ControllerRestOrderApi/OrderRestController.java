@@ -1,18 +1,16 @@
+
+
 package com.onlineLibrary.order.ControllerRestOrderApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderService;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.onlineLibrary.order.Util.ConvertJsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order")
@@ -27,13 +25,14 @@ public class OrderRestController {
     }
 
 
-    @PostMapping("/{userId}/place-order")
-    public ResponseEntity<JsonObject> placeOrder(
+    @PostMapping(value = "/{userId}/place-order")
+    public ResponseEntity<JsonNode> placeOrder(
             @PathVariable int userId,
-            @RequestParam(defaultValue = "true") boolean isAutoDelivery) {
+            @RequestParam(defaultValue = "true") boolean isAutoDelivery) throws Exception {
         try {
             logger.info("Placing order for user: {}, autoDelivery: {}", userId, isAutoDelivery);
-            JsonObject result = orderService.placeOrder(userId, isAutoDelivery);
+            JsonObject resultGson = orderService.placeOrder(userId, isAutoDelivery);
+            JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error placing order for user: {}", userId, e);
@@ -41,26 +40,28 @@ public class OrderRestController {
         }
     }
 
-    @PostMapping("/{orderId}/deliver")
-    public ResponseEntity<JsonObject> deliverOrder(@PathVariable int orderId) {
+    @PostMapping(value = "/{orderId}/deliver")
+    public ResponseEntity<JsonNode> deliverOrder(@PathVariable int orderId) throws Exception {
         logger.info("Delivering order: {}", orderId);
-        JsonObject result = orderService.deliveryOrder(orderId);
+        JsonObject resultGson = orderService.deliveryOrder(orderId);
+        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping
-    public ResponseEntity<JsonObject> getAllOrders() {
+    @GetMapping()
+    public ResponseEntity<JsonNode> getAllOrders() throws Exception {
         logger.info("Fetching all orders");
-        JsonObject result = orderService.displayAllOrders();
+        JsonObject resultGson = orderService.displayAllOrders();
+        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
+
         return ResponseEntity.ok(result);
     }
-    
 
-    @GetMapping("/display-all")
-    public ResponseEntity<JsonObject> displayAllOrders() {
-
+    @GetMapping(value = "/display-all")
+    public ResponseEntity<JsonNode> displayAllOrders() throws Exception {
         try {
-            JsonObject result = orderService.displayOrders();
+            JsonObject resultGson = orderService.displayOrders();
+            JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting orders");
@@ -68,20 +69,10 @@ public class OrderRestController {
         }
     }
 
-    private ResponseEntity<JsonObject> errorResponse(Exception e) {
-        JsonObject error = new JsonObject();
-        error.addProperty("error", e.getMessage());
-        return ResponseEntity.internalServerError().body(error);
-    }
-
-    private Map<Integer, Double> deserializePrices(String json) {
-        Type type = new TypeToken<Map<String, Double>>(){}.getType();
-        Map<String, Double> stringKeyMap = new Gson().fromJson(json, type);
-
-        return stringKeyMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> Integer.parseInt(e.getKey()),
-                        Map.Entry::getValue
-                ));
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 }

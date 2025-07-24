@@ -1,5 +1,6 @@
 package com.onlineLibrary.cart.ControllerRestCartApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonArray;
 import com.onlineLibrary.cart.Flux.Interfaces.ICartService;
 import com.google.gson.Gson;
@@ -15,6 +16,9 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.onlineLibrary.cart.Util.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.cart.Util.ConvertJsonUtils.jacksonToGson;
+
 @RestController
 @RequestMapping("/api/cart")
 public class CartRestController {
@@ -28,10 +32,11 @@ public class CartRestController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<JsonObject> getCart(@PathVariable int userId) {
+    public ResponseEntity<JsonNode> getCart(@PathVariable int userId) throws Exception {
         try {
             logger.info("Getting cart from user_id: {}", userId);
-            JsonObject result = cartService.getCart(userId);
+            JsonObject resultGson = cartService.getCart(userId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart from user: {}", userId, e);
@@ -40,10 +45,11 @@ public class CartRestController {
     }
 
     @GetMapping("/items/{cartId}")
-    public ResponseEntity<JsonObject> getItems(@PathVariable int cartId) {
+    public ResponseEntity<JsonNode> getItems(@PathVariable int cartId) throws Exception {
         try {
             logger.info("Getting specified cart items: {}", cartId);
-            JsonObject result = cartService.getItems(cartId);
+            JsonObject resultGson = cartService.getItems(cartId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart from user: {}", cartId, e);
@@ -54,10 +60,11 @@ public class CartRestController {
 
 
     @DeleteMapping("/{userId}/clear-cart")
-    public ResponseEntity<JsonObject> clearCart(@PathVariable int userId) {
+    public ResponseEntity<JsonNode> clearCart(@PathVariable int userId) throws Exception {
         try {
             logger.info("Clearing cart for user: {}", userId);
-            JsonObject result = cartService.clearCart(userId);
+            JsonObject resultGson = cartService.clearCart(userId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error clearing cart for user: {}", userId, e);
@@ -66,28 +73,32 @@ public class CartRestController {
     }
 
     @DeleteMapping("/{userId}/clear-books")
-    public ResponseEntity<JsonObject> clearBooks(
+    public ResponseEntity<JsonNode> clearBooks(
             @PathVariable int userId,
-            @RequestBody JsonObject requestBody) {
+            @RequestBody JsonNode requestBodyJackson) throws Exception {
         logger.info("Clearing specific books for user: {}", userId);
+        JsonObject requestBody = jacksonToGson(requestBodyJackson);
         JsonArray books = requestBody.getAsJsonArray("books");
-        JsonObject result = cartService.clearBooks(userId,books);
+        JsonObject resultGson = cartService.clearBooks(userId,books);
+        JsonNode result = gsonToJackson(resultGson);
         return ResponseEntity.ok(result);
     }
 
 
 
     @PostMapping("/{userId}/add-searched-items")
-    public ResponseEntity<JsonObject> addSearchedItems(
+    public ResponseEntity<JsonNode> addSearchedItems(
             @PathVariable int userId,
-            @RequestBody JsonObject requestBody,
-            @RequestParam("prices") String pricesJson) {
+            @RequestBody JsonNode requestBodyJackson,
+            @RequestParam("prices") String pricesJson) throws Exception {
 
         try {
             logger.info("Adding searched items for user: {}", userId);
             Map<Integer, Double> bookPrices = deserializePrices(pricesJson);
+            JsonObject requestBody = jacksonToGson(requestBodyJackson);
             JsonArray books = requestBody.getAsJsonArray("books");
-            JsonObject result = cartService.addSearchedItemsToCart(userId, books, bookPrices);
+            JsonObject resultGson = cartService.addSearchedItemsToCart(userId, books, bookPrices);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error adding searched items for user: {}", userId, e);
@@ -96,10 +107,11 @@ public class CartRestController {
     }
 
     @GetMapping("/carts/{cartId}/total-price")
-    public ResponseEntity<JsonObject> getCartTotal(@PathVariable int cartId) {
+    public ResponseEntity<JsonNode> getCartTotal(@PathVariable int cartId) throws Exception {
         try {
             logger.info("Getting total for cart: {}", cartId);
-            JsonObject result = cartService.getTotalPrice(cartId);
+            JsonObject resultGson = cartService.getTotalPrice(cartId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart total for cart: {}", cartId, e);
@@ -108,10 +120,11 @@ public class CartRestController {
     }
 
 
-    private ResponseEntity<JsonObject> errorResponse(Exception e) {
-        JsonObject error = new JsonObject();
-        error.addProperty("error", e.getMessage());
-        return ResponseEntity.internalServerError().body(error);
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 
     private Map<Integer, Double> deserializePrices(String json) {

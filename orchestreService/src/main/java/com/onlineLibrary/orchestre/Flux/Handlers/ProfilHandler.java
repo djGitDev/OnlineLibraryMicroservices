@@ -28,7 +28,6 @@ public class ProfilHandler {
     public JsonObject handleRegister(JsonObject task) throws Exception {
         JsonObject result = new JsonObject();
         if (!task.has("user") || !task.has("address")) {
-            logger.error("Champs manquants pour l'enregistrement");
             result.addProperty("error", "Missing user or address");
             return result;
         }
@@ -49,17 +48,14 @@ public class ProfilHandler {
     public JsonObject handleLogin(JsonObject task) throws Exception {
         JsonObject result = new JsonObject();
         if (!task.has("credentials")) {
-            logger.error("Credentials manquants pour le login");
             result.addProperty("error", "Missing credentials");
             return result;
         }
         JsonObject loginPayloadGson = new JsonObject();
         loginPayloadGson.add("credentials", task.get("credentials"));
 
-        logger.debug("Appel du microservice login avec payload: {}", loginPayloadGson);
         JsonNode loginPayload = gsonToJackson(loginPayloadGson);
         ResponseEntity<JsonNode> responseLoginJackson = profilMicroserviceClient.callLogin(loginPayload);
-        logger.info("Réponse du microservice login reçue");
         result = jacksonToGson(responseLoginJackson.getBody());
         return result;
     }

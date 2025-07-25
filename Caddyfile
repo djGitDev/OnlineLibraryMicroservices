@@ -1,0 +1,9 @@
+:80 {
+    handle /api/* {
+        reverse_proxy orchestre:8080
+    }
+
+    handle {
+        reverse_proxy webapp:5173
+    }
+}

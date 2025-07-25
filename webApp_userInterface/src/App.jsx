@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import './App.css';
+import axios from 'axios';
 
 function App() {
     const [files, setFiles] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [content, setContent] = useState(null);
-    const [apiResponse, setApiResponse] = useState(null); // Nouvel état pour la réponse API
-    const [isProcessing, setIsProcessing] = useState(false); // État pour le loading
+    const [apiResponse, setApiResponse] = useState(null); 
+    const [isProcessing, setIsProcessing] = useState(false); 
     const backendUrl = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL || 'http://localhost:80/api/workflow';
 
     useEffect(() => {
@@ -31,39 +32,35 @@ function App() {
     const handleCancel = () => {
         setSelectedFile(null);
         setContent(null);
-        setApiResponse(null); // Réinitialise aussi la réponse
+        setApiResponse(null); 
     };
 
-    const handleProcess = () => {
+    const handleProcess = async () => {
         if (!content || !Array.isArray(content)) {
             alert("Invalid or empty workflow data.");
             return;
         }
 
         setIsProcessing(true);
-        fetch(backendUrl, {
-            method: 'POST',
+      
+        try {
+        const response = await axios.post(backendUrl, content, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(content),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setApiResponse(data); // Stocke la réponse
-                console.log("Réponse backend :", data);
-            })
-            .catch((err) => {
-                console.error("Erreur d'envoi du workflow :", err);
-                alert("Erreur lors du traitement du workflow.");
-            })
-            .finally(() => {
-                setIsProcessing(false);
-            });
+        });
+          setApiResponse(response.data);
+          console.log("Réponse backend :", response.data);
+        } catch (err) {
+        console.error("Erreur d'envoi du workflow :", err);
+          alert("Erreur lors du traitement du workflow.");
+        } finally {
+        setIsProcessing(false);
+        }
     };
 
     const handleBackFromResponse = () => {
-        setApiResponse(null); // Permet de revenir à l'affichage précédent
+        setApiResponse(null); 
     };
 
     return (

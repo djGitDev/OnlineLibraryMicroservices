@@ -27,7 +27,6 @@ public class InventaryHandler {
     public JsonObject handleFindBookById(JsonObject task) {
         JsonObject result = new JsonObject();
         if (!task.has("book_id")) {
-            logger.error("book_id manquant");
             result.addProperty("error", "Missing book_id");
             return result;
         }
@@ -37,7 +36,6 @@ public class InventaryHandler {
         result = jacksonToGson(responseBookIdJackson.getBody());
 
         if (result == null || !result.has("book")) {
-            logger.error("Livre non trouvé ou réponse invalide");
             JsonObject errorResult = new JsonObject();
             errorResult.addProperty("error", "Book not found");
             return errorResult;
@@ -48,7 +46,6 @@ public class InventaryHandler {
     public JsonObject handleFindBookByIsbn(JsonObject task) {
         JsonObject result = new JsonObject();
         if (!task.has("isbn")) {
-            logger.error("isbn manquant");
             result.addProperty("error", "Missing isbn");
             return result;
         }
@@ -59,7 +56,6 @@ public class InventaryHandler {
 
 
         if (result == null || !result.has("book")) {
-            logger.error("Livre non trouvé ou réponse invalide");
             JsonObject errorResult = new JsonObject();
             errorResult.addProperty("error", "Book not found");
             return errorResult;

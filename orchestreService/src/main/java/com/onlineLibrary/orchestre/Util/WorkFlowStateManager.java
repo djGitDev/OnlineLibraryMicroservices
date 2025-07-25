@@ -18,13 +18,13 @@ public class WorkFlowStateManager {
 
     public  int getLastUserId() throws Exception {
         if (userIds.isEmpty())
-            throw new Exception("Aucun utilisateur connecté.");
+            throw new Exception("No connected user.");
         return userIds.get(userIds.size() - 1);
     }
 
     public  int getLastOrderId() throws Exception {
         if (orderIds.isEmpty())
-            throw new Exception("Aucune commande enregistrée.");
+            throw new Exception("no registred order.");
         return orderIds.get(orderIds.size() - 1);
     }
 

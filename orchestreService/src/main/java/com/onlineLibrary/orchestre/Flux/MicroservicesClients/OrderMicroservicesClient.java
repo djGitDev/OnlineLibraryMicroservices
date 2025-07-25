@@ -22,7 +22,7 @@ public interface OrderMicroservicesClient {
             @RequestParam("isAutoDelivery") boolean isAutoDelivery
     );
     @GetMapping(
-            value = "/api/order/display-all",
+            value = "/api/order",
             consumes = "application/json"
     )
     ResponseEntity<JsonNode> callDisplayAllOrders();

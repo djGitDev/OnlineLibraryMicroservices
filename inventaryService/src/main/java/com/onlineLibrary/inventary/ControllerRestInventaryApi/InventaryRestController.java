@@ -29,7 +29,7 @@ public class InventaryRestController {
         this.bookService = bookService;
     }
 
-    
+
     @Operation(
             summary = "Get all books",
             description = "Retrieves a list of all books in the database",

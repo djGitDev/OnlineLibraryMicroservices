@@ -3,6 +3,12 @@ package com.onlineLibrary.payment.ControllerRestPaymentApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.payment.Flux.IPaymentService;
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +30,48 @@ public class PaymentRestController {
         this.paymentService = paymentService;
     }
 
+
+    @Operation(
+            summary = "Process payment",
+            description = "Process payment for a shopping cart and return confirmation details",
+            parameters = {
+                    @Parameter(
+                            name = "cartId",
+                            description = "ID of the cart to process",
+                            example = "7",
+                            in = ParameterIn.PATH
+                    ),
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user making payment",
+                            example = "2",
+                            in = ParameterIn.PATH
+                    ),
+                    @Parameter(
+                            name = "autoDelivery",
+                            description = "Auto-delivery flag (default: true)",
+                            example = "true",
+                            in = ParameterIn.QUERY
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Payment processed successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                    {
+                      "to": "lucas.dupuis8@example.com",
+                      "subject": "Confirmation de paiement",
+                      "message": "Bonjour Lucas,\\n\\nNous vous confirmons que le paiement de 112.95$ a été effectué avec succès pour votre panier (ID : 7).\\nVotre commande (ID : 2) a été déclenchée et est en cours de traitement.\\n\\nMerci pour votre confiance.\\n\\n"
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @PostMapping("/{cartId}/process/{userId}")
     public ResponseEntity<JsonNode> processPayment(
             @PathVariable int cartId,

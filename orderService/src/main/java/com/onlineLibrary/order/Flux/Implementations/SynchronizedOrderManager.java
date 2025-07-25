@@ -7,13 +7,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class SynchronizedOrderManager implements ISynchronizedOrderManager {
-    // Instance Singleton
-    private static final SynchronizedOrderManager INSTANCE = new SynchronizedOrderManager();
 
-    // Liste synchronisée de JsonObject
+    private static final SynchronizedOrderManager INSTANCE = new SynchronizedOrderManager();
     private final List<JsonObject> synchronizedOrders;
 
-    // Constructeur privé pour empêcher l'instanciation externe
     public SynchronizedOrderManager() {
         this.synchronizedOrders = Collections.synchronizedList(new ArrayList<>());
     }
@@ -21,22 +18,22 @@ public class SynchronizedOrderManager implements ISynchronizedOrderManager {
     public static SynchronizedOrderManager getInstance() {
         return INSTANCE;
     }
-    // Ajouter un ordre de manière thread-safe
+    // add order thread-safetly
     @Override
     public void addRepport(JsonObject order) {
         synchronized (synchronizedOrders) {
             synchronizedOrders.add(order);
         }
     }
-    // Récupérer tous les ordres de manière thread-safe
+    // fetch all orders thread-safetly
     @Override
     public List<JsonObject> getAllRepports() {
         synchronized (synchronizedOrders) {
-            return new ArrayList<>(synchronizedOrders); // Retourne une copie pour éviter les modifications externes
+            return new ArrayList<>(synchronizedOrders);
         }
     }
 
-    // Vider la liste de manière thread-safe
+    // clean list thread-safetly
     @Override
     public void clearRepports() {
         synchronized (synchronizedOrders) {

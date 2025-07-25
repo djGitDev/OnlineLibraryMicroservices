@@ -3,7 +3,7 @@ package com.onlineLibrary.inventary.Persistance.Impl;
 import com.onlineLibrary.inventary.Entities.Book;
 import com.onlineLibrary.inventary.Persistance.IBookRepository;
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,11 +11,12 @@ import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class BookRepository implements IBookRepository {
     private IDBConnection dbConnection;
 
-    public BookRepository(BeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public BookRepository(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
     @Override
@@ -44,36 +45,6 @@ public class BookRepository implements IBookRepository {
             }
             return null;
         }
-    }
-
-    @Override
-    public Book addBook(Book book) throws Exception {
-        String sql = "INSERT INTO books (id, isbn, title, description, parution_date, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection connection = dbConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, book.getId());
-            statement.setString(2, book.getIsbn());
-            statement.setString(3, book.getTitle());
-            statement.setString(4, book.getDescription());
-            statement.setDate(5, new java.sql.Date(book.getParutionDate().getTime()));
-            statement.setDouble(6, book.getPrice());
-            statement.setInt(7, book.getQuantity());
-
-            statement.executeUpdate();
-
-            return book;
-        }
-    }
-
-
-    @Override
-    public List<Book> addManyBooks(List<Book> books) throws Exception {
-        for (Book book : books) {
-            addBook(book);
-        }
-        return books;
     }
 
 
@@ -111,38 +82,8 @@ public class BookRepository implements IBookRepository {
         }
     }
 
-    @Override
-    public List<Book> findBookByTitle(String title) throws Exception {
-        String sql = "SELECT * FROM books WHERE title = ?";
-        try (Connection connection = dbConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, title);
-            ResultSet resultSet = statement.executeQuery();
-            List<Book> books = new java.util.ArrayList<>();
-            while (resultSet.next()) {
-                books.add(makeBook(resultSet));
-            }
-            connection.close();
-            return books;
-        }
-    }
 
 
-    @Override
-    public List<Book> findUnavailableBooks() throws Exception{
-        String sql = "SELECT * FROM books WHERE quantity = 0";
-        try (
-            Connection connection = dbConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)){
-            ResultSet resultSet = statement.executeQuery();
-            List<Book> books = new java.util.ArrayList<>();
-            while (resultSet.next()) {
-                books.add(makeBook(resultSet));
-            }
-            connection.close();
-            return books;
-        }
-    }
 
     private Book makeBook(ResultSet resultSet) throws Exception {
         int id = resultSet.getInt("id");

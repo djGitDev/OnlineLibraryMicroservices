@@ -9,13 +9,6 @@ import java.sql.SQLException;
 public class Application {
 
     public static void main(String[] args) throws SQLException {
-        try {
-            Class.forName("org.postgresql.Driver");
-            System.out.println("PostgreSQL driver loaded successfully");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Failed to load PostgreSQL driver");
-            e.printStackTrace();
-        }
         SpringApplication.run(Application.class, args);
         InitDB.initialize();
 

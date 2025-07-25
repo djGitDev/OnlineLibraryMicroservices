@@ -1,5 +1,6 @@
 package com.onlineLibrary.cart.Flux.Implementations;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.cart.Flux.Interfaces.InventaryMicroservicesClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.onlineLibrary.cart.Util.ConvertJsonUtils.jacksonToGson;
 
 @Service
 public class CartService implements ICartService {
@@ -127,10 +130,7 @@ public class CartService implements ICartService {
         return response;
     }
 
-//    @Override
-//    public Optional<Cart> getCart(int userId) throws Exception {
-//        return cartRepository.findByUserId(userId);
-//    }
+
 
     @Override
     public JsonObject getCart(int userId) throws Exception {
@@ -165,8 +165,8 @@ public class CartService implements ICartService {
             int bookId = book.get("book_id").getAsInt();
             int quantity = book.get("quantity").getAsInt();
             double bookPrice = searchedBooksIds.get(bookId);
-            ResponseEntity<JsonObject> respense = microserviceClient.callFindBookById(bookId);
-            JsonObject jsonBook = respense.getBody().getAsJsonObject();
+            ResponseEntity<JsonNode> respense = microserviceClient.callFindBookById(bookId);
+            JsonObject jsonBook = jacksonToGson(respense.getBody()).getAsJsonObject();
             JsonObject bookInInventary = jsonBook.getAsJsonObject("book");
             int quantityAvailable = bookInInventary.get("quantity").getAsInt();
             if (quantityAvailable > 0) {

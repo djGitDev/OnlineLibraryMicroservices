@@ -3,8 +3,11 @@ package com.onlineLibrary.profil.Flux;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Persistance.IRepositoryAddress;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+
+@Service
 public class ProfilServiceDispatcher implements IProfilServiceDispatcher{
 
     private IRegisterService registerService;
@@ -12,12 +15,12 @@ public class ProfilServiceDispatcher implements IProfilServiceDispatcher{
     private IRepositoryAddress repositoryAddress;
     private IRepositoryUser repositoryUser;
 
-
-    public ProfilServiceDispatcher(IBeansInjectionFactory factory) {
-        this.registerService = factory.getRegisterService();
-        this.loginService = factory.getLoginService();
-        this.repositoryAddress = factory.getAddressRepository();
-        this.repositoryUser = factory.getUserRepository();
+    @Autowired
+    public ProfilServiceDispatcher(IRegisterService registerService,ILoginService loginService,IRepositoryAddress repositoryAddress,IRepositoryUser repositoryUser) {
+        this.registerService = registerService ;
+        this.loginService = loginService ;
+        this.repositoryAddress = repositoryAddress;
+        this.repositoryUser = repositoryUser;
     }
 
     @Override

@@ -4,19 +4,22 @@ import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Entities.User;
 import com.onlineLibrary.profil.Entities.Address;
 import com.onlineLibrary.profil.Persistance.IRepositoryAddress;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RegisterService implements IRegisterService {
 
     private final IRepositoryUser repositoryUser;
     private final IRepositoryAddress repositoryAddress;
     private final IHashService passwordHasher;
 
-    public RegisterService(IBeansInjectionFactory factory) {
-        this.repositoryUser = factory.getUserRepository();
-        this.repositoryAddress = factory.getAddressRepository();
-        this.passwordHasher = factory.getHasherPassword();
+    @Autowired
+    public RegisterService(IRepositoryUser repositoryUser,IRepositoryAddress repositoryAddress,IHashService passwordHasher) {
+        this.repositoryUser = repositoryUser;
+        this.repositoryAddress = repositoryAddress;
+        this.passwordHasher = passwordHasher;
     }
 
     @Override

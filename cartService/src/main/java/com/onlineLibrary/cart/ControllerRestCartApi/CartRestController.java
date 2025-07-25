@@ -1,10 +1,17 @@
 package com.onlineLibrary.cart.ControllerRestCartApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonArray;
 import com.onlineLibrary.cart.Flux.Interfaces.ICartService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.onlineLibrary.cart.Util.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.cart.Util.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -27,11 +37,40 @@ public class CartRestController {
         this.cartService = cartService;
     }
 
+
+    @Operation(
+            summary = "Get user's cart",
+            description = "Retrieves the cart ID for a specific user",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user whose cart to retrieve",
+                            example = "123",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Cart retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                    {
+                      "cartId": 5
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @GetMapping("/{userId}")
-    public ResponseEntity<JsonObject> getCart(@PathVariable int userId) {
+    public ResponseEntity<JsonNode> getCart(@PathVariable int userId) throws Exception {
         try {
             logger.info("Getting cart from user_id: {}", userId);
-            JsonObject result = cartService.getCart(userId);
+            JsonObject resultGson = cartService.getCart(userId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart from user: {}", userId, e);
@@ -39,11 +78,52 @@ public class CartRestController {
         }
     }
 
+
+    @Operation(
+            summary = "Get cart items",
+            description = "Retrieves all items in a specific shopping cart",
+            parameters = {
+                    @Parameter(
+                            name = "cartId",
+                            description = "ID of the cart to retrieve items from",
+                            required = true,
+                            example = "5",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Cart items retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "CartItemsExample",
+                                            value = """
+                    {
+                      "cartId": 5,
+                      "items": [
+                        {
+                          "bookId": 1,
+                          "quantity": 3
+                        },
+                        {
+                          "bookId": 3,
+                          "quantity": 2
+                        }
+                      ]
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @GetMapping("/items/{cartId}")
-    public ResponseEntity<JsonObject> getItems(@PathVariable int cartId) {
+    public ResponseEntity<JsonNode> getItems(@PathVariable int cartId) throws Exception {
         try {
             logger.info("Getting specified cart items: {}", cartId);
-            JsonObject result = cartService.getItems(cartId);
+            JsonObject resultGson = cartService.getItems(cartId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart from user: {}", cartId, e);
@@ -52,12 +132,43 @@ public class CartRestController {
     }
 
 
-
+    @Operation(
+            summary = "Clear user cart",
+            description = "Removes all items from a user's shopping cart",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user whose cart to clear",
+                            required = true,
+                            example = "123",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Cart cleared successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "CartClearedSuccessfully",
+                                            value = """
+                    {
+                      "status": "success",
+                      "message": "Cart and all items deleted successfully.",
+                      "items": []
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @DeleteMapping("/{userId}/clear-cart")
-    public ResponseEntity<JsonObject> clearCart(@PathVariable int userId) {
+    public ResponseEntity<JsonNode> clearCart(@PathVariable int userId) throws Exception {
         try {
             logger.info("Clearing cart for user: {}", userId);
-            JsonObject result = cartService.clearCart(userId);
+            JsonObject resultGson = cartService.clearCart(userId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error clearing cart for user: {}", userId, e);
@@ -65,29 +176,154 @@ public class CartRestController {
         }
     }
 
+
+    @Operation(
+            summary = "Remove specific books from cart",
+            description = "Removes selected books from a user's shopping cart",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user whose cart to modify",
+                            required = true,
+                            example = "123",
+                            in = ParameterIn.PATH
+                    )
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "BooksToRemoveExample",
+                                    value = """
+                {
+                  "books": [
+                    {
+                      "book_id": 1,
+                      "quantity": 2
+                    }
+                  ]
+                }"""
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Books removed successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "BooksRemovedResponse",
+                                            value = """
+                    {
+                      "status": "success",
+                      "message": "Books removed from cart.",
+                      "items": [
+                        {
+                          "book_id": 1,
+                          "quantity": 2
+                        }
+                      ]
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @DeleteMapping("/{userId}/clear-books")
-    public ResponseEntity<JsonObject> clearBooks(
+    public ResponseEntity<JsonNode> clearBooks(
             @PathVariable int userId,
-            @RequestBody JsonObject requestBody) {
+            @RequestBody JsonNode requestBodyJackson) throws Exception {
         logger.info("Clearing specific books for user: {}", userId);
+        JsonObject requestBody = jacksonToGson(requestBodyJackson);
         JsonArray books = requestBody.getAsJsonArray("books");
-        JsonObject result = cartService.clearBooks(userId,books);
+        JsonObject resultGson = cartService.clearBooks(userId,books);
+        JsonNode result = gsonToJackson(resultGson);
         return ResponseEntity.ok(result);
     }
 
 
-
+    @Operation(
+            summary = "Add searched items to cart",
+            description = "Adds multiple books from search results to user's cart with their prices",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user adding items",
+                            required = true,
+                            example = "123",
+                            in = ParameterIn.PATH
+                    ),
+                    @Parameter(
+                            name = "prices",
+                            description = "JSON string mapping book IDs to prices",
+                            required = true,
+                            example = "{\"1\":10.99,\"3\":39.99}",
+                            in = ParameterIn.QUERY
+                    )
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "BooksToAddExample",
+                                    value = """
+                {
+                  "books": [
+                    {
+                      "book_id": 1,
+                      "quantity": 2
+                    },
+                    {
+                      "book_id": 3,
+                      "quantity": 1
+                    }
+                  ]
+                }"""
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Books added successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "BooksAddedResponse",
+                                            value = """
+                    {
+                      "status": "success",
+                      "message": "Books added to cart",
+                      "cartId": 6,
+                      "items": [
+                        {
+                          "book_id": 1,
+                          "quantity": 7,
+                          "bookPrice": 10.99
+                        }
+                      ]
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @PostMapping("/{userId}/add-searched-items")
-    public ResponseEntity<JsonObject> addSearchedItems(
+    public ResponseEntity<JsonNode> addSearchedItems(
             @PathVariable int userId,
-            @RequestBody JsonObject requestBody,
-            @RequestParam("prices") String pricesJson) {
+            @RequestBody JsonNode requestBodyJackson,
+            @RequestParam("prices") String pricesJson) throws Exception {
 
         try {
             logger.info("Adding searched items for user: {}", userId);
             Map<Integer, Double> bookPrices = deserializePrices(pricesJson);
+            JsonObject requestBody = jacksonToGson(requestBodyJackson);
             JsonArray books = requestBody.getAsJsonArray("books");
-            JsonObject result = cartService.addSearchedItemsToCart(userId, books, bookPrices);
+            JsonObject resultGson = cartService.addSearchedItemsToCart(userId, books, bookPrices);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error adding searched items for user: {}", userId, e);
@@ -95,11 +331,60 @@ public class CartRestController {
         }
     }
 
+
+
+    @Operation(
+            summary = "Get cart total price",
+            description = "Calculates and returns the total price of all items in the specified cart",
+            parameters = {
+                    @Parameter(
+                            name = "cartId",
+                            description = "ID of the cart to calculate total",
+                            required = true,
+                            example = "5",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Total price calculated successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "CartTotalExample",
+                                            value = """
+                    {
+                      "status": "success",
+                      "message": "Cart total calculated successfully",
+                      "cartId": 5,
+                      "totalPrice": 112.95,
+                      "items": [
+                        {
+                          "bookId": 1,
+                          "quantity": 3,
+                          "unitPrice": 10.99,
+                          "totalPrice": 32.97
+                        },
+                        {
+                          "bookId": 3,
+                          "quantity": 2,
+                          "unitPrice": 39.99,
+                          "totalPrice": 79.98
+                        }
+                      ]
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
     @GetMapping("/carts/{cartId}/total-price")
-    public ResponseEntity<JsonObject> getCartTotal(@PathVariable int cartId) {
+    public ResponseEntity<JsonNode> getCartTotal(@PathVariable int cartId) throws Exception {
         try {
             logger.info("Getting total for cart: {}", cartId);
-            JsonObject result = cartService.getTotalPrice(cartId);
+            JsonObject resultGson = cartService.getTotalPrice(cartId);
+            JsonNode result = gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart total for cart: {}", cartId, e);
@@ -108,10 +393,11 @@ public class CartRestController {
     }
 
 
-    private ResponseEntity<JsonObject> errorResponse(Exception e) {
-        JsonObject error = new JsonObject();
-        error.addProperty("error", e.getMessage());
-        return ResponseEntity.internalServerError().body(error);
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 
     private Map<Integer, Double> deserializePrices(String json) {

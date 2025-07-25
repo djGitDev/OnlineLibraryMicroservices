@@ -61,7 +61,7 @@ public class DeliveryRepository implements IDeliveryRepository {
                 if (rs.next()) {
                     return rs.getInt("id");
                 }
-                throw new SQLException("Échec de la création de la livraison");
+                throw new SQLException("error creating delivery");
             }
         }
     }
@@ -85,17 +85,17 @@ public class DeliveryRepository implements IDeliveryRepository {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     response.addProperty("status", "success");
-                    response.addProperty("message", "Commande livrée avec succès.");
+                    response.addProperty("message", "delivery order succes.");
                     response.addProperty("delivery_id", rs.getInt("id"));
                 } else {
                     response.addProperty("status", "error");
-                    response.addProperty("message", "Aucune livraison trouvée pour cette commande.");
+                    response.addProperty("message", "no delivery founded for this order.");
                 }
             }
 
         } catch (SQLException e) {
             response.addProperty("status", "error");
-            response.addProperty("message", "Erreur lors de la mise à jour de la livraison : " + e.getMessage());
+            response.addProperty("message", "error when updating delivery status : " + e.getMessage());
         }
 
         return response;
@@ -128,7 +128,6 @@ public class DeliveryRepository implements IDeliveryRepository {
         }
     }
 
-    // Méthode supplémentaire pour marquer une livraison comme complétée
     public void markAsDelivered(int deliveryId) throws SQLException {
         String sql = """
             UPDATE deliveries 

@@ -1,8 +1,14 @@
 
 package com.onlineLibrary.orchestre.ControllersWorkFlows;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.onlineLibrary.orchestre.Flux.Handlers.*;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import com.google.gson.JsonArray;
@@ -11,9 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.arrayNodeToJsonArray;
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jsonArrayToArrayNode;
+
 
 @RestController
-@RequestMapping("/workflow")
+@RequestMapping("/api/workflow")
 public class WorkFlowProcessController {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowProcessController.class);
@@ -47,12 +58,96 @@ public class WorkFlowProcessController {
 
 
 
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<JsonArray> orchestrate(@RequestBody JsonArray inputArray) {
-        logger.info("Starting request processing - Received array of {} elements", inputArray.size());
-        System.out.println("[DEBUG] Request received: " + inputArray);
 
-        JsonArray resultsArray = new JsonArray();
+    @Operation(
+            summary = "Vérifie l'état du service",
+            description = "Retourne un statut simple indiquant si le service est opérationnel.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "The service is up",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "HealthCheckExample",
+                                            value = "{ \"status\": \"UP\" }"
+                                    )
+                            )
+                    )
+            }
+    )
+    @GetMapping("/actuator/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of("status", "UP"));
+    }
+    @Operation(
+            summary = "Workflow orchestration",
+            description = "Receives an array of actions and returns an array of results.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "WorkflowExample",
+                                    value = "[\n" +
+                                            "  {\n" +
+                                            "    \"action\": \"register\",\n" +
+                                            "    \"user\": {\n" +
+                                            "      \"first_name\": \"Mathieu\",\n" +
+                                            "      \"last_name\": \"Tremblay\",\n" +
+                                            "      \"email\": \"mathieu.tremblay@example.ca\",\n" +
+                                            "      \"phone\": \"+15145557890\",\n" +
+                                            "      \"password\": \"MonMot2PasseFort!\"\n" +
+                                            "    },\n" +
+                                            "    \"address\": {\n" +
+                                            "      \"street\": \"456 Avenue Laurier Est\",\n" +
+                                            "      \"city\": \"Quebec\",\n" +
+                                            "      \"postal_code\": \"G1R 2L4\",\n" +
+                                            "      \"province\": \"QC\",\n" +
+                                            "      \"country\": \"Canada\"\n" +
+                                            "    }\n" +
+                                            "  },\n" +
+                                            "  {\n" +
+                                            "    \"action\": \"login\",\n" +
+                                            "    \"credentials\": {\n" +
+                                            "      \"email\": \"mathieu.tremblay@example.ca\",\n" +
+                                            "      \"password\": \"MonMot2PasseFort!\"\n" +
+                                            "    }\n" +
+                                            "  }\n" +
+                                            "]"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "array of results",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = "[\n" +
+                                                    "  {\n" +
+                                                    "    \"status\": \"success\",\n" +
+                                                    "    \"user_id\": 1,\n" +
+                                                    "    \"address_id\": 1\n" +
+                                                    "  },\n" +
+                                                    "  {\n" +
+                                                    "    \"status\": \"success\",\n" +
+                                                    "    \"user_id\": 1,\n" +
+                                                    "    \"email\": \"mathieu.tremblay@example.ca\"\n" +
+                                                    "  }\n" +
+                                                    "]"
+                                    )
+                            )
+                    )
+            }
+    )
+    @PostMapping()
+    public ResponseEntity<ArrayNode> orchestrate(@RequestBody ArrayNode inputArrayJackson) throws Exception {
+        logger.info("Starting request processing - Received array of {} elements", inputArrayJackson.size());
+        System.out.println("[DEBUG] Request received: " + inputArrayJackson);
+        JsonArray inputArray = arrayNodeToJsonArray(inputArrayJackson);
+        JsonArray resultsArrayGson = new JsonArray();
         logger.debug("Initializing results array");
 
         for (int i = 0; i < inputArray.size(); i++) {
@@ -67,7 +162,7 @@ public class WorkFlowProcessController {
                 System.out.println("[WARN] Missing action for element " + i);
 
                 result.addProperty("error", "Missing action");
-                resultsArray.add(result);
+                resultsArrayGson.add(result);
                 continue;
             }
 
@@ -75,13 +170,14 @@ public class WorkFlowProcessController {
             logger.debug("Element {}: Detected action - {}", i, action);
             System.out.println("[INFO] Action: " + action);
             result = processAction(action, task);
-            resultsArray.add(result);
+            resultsArrayGson.add(result);
             logger.debug("Result added for element {}: {}", i, result);
         }
 
-        logger.info("Processing completed - Returning {} results", resultsArray.size());
-        System.out.println("[DEBUG] Final results: " + resultsArray);
-        return ResponseEntity.ok(resultsArray);
+        logger.info("Processing completed - Returning {} results", resultsArrayGson.size());
+        System.out.println("[DEBUG] Final results: " + resultsArrayGson);
+        ArrayNode resultsArray = jsonArrayToArrayNode(resultsArrayGson);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultsArray);
     }
 
 
@@ -145,11 +241,11 @@ public class WorkFlowProcessController {
                     result = orderHandler.handleDeliverOrder();
                     break;
                 default:
-                    logger.warn("Action inconnue: {}", action);
+                    logger.warn("Unrecognize action: {}", action);
                     result.addProperty("error", "Unknown action: " + action);
             }
         } catch (Exception e) {
-            logger.error("Erreur lors du traitement de l'action '{}': {}", action, e.getMessage(), e);
+            logger.error("Error while processing action '{}': {}", action, e.getMessage(), e);
             System.out.println("[ERROR] Erreur: " + e.getMessage());
 
             result.addProperty("action", action);

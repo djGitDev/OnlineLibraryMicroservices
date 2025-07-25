@@ -2,7 +2,7 @@ package com.onlineLibrary.profil.Persistance;
 
 import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Entities.User;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,12 +10,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+@Repository
 public class RepositoryUser implements IRepositoryUser {
 
-   private IDBConnection dbConnection;
+    private IDBConnection dbConnection;
 
-    public RepositoryUser(IBeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public RepositoryUser(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
     @Override

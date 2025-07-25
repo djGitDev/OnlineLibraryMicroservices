@@ -1,5 +1,6 @@
 package com.onlineLibrary.orchestre.Flux.Handlers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.orchestre.Flux.MicroservicesClients.PaymentMicroservicesClient;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jacksonToGson;
 
 
 @Service
@@ -24,13 +27,13 @@ public class PaymentHandler {
     }
 
     public JsonObject handleProcessPayment() throws Exception {
-        ResponseEntity<JsonObject> responsePayment = paymentMicroserviceClient.callProcessPaiement
+        ResponseEntity<JsonNode> responsePaymentJackson = paymentMicroserviceClient.callProcessPaiement
                 (
                         workFlowStateManager.getCurrentCartId(),
                         workFlowStateManager.getLastUserId(),
                         true
                 );
-        return responsePayment.getBody();
+        return jacksonToGson(responsePaymentJackson.getBody());
     }
 
 }

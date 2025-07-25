@@ -1,18 +1,22 @@
+
+
 package com.onlineLibrary.order.ControllerRestOrderApi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderService;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.onlineLibrary.order.Util.ConvertJsonUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order")
@@ -26,34 +30,55 @@ public class OrderRestController {
         this.orderService = orderService;
     }
 
-//    @DeleteMapping("/{userId}/clear-cart")
-//    public ResponseEntity<JsonObject> clearCart(@PathVariable int userId) {
-//        try {
-//            logger.info("Clearing cart for user: {}", userId);
-//            JsonObject result = orderService.clearCart(userId);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error clearing cart for user: {}", userId, e);
-//            return errorResponse(e);
-//        }
-//    }
-//
-//    @DeleteMapping("/{userId}/clear-books")
-//    public ResponseEntity<JsonObject> clearBooks(
-//            @PathVariable int userId,
-//            @RequestBody JsonObject requestBody) {
-//        logger.info("Clearing specific books for user: {}", userId);
-//        JsonObject result = orderService.clearBooks(userId, requestBody);
-//        return ResponseEntity.ok(result);
-//    }
-
-    @PostMapping("/{userId}/place-order")
-    public ResponseEntity<JsonObject> placeOrder(
+    @Operation(
+            summary = "Place order",
+            description = "Creates an order from the user's cart and optionally schedules delivery",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "ID of the user placing the order",
+                            required = true,
+                            example = "123",
+                            in = ParameterIn.PATH
+                    ),
+                    @Parameter(
+                            name = "isAutoDelivery",
+                            description = "Whether to automatically schedule delivery (default: true)",
+                            example = "true",
+                            in = ParameterIn.QUERY
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Order placed successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "OrderPlacedSuccessfully",
+                                            value = """
+                    {
+                      "orderId": 6,
+                      "deliveryId": 6,
+                      "cartClearedInfo": {
+                        "status": "success",
+                        "message": "Cart and all items deleted successfully.",
+                        "items": []
+                      }
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
+    @PostMapping(value = "/{userId}/place-order")
+    public ResponseEntity<JsonNode> placeOrder(
             @PathVariable int userId,
-            @RequestParam(defaultValue = "true") boolean isAutoDelivery) {
+            @RequestParam(defaultValue = "true") boolean isAutoDelivery) throws Exception {
         try {
             logger.info("Placing order for user: {}, autoDelivery: {}", userId, isAutoDelivery);
-            JsonObject result = orderService.placeOrder(userId, isAutoDelivery);
+            JsonObject resultGson = orderService.placeOrder(userId, isAutoDelivery);
+            JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error placing order for user: {}", userId, e);
@@ -61,75 +86,122 @@ public class OrderRestController {
         }
     }
 
-    @PostMapping("/{orderId}/deliver")
-    public ResponseEntity<JsonObject> deliverOrder(@PathVariable int orderId) {
+
+    @Operation(
+            summary = "Mark order as delivered",
+            description = "Updates order status to mark it as delivered",
+            parameters = {
+                    @Parameter(
+                            name = "orderId",
+                            description = "ID of the order to mark as delivered",
+                            required = true,
+                            example = "6",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Order successfully marked as delivered",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "OrderDeliveredResponse",
+                                            value = """
+                    {
+                      "status": "success",
+                      "updated_lines": 2,
+                      "message": "order lines marked as delivered"
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
+    @PostMapping(value = "/{orderId}/deliver")
+    public ResponseEntity<JsonNode> deliverOrder(@PathVariable int orderId) throws Exception {
         logger.info("Delivering order: {}", orderId);
-        JsonObject result = orderService.deliveryOrder(orderId);
+        JsonObject resultGson = orderService.deliveryOrder(orderId);
+        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping
-    public ResponseEntity<JsonObject> getAllOrders() {
+
+
+    @Operation(
+            summary = "Get all orders",
+            description = "Retrieves a complete list of all orders with their current statuses",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully retrieved all orders",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "AllOrdersResponse",
+                                            value = """
+                    {
+                      "orders_with_status": [
+                        {
+                          "order_id": 1,
+                          "status": "PENDING"
+                        },
+                        {
+                          "order_id": 2,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 3,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 4,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 5,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 6,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 7,
+                          "status": "PENDING"
+                        },
+                        {
+                          "order_id": 8,
+                          "status": "DELIVERED"
+                        },
+                        {
+                          "order_id": 9,
+                          "status": "PENDING"
+                        },
+                        {
+                          "order_id": 10,
+                          "status": "PENDING"
+                        }
+                      ]
+                    }"""
+                                    )
+                            )
+                    )
+            }
+    )
+    @GetMapping()
+    public ResponseEntity<JsonNode> getAllOrders() throws Exception {
         logger.info("Fetching all orders");
-        JsonObject result = orderService.displayAllOrders();
+        JsonObject resultGson = orderService.displayAllOrders();
+        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
         return ResponseEntity.ok(result);
     }
 
-//    @PostMapping("/{userId}/add-searched-items")
-//    public ResponseEntity<JsonObject> addSearchedItems(
-//            @PathVariable int userId,
-//            @RequestBody JsonObject requestBody,
-//            @RequestParam("prices") String pricesJson) {
-//
-//        try {
-//            logger.info("Adding searched items for user: {}", userId);
-//            Map<Integer, Double> bookPrices = deserializePrices(pricesJson);
-//            JsonObject result = orderService.addSearchedItemsToCart(userId, requestBody, bookPrices);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error adding searched items for user: {}", userId, e);
-//            return errorResponse(e);
-//        }
-//    }
 
-//    @GetMapping("/carts/{cartId}/total-price")
-//    public ResponseEntity<JsonObject> getCartTotal(@PathVariable int cartId) {
-//        try {
-//            logger.info("Getting total for cart: {}", cartId);
-//            JsonObject result = orderService.getTotalPriceCart(cartId);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error getting cart total for cart: {}", cartId, e);
-//            return errorResponse(e);
-//        }
-//    }
-
-    @GetMapping("/display-all")
-    public ResponseEntity<JsonObject> displayAllOrders() {
-
-        try {
-            JsonObject result = orderService.displayOrders();
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            logger.error("Error getting orders");
-            return errorResponse(e);
-        }
-    }
-
-    private ResponseEntity<JsonObject> errorResponse(Exception e) {
-        JsonObject error = new JsonObject();
-        error.addProperty("error", e.getMessage());
-        return ResponseEntity.internalServerError().body(error);
-    }
-
-    private Map<Integer, Double> deserializePrices(String json) {
-        Type type = new TypeToken<Map<String, Double>>(){}.getType();
-        Map<String, Double> stringKeyMap = new Gson().fromJson(json, type);
-
-        return stringKeyMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> Integer.parseInt(e.getKey()),
-                        Map.Entry::getValue
-                ));
+    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
+        JsonObject gsonError = new JsonObject();
+        gsonError.addProperty("error", e.getMessage());
+        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
+        return ResponseEntity.internalServerError().body(jacksonError);
     }
 }

@@ -44,10 +44,10 @@ public class OrderEntityRepository implements IOrderEntityRepository {
                     order.setId(orderId);
                     return orderId;
                 }
-                throw new SQLException("Échec : aucun ID retourné après insertion de la commande.");
+                throw new SQLException("Échec : on founded ID after order insert.");
             }
         } catch (SQLException e) {
-            throw new Exception("Erreur lors de l'enregistrement de la commande : " + e.getMessage(), e);
+            throw new Exception("error while registering order : " + e.getMessage(), e);
         }
     }
 
@@ -74,7 +74,7 @@ public class OrderEntityRepository implements IOrderEntityRepository {
 
         } catch (Exception e) {
             response.addProperty("status", "error");
-            response.addProperty("message", "Erreur lors de la récupération des commandes : " + e.getMessage());
+            response.addProperty("message", "error while fetch orders : " + e.getMessage());
         }
 
         return response;
@@ -99,11 +99,11 @@ public class OrderEntityRepository implements IOrderEntityRepository {
                 if (rs.next()) {
                     return rs.getInt("id");
                 } else {
-                    throw new SQLException("Aucune commande trouvée pour l'utilisateur avec ID " + userId);
+                    throw new SQLException("no founded order for user whith ID " + userId);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // À remplacer par un vrai logger en prod
+            e.printStackTrace();
             return -1;
         }
     }

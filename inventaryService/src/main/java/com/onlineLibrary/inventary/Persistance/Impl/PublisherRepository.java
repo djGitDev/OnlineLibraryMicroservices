@@ -2,17 +2,18 @@ package com.onlineLibrary.inventary.Persistance.Impl;
 
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
 import com.onlineLibrary.inventary.Persistance.IPublisherRepository;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+@Repository
 public class PublisherRepository implements IPublisherRepository {
     private IDBConnection dbConnection;
 
-    public PublisherRepository(BeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public PublisherRepository(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
     @Override

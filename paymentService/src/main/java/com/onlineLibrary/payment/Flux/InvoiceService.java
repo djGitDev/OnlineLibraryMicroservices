@@ -1,5 +1,6 @@
 package com.onlineLibrary.payment.Flux;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.payment.Entities.Invoice;
 import com.onlineLibrary.payment.Persistance.IInvoiceRepository;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import static com.onlineLibrary.payment.Util.ConvertJsonUtils.jacksonToGson;
 import static java.time.LocalDate.now;
 
 @Service
@@ -25,8 +27,9 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public JsonObject generateInvoice(int cartId) throws Exception {
-        ResponseEntity<JsonObject> response = cartMicroservicesClient.callGetTotalPriceCart(cartId);
-        JsonObject jsonTotalPrice =  response.getBody().getAsJsonObject();
+        ResponseEntity<JsonNode> responseJackson = cartMicroservicesClient.callGetTotalPriceCart(cartId);
+        JsonObject response = jacksonToGson(responseJackson.getBody());
+        JsonObject jsonTotalPrice =  response.getAsJsonObject();
         double totalPrice = jsonTotalPrice.get("total_price").getAsDouble();
         Invoice invoice = new Invoice(now(), totalPrice);
         int invoiceId =  invoiceRepository.save(invoice);

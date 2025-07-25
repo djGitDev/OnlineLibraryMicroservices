@@ -1,8 +1,7 @@
 package com.onlineLibrary.orchestre.Flux.MicroservicesClients;
 
 
-import com.onlineLibrary.orchestre.Config.GsonConfig;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,27 +9,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "inventary-service", url = "${inventary-service.url}",configuration = GsonConfig.FeignConfig.class
-)
+@FeignClient(name = "inventary-service", url = "${inventary-service.url}")
 public interface InventaryMicroservicesClient {
 
-    @GetMapping(
-            value = "/api/books/{id}",
-            produces = "application/json"
-    )
-    ResponseEntity<JsonObject> callFindBookById(@PathVariable("id") int id);
+    @GetMapping(value = "/api/books/{id}")
+    ResponseEntity<JsonNode> callFindBookById(@PathVariable("id") int id);
 
     @GetMapping(
             value = "/api/books/research/{isbn}",
             produces = "application/json"
     )
-    ResponseEntity<JsonObject> callFindBookByIsbn(@PathVariable("isbn") String isbn);
+    ResponseEntity<JsonNode> callFindBookByIsbn(@PathVariable("isbn") String isbn);
 
     @PutMapping(
             value = "/api/books/{id}/quantity",
             produces = "application/json"
     )
-    ResponseEntity<JsonObject> callDecreaseBookQuantity(
+    ResponseEntity<JsonNode> callDecreaseBookQuantity(
             @PathVariable("id") int id,
             @RequestParam("quantity") int quantity
     );
@@ -39,6 +34,6 @@ public interface InventaryMicroservicesClient {
             value = "/api/books",
             produces = "application/json"
     )
-    ResponseEntity<JsonObject> callGetBooks();
+    ResponseEntity<JsonNode> callGetBooks();
 
 }

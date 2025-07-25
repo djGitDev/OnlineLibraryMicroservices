@@ -6,6 +6,7 @@
   "TestCaseDecreaseBookQuantityInStock.json",
   "TestCaseAddBooksFromInventaryToCartThenClearCart.json",
   "TestCaseAddTwoCartItemsWithSameBookIdsThanClear.json",
+  "TestCaseAddBooksWithoutClearingCart.json",
   "TestClearBooksFromCart.json",
   "TestCaseClearAllBooksFromCart.json",
   "TestCasePlaceOrderAfterAddingBooks.json",

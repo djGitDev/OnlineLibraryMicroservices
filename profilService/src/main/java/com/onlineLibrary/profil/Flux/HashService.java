@@ -1,8 +1,12 @@
 package com.onlineLibrary.profil.Flux;
 
+import org.springframework.stereotype.Service;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+
+@Service
 public class HashService implements IHashService {
 
     @Override

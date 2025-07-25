@@ -2,19 +2,20 @@ package com.onlineLibrary.profil.Persistance;
 
 import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Entities.Address;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Repository
 public class RepositoryAddress implements IRepositoryAddress {
 
     private final IDBConnection dbConnection;
 
-    public RepositoryAddress(IBeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public RepositoryAddress(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
     @Override

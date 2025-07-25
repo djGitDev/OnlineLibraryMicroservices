@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-# Configuration
+# Database container configurations
 $containers = @(
     @{
         Name = "db-profil";
@@ -30,15 +30,22 @@ $containers = @(
         User = "postgres";
         Password = "mypass"
     }
+    @{
+        Name = "db-cart";
+        Port = 5436;
+        DB = "CartServiceDB";
+        User = "postgres";
+        Password = "mypass"
+    }
 )
 
-# Fonction pour lister les tables
+# Function to list database tables
 function Get-PGTables {
     param (
         $container
     )
     
-    Write-Host "`n[${$container.Name}] Connexion a la base ${$container.DB}..." -ForegroundColor Cyan
+    Write-Host "`n[${$container.Name}] Connecting to database ${$container.DB}..." -ForegroundColor Cyan
     
     try {
         $query = @"
@@ -51,31 +58,31 @@ ORDER BY table_schema, table_name;
         $result = docker exec $container.Name psql -U $container.User -d $container.DB -c $query 2>&1
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Tables trouvees dans ${$container.DB}:" -ForegroundColor Green
+            Write-Host "Tables found in ${$container.DB}:" -ForegroundColor Green
             $result | Where-Object { $_ -match "\w+\.\w+" } | ForEach-Object {
                 Write-Host "  $_" -ForegroundColor Yellow
             }
         } else {
-            Write-Host "Erreur: $result" -ForegroundColor Red
+            Write-Host "Error: $result" -ForegroundColor Red
         }
     }
     catch {
-        Write-Host "Erreur de connexion à ${$container.Name}: $_" -ForegroundColor Red
+        Write-Host "Connection error to ${$container.Name}: $_" -ForegroundColor Red
     }
 }
 
-# Exécution pour chaque conteneur
+# Process each container
 foreach ($container in $containers) {
-    # Vérifie que le conteneur est en cours d'exécution
+    # Check if container is running
     $status = docker inspect -f '{{.State.Status}}' $container.Name 2>$null
     
     if ($status -eq "running") {
         Get-PGTables $container
-        Start-Sleep -Seconds 2  # Pause entre les conteneurs
+        Start-Sleep -Seconds 2  # Pause between containers
     }
     else {
-        Write-Host "`n[${$container.Name}] Conteneur non trouvé ou non demarre (status: $status)" -ForegroundColor Red
+        Write-Host "`n[${$container.Name}] Container not found or not running (status: $status)" -ForegroundColor Red
     }
 }
 
-Write-Host "`nAnalyse terminée pour tous les conteneurs." -ForegroundColor Green
+Write-Host "`nAnalysis completed for all containers." -ForegroundColor Green

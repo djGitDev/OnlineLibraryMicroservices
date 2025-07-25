@@ -1,0 +1,64 @@
+@startuml
+actor User
+
+participant "Caddy (proxy 80)" as Caddy
+participant "Webapp (5173)" as Webapp
+participant "Orchestre (8080)" as Orchestre
+
+participant "Profil Service (8081)" as Profil
+participant "Inventary Service (8082)" as Inventary
+participant "Cart Service (8085)" as Cart
+participant "Payment Service (8083)" as Payment
+participant "Order Service (8084)" as Order
+
+== User Authentication ==
+User -> Caddy : POST /api/profil/login
+Caddy -> Orchestre : Forward request
+Orchestre -> Profil : Create / Verify and login user
+Profil --> Orchestre : Return success/failure
+Orchestre --> Caddy : Return response
+Caddy --> User : Return response
+
+== User searches for books ==
+User -> Caddy : GET /api/books/{id}
+Caddy -> Orchestre : Forward request
+Orchestre -> Inventary : Search book
+Inventary --> Orchestre : Return search result
+Orchestre --> Caddy : Return result
+Caddy --> User : Return book
+
+== User adds book to cart ==
+User -> Caddy : POST /api/cart/{userId}/add-searched-items
+Caddy -> Orchestre : Forward request
+Orchestre -> Cart : Add item(s) to cart
+Cart --> Orchestre : Confirm addition
+Orchestre --> Caddy : Return confirmation
+Caddy --> User : Confirm item added
+
+== User makes payment ==
+User -> Caddy : POST /api/payment/{cartId}/process/{userId}
+Caddy -> Orchestre : Forward payment request
+Orchestre -> Payment : Process payment
+Payment -> Cart : /api/cart/carts/{cartId}/total-price get total price
+Cart --> Payment : return total price
+Payment -> Payment : generate invoice
+Payment -> Order : /api/order/{userId}/place-order  create order
+Order -> Profil : /api/profil/{user_id}  retrieve profile(address)
+Profil --> Order : return profile data
+Order -> Cart : /api/cart/{userId} retrieve cart
+Cart --> Order : returne cart id
+Order -> Cart : /api/cart/items/{cartId} retrieve all items
+Cart --> Order : return all cart items
+Order -> Cart : /api/cart/{userId}/clear-cart Clear purchased items
+Cart ->Cart : clear cart data
+Order -> Inventary :/api/cart/items/{cartId} update inventary
+Inventary -> Inventary : update inventary
+Order -> Order : deliver
+Order --> Payment : Confirm order created
+Payment -> Profil : /api/profil/data/{userId} retrieve user email
+Payment -> Payment : notify user
+Payment --> Orchestre : Return payment and order confirmation
+Orchestre --> Caddy : Return success response
+Caddy --> User : Return payment confirmation
+
+@enduml

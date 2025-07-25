@@ -1,4 +1,4 @@
-package com.onlineLibrary.profil.UtilProfil;
+package com.onlineLibrary.profil.Util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

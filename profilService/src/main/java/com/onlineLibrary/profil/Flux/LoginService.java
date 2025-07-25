@@ -4,17 +4,21 @@ import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Entities.Credential;
 import com.onlineLibrary.profil.Entities.User;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.Optional;
 
+
+@Service
 public class LoginService implements ILoginService {
 
     private final IRepositoryUser repositoryUser;
     private final IHashService hashService;
 
-    public LoginService(IBeansInjectionFactory factory) {
-        this.repositoryUser = factory.getUserRepository();
-        this.hashService = factory.getHasherPassword();
+    @Autowired
+    public LoginService(IRepositoryUser repositoryUser,IHashService hashService) {
+        this.repositoryUser = repositoryUser;
+        this.hashService = hashService;
     }
 
     @Override

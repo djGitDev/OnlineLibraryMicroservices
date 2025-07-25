@@ -2,9 +2,8 @@ package com.onlineLibrary.profil.ControllerRestProfilApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.onlineLibrary.profil.Flux.IProfilServiceDispatcher;
-import com.onlineLibrary.profil.UtilProfil.BeansInjectionFactory;
-import com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils;
-import com.onlineLibrary.profil.UtilProfil.IBeansInjectionFactory;
+import com.onlineLibrary.profil.Util.ConvertJsonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +11,8 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils.gsonToJackson;
-import static com.onlineLibrary.profil.UtilProfil.ConvertJsonUtils.jacksonToGson;
+import static com.onlineLibrary.profil.Util.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.profil.Util.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/profil")
@@ -23,9 +22,9 @@ public class ProfilRestController {
 
     private IProfilServiceDispatcher dispatcher;
 
-    public ProfilRestController() {
-        IBeansInjectionFactory factory = BeansInjectionFactory.getInstance();
-        this.dispatcher = factory.getProfilServiceDispatcher();
+    @Autowired
+    public ProfilRestController(IProfilServiceDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
     }
 
     @PostMapping(path = "/register")

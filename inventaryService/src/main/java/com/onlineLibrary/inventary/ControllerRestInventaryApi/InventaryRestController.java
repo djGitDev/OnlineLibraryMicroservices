@@ -1,18 +1,17 @@
 package com.onlineLibrary.inventary.ControllerRestInventaryApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
-import com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils;
-import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
+import com.onlineLibrary.inventary.Util.ConvertJsonUtils;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.inventary.Flux.IBookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils.gsonToJackson;
-import static com.onlineLibrary.inventary.UtilInventaire.ConvertJsonUtils.jacksonToGson;
+import static com.onlineLibrary.inventary.Util.ConvertJsonUtils.gsonToJackson;
+import static com.onlineLibrary.inventary.Util.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/books")
@@ -21,9 +20,9 @@ public class InventaryRestController {
     private static final Logger logger = LoggerFactory.getLogger(InventaryRestController.class);
     private final IBookService bookService;
 
-    public InventaryRestController() {
-        IBeansInjectionFactory factory = BeansInjectionFactory.getInstance();
-        this.bookService = factory.getIBookService();
+    @Autowired
+    public InventaryRestController(IBookService bookService) {
+        this.bookService = bookService;
     }
 
     @PostMapping

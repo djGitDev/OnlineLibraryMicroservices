@@ -3,7 +3,7 @@ package com.onlineLibrary.inventary.Persistance.Impl;
 import com.onlineLibrary.inventary.Entities.Book;
 import com.onlineLibrary.inventary.Persistance.IBookRepository;
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,11 +11,12 @@ import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class BookRepository implements IBookRepository {
     private IDBConnection dbConnection;
 
-    public BookRepository(BeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public BookRepository(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
     @Override

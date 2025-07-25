@@ -2,19 +2,21 @@ package com.onlineLibrary.inventary.Persistance.Impl;
 
 import com.onlineLibrary.inventary.Persistance.IAuthorBookRepository;
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+@Repository
 public class AuthorBookRepository implements IAuthorBookRepository {
 
     private IDBConnection dbConnection;
 
-
-    public AuthorBookRepository(BeansInjectionFactory factory) {
-        dbConnection = factory.getDBConnection();
+    @Autowired
+    public AuthorBookRepository(IDBConnection dbConnection) {
+        dbConnection = dbConnection;
     }
 
     @Override

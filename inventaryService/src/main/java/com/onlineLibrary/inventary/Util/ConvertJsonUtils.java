@@ -1,4 +1,4 @@
-package com.onlineLibrary.inventary.UtilInventaire;
+package com.onlineLibrary.inventary.Util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

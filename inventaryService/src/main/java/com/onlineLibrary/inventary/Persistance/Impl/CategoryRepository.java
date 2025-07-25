@@ -1,19 +1,20 @@
 package com.onlineLibrary.inventary.Persistance.Impl;
 
-import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
 import com.onlineLibrary.inventary.Persistance.ICategoryRepository;
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+@Repository
 public class CategoryRepository implements ICategoryRepository {
 
     private IDBConnection dbConnection;
 
-    public CategoryRepository(IBeansInjectionFactory factory) {
-        this.dbConnection = factory.getDBConnection();
+    public CategoryRepository(IDBConnection dbConnection) {
+        this.dbConnection = dbConnection;
     }
 
 

@@ -3,16 +3,19 @@ package com.onlineLibrary.inventary.Flux.Impl;
 import com.onlineLibrary.inventary.Flux.IAuthorService;
 import com.onlineLibrary.inventary.Persistance.IAuthorBookRepository;
 import com.onlineLibrary.inventary.Persistance.IAuthorRepository;
-import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthorService implements IAuthorService {
 
     private IAuthorRepository authorRepository;
     private IAuthorBookRepository authorBookRepository;
 
-    public AuthorService(IBeansInjectionFactory factory){
-        this.authorRepository = factory.getAuthorRepository(factory);
-        this.authorBookRepository = factory.getAuthorBookRepository(factory);
+    @Autowired
+    public AuthorService(IAuthorRepository authorRepository,IAuthorBookRepository authorBookRepository){
+        this.authorRepository = authorRepository;
+        this.authorBookRepository = authorBookRepository;
     }
 
 

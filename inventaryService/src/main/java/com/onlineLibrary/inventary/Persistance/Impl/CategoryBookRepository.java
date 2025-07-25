@@ -2,19 +2,20 @@ package com.onlineLibrary.inventary.Persistance.Impl;
 
 import com.onlineLibrary.inventary.Persistance.ICategoryBookRepository;
 import com.onlineLibrary.inventary.Persistance.IDBConnection;
-import com.onlineLibrary.inventary.UtilInventaire.BeansInjectionFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+@Repository
 public class CategoryBookRepository implements ICategoryBookRepository {
 
     private IDBConnection dbConnection;
 
 
-    public CategoryBookRepository(BeansInjectionFactory factory) {
-        dbConnection = factory.getDBConnection();
+    public CategoryBookRepository(IDBConnection dbConnection) {
+        dbConnection = dbConnection;
     }
 
     @Override

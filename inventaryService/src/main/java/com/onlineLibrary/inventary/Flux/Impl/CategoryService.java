@@ -3,17 +3,20 @@ package com.onlineLibrary.inventary.Flux.Impl;
 import com.onlineLibrary.inventary.Flux.ICategoryService;
 import com.onlineLibrary.inventary.Persistance.ICategoryBookRepository;
 import com.onlineLibrary.inventary.Persistance.ICategoryRepository;
-import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+
+@Service
 public class CategoryService implements ICategoryService {
 
     private  ICategoryRepository categoryRepository;
     private  ICategoryBookRepository categoryBookRepository;
 
-
-    public CategoryService(IBeansInjectionFactory factory){
-        this.categoryRepository = factory.getCategoryRepository(factory);
-        this.categoryBookRepository = factory.getCategoryBookRepository(factory);
+    @Autowired
+    public CategoryService(ICategoryRepository categoryRepository,ICategoryBookRepository categoryBookRepository){
+        this.categoryRepository = categoryRepository;
+        this.categoryBookRepository = categoryBookRepository;
     }
 
     @Override

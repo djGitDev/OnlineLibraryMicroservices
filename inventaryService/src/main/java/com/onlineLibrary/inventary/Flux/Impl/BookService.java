@@ -10,12 +10,14 @@ import com.onlineLibrary.inventary.Flux.IBookService;
 import com.onlineLibrary.inventary.Flux.ICategoryService;
 import com.onlineLibrary.inventary.Flux.IPublisherService;
 import com.onlineLibrary.inventary.Persistance.IBookRepository;
-import com.onlineLibrary.inventary.UtilInventaire.IBeansInjectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class BookService implements IBookService {
 
 
@@ -24,11 +26,12 @@ public class BookService implements IBookService {
     private  ICategoryService categoryService;
     private  IPublisherService publisherService;
 
-    public BookService(IBeansInjectionFactory factory) {
-        this.bookRepository = factory.getBookRepository(factory);
-        this.authorService = factory.getAuthorService(factory);
-        this.categoryService = factory.getCategoryService(factory);
-        this.publisherService = factory.getPublisherService(factory);
+    @Autowired
+    public BookService(IBookRepository bookRepository,IAuthorService authorService,ICategoryService categoryService,IPublisherService publisherService) {
+        this.bookRepository = bookRepository;
+        this.authorService = authorService;
+        this.categoryService = categoryService;
+        this.publisherService = publisherService;
     }
 
     @Override

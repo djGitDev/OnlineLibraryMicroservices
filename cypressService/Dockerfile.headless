@@ -9,8 +9,8 @@ WORKDIR /app
 COPY . .
 
 # Installer les dépendances nécessaires pour la validation DB
-RUN npm install pg \
-    && npx cypress install   # <--- Télécharge le binaire Cypress pendant le build
+RUN npm install pg 
+RUN npx cypress verify
 
 USER node
 

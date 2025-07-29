@@ -1,14 +1,21 @@
 image: docker:24.0.9-cli
 
 variables:
+  DOCKER_HOST: tcp://localhost:2375
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
-  DOCKER_HOST: tcp://localhost:2375
 
 before_script:
-  - apk add --no-cache docker docker-cli-compose
-  - dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 &  
-  - timeout 20 sh -c 'until docker info; do sleep 1; done'
+  # Install dependencies (docker-cli-compose is now included in docker:24.0.9-cli)
+  - apk add --no-cache shadow
+  # Create docker group and add current user
+  - getent group docker || groupadd docker
+  - usermod -aG docker $(whoami)
+  # Start Docker daemon with proper permissions
+  - nohup dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > /dev/null 2>&1 &
+  # Wait for Docker to be ready
+  - timeout 30 sh -c 'until docker info >/dev/null 2>&1; do sleep 1; echo "Waiting for Docker..."; done'
+  # Verify installation
   - docker version
   - docker compose version
 

@@ -1,11 +1,19 @@
-image: docker:latest
+image: docker:24.0.9
+
 services:
-  - name: docker:dind
-    command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
- 
+  - name: docker:24.0.9-dind
+    alias: docker
+
 variables:
-  DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
+
+before_script:
+  - echo "Waiting for Docker daemon to be ready..."
+  - timeout 30 sh -c 'until docker info; do sleep 1; done' || false
+  - docker version
+  - docker compose version
 
 
 stages:

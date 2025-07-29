@@ -1,6 +1,5 @@
 FROM cypress/included:12.17.0
 
-# Pas besoin de DISPLAY ni des libs graphiques
 ENV QT_X11_NO_MITSHM=1 \
     _X11_NO_MITSHM=1 \
     _MITSHM=0 \
@@ -9,12 +8,10 @@ ENV QT_X11_NO_MITSHM=1 \
 WORKDIR /app
 COPY . .
 
-
 # Installer les dépendances nécessaires pour la validation DB
-RUN npm install pg
+RUN npm install pg \
+    && npx cypress install   # <--- Télécharge le binaire Cypress pendant le build
 
-# Définir l'utilisateur node
 USER node
 
-# Lancer Cypress en mode headless sans vidéo
 CMD ["npx", "cypress", "run", "--headless", "--config", "video=false,screenshotOnRunFailure=false"]

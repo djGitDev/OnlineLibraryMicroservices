@@ -6,16 +6,31 @@ variables:
   DOCKER_DRIVER: overlay2
 
 before_script:
-  # Install dependencies (docker-cli-compose is now included in docker:24.0.9-cli)
-  - apk add --no-cache shadow
-  # Create docker group and add current user
-  - getent group docker || groupadd docker
-  - usermod -aG docker $(whoami)
-  # Start Docker daemon with proper permissions
-  - nohup dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > /dev/null 2>&1 &
-  # Wait for Docker to be ready
-  - timeout 30 sh -c 'until docker info >/dev/null 2>&1; do sleep 1; echo "Waiting for Docker..."; done'
-  # Verify installation
+  # Installer les dépendances nécessaires
+  - apk add --no-cache shadow docker-cli-buildx
+  # Configurer les permissions Docker
+  - mkdir -p /etc/docker
+  - echo '{"storage-driver":"overlay2"}' > /etc/docker/daemon.json
+  # Démarrer le daemon Docker en mode debug
+  - dockerd --host=tcp://0.0.0.0:2375 > /tmp/dockerd.log 2>&1 &
+  # Attendre que Docker soit prêt avec timeout
+  - |
+    echo "Attente du démarrage de Docker..."
+    for i in $(seq 1 30); do
+      if docker info >/dev/null 2>&1; then
+        echo "Docker démarré avec succès"
+        break
+      fi
+      sleep 1
+      echo "Attente... (${i}/30)"
+      # Afficher les logs si échec
+      if [ $i -eq 30 ]; then
+        echo "Échec du démarrage de Docker - derniers logs:"
+        tail -n 50 /tmp/dockerd.log
+        exit 1
+      fi
+    done
+  # Vérifier les versions
   - docker version
   - docker compose version
 

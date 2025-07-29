@@ -2,8 +2,7 @@ image: docker:24.0
 
 services:
   - docker:24.0-dind  # Match the Docker client version
-  - alias: docker  # Ensures the hostname "docker" resolves
-
+ 
 variables:
   DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)
   DOCKER_DRIVER: overlay2

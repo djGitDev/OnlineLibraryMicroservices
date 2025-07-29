@@ -1,37 +1,19 @@
-image: docker:24.0.9-cli
+image: ubuntu:22.04
 
 variables:
-  DOCKER_HOST: tcp://localhost:2375
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
 
 before_script:
-  # Installer les dépendances nécessaires
-  - apk add --no-cache shadow docker-cli-buildx
-  # Configurer les permissions Docker
-  - mkdir -p /etc/docker
-  - echo '{"storage-driver":"overlay2"}' > /etc/docker/daemon.json
-  # Démarrer le daemon Docker en mode debug
-  - dockerd --host=tcp://0.0.0.0:2375 > /tmp/dockerd.log 2>&1 &
-  # Attendre que Docker soit prêt avec timeout
-  - |
-    echo "Attente du démarrage de Docker..."
-    for i in $(seq 1 30); do
-      if docker info >/dev/null 2>&1; then
-        echo "Docker démarré avec succès"
-        break
-      fi
-      sleep 1
-      echo "Attente... (${i}/30)"
-      # Afficher les logs si échec
-      if [ $i -eq 30 ]; then
-        echo "Échec du démarrage de Docker - derniers logs:"
-        tail -n 50 /tmp/dockerd.log
-        exit 1
-      fi
-    done
-  # Vérifier les versions
-  - docker version
+  - apt-get update -y
+  - apt-get install -y docker.io docker-compose net-tools
+  # Démarrer dockerd en mode non privilégié, écoute sur tcp
+  - dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > /dev/null 2>&1 &
+  - sleep 10
+  # Vérifications
+  - ps aux | grep dockerd
+  - netstat -tlnp
+  - docker info
   - docker compose version
 
 

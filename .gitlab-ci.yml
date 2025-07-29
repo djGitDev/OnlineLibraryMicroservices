@@ -3,14 +3,13 @@ image: ubuntu:22.04
 variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://localhost:2375
 
 before_script:
   - apt-get update -y
   - apt-get install -y docker.io docker-compose net-tools
-  # Démarrer dockerd en mode non privilégié, écoute sur tcp
   - dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > /dev/null 2>&1 &
   - sleep 10
-  # Vérifications
   - ps aux | grep dockerd
   - netstat -tlnp
   - docker info

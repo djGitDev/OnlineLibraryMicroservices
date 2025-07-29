@@ -3,11 +3,11 @@
 
 # Configuration
 declare -A containers=(
-    ["db-profil"]="5432:ProfilServiceDB:postgres:mypass"
+    ["db-profil-test"]="5432:ProfilServiceTestDB:postgres:mypass"
     ["db-inventary"]="5433:InventaryServiceDB:postgres:mypass"
-    ["db-order"]="5434:OrderServiceDB:postgres:mypass"
-    ["db-payment"]="5435:PaymentServiceDB:postgres:mypass"
-    ["db-cart"]="5436:CartServiceDB:postgres:mypass"
+    ["db-order-test"]="5434:OrderServiceTestDB:postgres:mypass"
+    ["db-payment-test"]="5435:PaymentServiceTestDB:postgres:mypass"
+    ["db-cart-test"]="5436:CartServiceTestDB:postgres:mypass"
 )
 
 # Colors

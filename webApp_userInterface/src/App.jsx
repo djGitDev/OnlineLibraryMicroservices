@@ -6,9 +6,11 @@ function App() {
     const [files, setFiles] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [content, setContent] = useState(null);
-    const [apiResponse, setApiResponse] = useState(null); 
-    const [isProcessing, setIsProcessing] = useState(false); 
-    const backendUrl = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL || 'http://localhost:80/api/workflow';
+    const [apiResponse, setApiResponse] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const backendUrlInternalNetwork = import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL_INTERNAL_NETWORK;
+    const backendUrlFromProxy =  import.meta.env.VITE_API_SERVICE_ORCHESTRE_URL_FROM_PROXY;
+
 
     useEffect(() => {
         fetch("/workFlowsScenarios/files.json")
@@ -32,7 +34,7 @@ function App() {
     const handleCancel = () => {
         setSelectedFile(null);
         setContent(null);
-        setApiResponse(null); 
+        setApiResponse(null);
     };
 
     const handleProcess = async () => {
@@ -42,100 +44,111 @@ function App() {
         }
 
         setIsProcessing(true);
-      
+
+    
         try {
-        const response = await axios.post(backendUrl, content, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-          setApiResponse(response.data);
-          console.log("Réponse backend :", response.data);
+            let response;
+            try {
+                // 1er essai : via Caddy (localhost:80)
+                response = await axios.post(backendUrlFromProxy, content, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            } catch (e) {
+                console.warn("Échec via Caddy, tentative via backend interne…", e.message);
+                // 2ème essai : accès direct au backend
+                response = await axios.post(backendUrlInternalNetwork, content, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            }
+
+            setApiResponse(response.data);
+            console.log("Réponse backend :", response.data);
+
         } catch (err) {
-        console.error("Erreur d'envoi du workflow :", err);
-          alert("Erreur lors du traitement du workflow.");
+            console.error("Erreur d'envoi du workflow :", err);
+            alert("Erreur lors du traitement du workflow.");
         } finally {
-        setIsProcessing(false);
+            setIsProcessing(false);
         }
-    };
+    }
 
-    const handleBackFromResponse = () => {
-        setApiResponse(null); 
-    };
+        const handleBackFromResponse = () => {
+            setApiResponse(null);
+        };
 
-    return (
-        <div className="app-container">
-            <h1>Supported Workflows List</h1>
+        return (
+            <div className="app-container">
+                <h1>Supported Workflows List</h1>
 
-            {/* État initial - Liste des fichiers */}
-            {!selectedFile && !apiResponse && (
-                <ul className="file-list">
-                    {Array.isArray(files) &&
-                        files.map((file, i) => (
-                            <li key={i}>
-                                <button
-                                    onClick={() => setSelectedFile(file)}
-                                    className="file-button"
-                                >
-                                    {file}
-                                </button>
-                            </li>
-                        ))}
-                </ul>
-            )}
+                {/* État initial - Liste des fichiers */}
+                {!selectedFile && !apiResponse && (
+                    <ul className="file-list">
+                        {Array.isArray(files) &&
+                            files.map((file, i) => (
+                                <li key={i}>
+                                    <button
+                                        onClick={() => setSelectedFile(file)}
+                                        className="file-button"
+                                    >
+                                        {file}
+                                    </button>
+                                </li>
+                            ))}
+                    </ul>
+                )}
 
-            {/* État fichier sélectionné */}
-            {selectedFile && !apiResponse && (
-                <div className="selected-content">
-                    <h2>Selected File: {selectedFile}</h2>
+                {/* État fichier sélectionné */}
+                {selectedFile && !apiResponse && (
+                    <div className="selected-content">
+                        <h2>Selected File: {selectedFile}</h2>
 
-                    {content ? (
+                        {content ? (
+                            <pre className="json-box">
+                                {JSON.stringify(content, null, 2)}
+                            </pre>
+                        ) : (
+                            <p>Loading file content...</p>
+                        )}
+
+                        <div className="action-buttons">
+                            <button
+                                onClick={handleProcess}
+                                className="action-button process"
+                                disabled={isProcessing}
+                            >
+                                {isProcessing ? 'Processing...' : 'Process Workflow'}
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="action-button cancel"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* État réponse API */}
+                {apiResponse && (
+                    <div className="selected-content">
+                        <h2>API Response</h2>
+
                         <pre className="json-box">
-                            {JSON.stringify(content, null, 2)}
+                            {JSON.stringify(apiResponse, null, 2)}
                         </pre>
-                    ) : (
-                        <p>Loading file content...</p>
-                    )}
 
-                    <div className="action-buttons">
-                        <button
-                            onClick={handleProcess}
-                            className="action-button process"
-                            disabled={isProcessing}
-                        >
-                            {isProcessing ? 'Processing...' : 'Process Workflow'}
-                        </button>
-                        <button
-                            onClick={handleCancel}
-                            className="action-button cancel"
-                        >
-                            Cancel
-                        </button>
+                        <div className="action-buttons">
+                            <button
+                                onClick={handleBackFromResponse}
+                                className="action-button cancel"
+                            >
+                                Back
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+        );
+    }
 
-            {/* État réponse API */}
-            {apiResponse && (
-                <div className="selected-content">
-                    <h2>API Response</h2>
-
-                    <pre className="json-box">
-                        {JSON.stringify(apiResponse, null, 2)}
-                    </pre>
-
-                    <div className="action-buttons">
-                        <button
-                            onClick={handleBackFromResponse}
-                            className="action-button cancel"
-                        >
-                            Back
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-}
-
-export default App;
+    export default App;

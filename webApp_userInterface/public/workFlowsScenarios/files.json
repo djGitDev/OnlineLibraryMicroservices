@@ -1,4 +1,5 @@
 [
+  "purchaseFlowTestCase.json",
   "TestCaseRegister&Login.json",
   "TestCaseFindBookById.json",
   "TestCaseFindBookByIsbn.json",
@@ -11,6 +12,5 @@
   "TestCaseClearAllBooksFromCart.json",
   "TestCasePlaceOrderAfterAddingBooks.json",
   "TestCasePlaceOrderAndDeliverAutomaticaly.json",
-  "purchaseFlowTestCase.json",
   "TestCaseDisplayOrders.json"
 ]

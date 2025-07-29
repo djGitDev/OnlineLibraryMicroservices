@@ -1,9 +1,13 @@
-:80 {
-    handle /api/* {
-        reverse_proxy orchestre:8080
-    }
 
-    handle {
+http://localhost:80 {
+    # Proxy API
+    handle /api/* {
+    reverse_proxy orchestre:8080
+}
+
+    # Proxy frontend
+    handle /* {
         reverse_proxy webapp:5173
     }
 }
+

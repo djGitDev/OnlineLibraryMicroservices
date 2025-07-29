@@ -3,7 +3,10 @@ package com.onlineLibrary.cart.Flux.Implementations;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.cart.Entities.CartItem;
 import com.onlineLibrary.cart.Flux.Interfaces.ICartItemsService;
+import com.onlineLibrary.cart.Persistance.Implementations.CartItemRepository;
 import com.onlineLibrary.cart.Persistance.Interfaces.ICartItemRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,7 @@ import java.util.Optional;
 
 @Service
 public class CartItemService implements ICartItemsService {
+    private static final Logger logger = LoggerFactory.getLogger(CartItemService.class);
 
     private ICartItemRepository cartItemRepository;
 

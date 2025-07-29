@@ -7,9 +7,6 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)
   DOCKER_DRIVER: overlay2
 
-before_script:
-  - apk add --no-cache docker-cli-compose  # installer docker compose V2
-  - docker version
 
 stages:
   - test

@@ -9,9 +9,10 @@ WORKDIR /app
 COPY . .
 
 # Installer les dépendances nécessaires pour la validation DB
-RUN npm install pg 
-RUN npx cypress install --force \
-    && mkdir -p /home/node/.cache/Cypress \
+RUN mkdir -p /app/cypress-logs /app/cypress/videos \
+    && chown -R node:node /app/cypress-logs /app/cypress/videos \
+    && npm install pg \
+    && npx cypress install --force \
     && chown -R node:node /home/node/.cache
 USER node
 

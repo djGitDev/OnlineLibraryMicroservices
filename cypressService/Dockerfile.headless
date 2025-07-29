@@ -10,8 +10,7 @@ COPY . .
 
 # Installer les dépendances nécessaires pour la validation DB
 RUN npm install pg 
-RUN npx cypress verify
-
+RUN npx cypress install --force
 USER node
 
 CMD ["npx", "cypress", "run", "--headless", "--config", "video=false,screenshotOnRunFailure=false"]

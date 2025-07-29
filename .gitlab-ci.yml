@@ -6,7 +6,7 @@ variables:
 before_script:
   - apt-get update -y
   - apt-get install -y docker.io docker-compose net-tools iproute2
-  - dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > dockerd.log 2>&1 &
+  - dockerd --debug --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay2
   - sleep 15   # attendre que dockerd démarre
   - docker info
   - docker compose version

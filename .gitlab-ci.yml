@@ -8,10 +8,6 @@ variables:
 before_script:
   - apt-get update -y
   - apt-get install -y docker.io docker-compose net-tools
-  - dockerd --host=tcp://0.0.0.0:2375 --storage-driver=overlay2 > /dev/null 2>&1 &
-  - sleep 10
-  - ps aux | grep dockerd
-  - netstat -tlnp
   - docker info
   - docker compose version
 

@@ -1,17 +1,13 @@
-image: docker:24.0.9
-
-services:
-  - name: docker:24.0.9-dind
-    alias: docker
+image: docker:24.0.9-cli
 
 variables:
-  DOCKER_HOST: tcp://localhost:2375  
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
 
 before_script:
-  - ps aux
-  - netstat -tlnp
+  - apk add --no-cache docker-cli docker-cli-compose
+  - dockerd &
+  - sleep 5
   - docker version
   - docker compose version
 

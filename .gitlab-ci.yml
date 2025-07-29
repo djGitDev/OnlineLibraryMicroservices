@@ -17,7 +17,7 @@ stages:
 test_e2e:
   stage: test
   script:
-    - docker compose -f docker-compose.ci.yml up -d --scale cypress=0
+    - docker compose -f docker-compose.ci.yaml up -d --scale cypress=0
     - docker compose -f docker-compose.ci.yaml run --rm cypress npx cypress run
     - EXIT_CODE=$?
     - exit $EXIT_CODE

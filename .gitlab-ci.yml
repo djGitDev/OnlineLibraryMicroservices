@@ -1,11 +1,11 @@
-image: docker:latest
+image: docker:24.0
 
 services:
-  - docker:dind
+  - docker:24.0-dind  # Match the Docker client version
 
 variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)
+  DOCKER_DRIVER: overlay2
 
 before_script:
   - docker version

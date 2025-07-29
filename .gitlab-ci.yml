@@ -1,7 +1,7 @@
 image: docker:latest
 services:
   - name: docker:dind
-    command: ["--tls=false"]
+    command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
  
 variables:
   DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)

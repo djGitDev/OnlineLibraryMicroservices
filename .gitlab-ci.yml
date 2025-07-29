@@ -1,7 +1,7 @@
-image: docker:24.0
-
+image: docker:latest
 services:
-  - docker:24.0-dind  # Match the Docker client version
+  - name: docker:dind
+    command: ["--tls=false"]
  
 variables:
   DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS (default)

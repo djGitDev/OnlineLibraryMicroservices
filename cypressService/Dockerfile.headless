@@ -10,7 +10,9 @@ COPY . .
 
 # Installer les dépendances nécessaires pour la validation DB
 RUN npm install pg 
-RUN npx cypress install --force
+RUN npx cypress install --force \
+    && mkdir -p /home/node/.cache/Cypress \
+    && chown -R node:node /home/node/.cache
 USER node
 
 CMD ["npx", "cypress", "run", "--headless", "--config", "video=false,screenshotOnRunFailure=false"]

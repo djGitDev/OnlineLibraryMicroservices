@@ -30,8 +30,6 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          docker compose -f docker-compose.ci.yaml run --rm cypress npm install -g cypress
-          docker compose -f docker-compose.ci.yaml run --rm cypress npx cypress install
           docker compose -f docker-compose.ci.yaml run --rm cypress npx cypress run
         continue-on-error: false
 

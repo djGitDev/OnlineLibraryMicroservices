@@ -38,6 +38,8 @@ services:
       dockerfile: Dockerfile.headless
     environment:
       - CYPRESS_baseUrl=http://webapp:5173
+    volumes:
+      - cypress-cache:/home/node/.cache/Cypress
     depends_on:
       - webapp
       - orchestre
@@ -209,3 +211,5 @@ networks:
 
 volumes:
   pgInventaryData:
+  cypress-cache:
+

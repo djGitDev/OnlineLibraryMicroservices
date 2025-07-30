@@ -3,9 +3,9 @@
 # Database container configurations
 $containers = @(
     @{
-        Name = "db-profil";
+        Name = "db-profil-test";
         Port = 5432;
-        DB = "ProfilServiceDB";
+        DB = "ProfilServiceTestDB";
         User = "postgres";
         Password = "mypass"
     },
@@ -17,23 +17,23 @@ $containers = @(
         Password = "mypass"
     }
     @{
-        Name = "db-order";
+        Name = "db-order-test";
         Port = 5434;
-        DB = "OrderServiceDB";
+        DB = "OrderServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }
     @{
-        Name = "db-payment";
+        Name = "db-payment-test";
         Port = 5435;
-        DB = "PaymentServiceDB";
+        DB = "PaymentServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }
     @{
-        Name = "db-cart";
+        Name = "db-cart-test";
         Port = 5436;
-        DB = "CartServiceDB";
+        DB = "CartServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }

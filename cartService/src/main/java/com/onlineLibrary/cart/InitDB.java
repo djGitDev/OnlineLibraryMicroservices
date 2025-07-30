@@ -1,32 +1,18 @@
 package com.onlineLibrary.cart;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.onlineLibrary.cart.config.LoaderConfig;
 import java.sql.*;
-import java.util.Properties;
 
 public final class InitDB {
-    private static final String PROPERTIES_FILE = "/application.properties";
-    private static final Properties props = new Properties();
+
+private static final LoaderConfig configLoader = new LoaderConfig();
 
     static {
-        loadProperties();
         loadDriver();
     }
 
     private InitDB() {
         throw new AssertionError("Cette classe ne doit pas être instanciée");
-    }
-
-    private static void loadProperties() {
-        try (InputStream input = InitDB.class.getResourceAsStream(PROPERTIES_FILE)) {
-            if (input == null) {
-                throw new RuntimeException("Fichier " + PROPERTIES_FILE + " non trouvé");
-            }
-            props.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException("Erreur de lecture du fichier de configuration", e);
-        }
     }
 
     private static void loadDriver() {
@@ -38,15 +24,16 @@ public final class InitDB {
     }
 
     public static void initialize() throws SQLException {
-        String url = props.getProperty("spring.datasource.url");
-        String username = props.getProperty("spring.datasource.username");
-        String password = props.getProperty("spring.datasource.password");
+        String url = configLoader.getProperty("spring.datasource.url");
+        String username = configLoader.getProperty("spring.datasource.username");
+        String password = configLoader.getProperty("spring.datasource.password");
 
         if (url == null || username == null || password == null) {
-            throw new SQLException("Configuration DB incomplète dans application.properties");
+            throw new SQLException("Configuration DB incomplète dans " +
+                    "application-" + configLoader.getProfile() + ".properties");
         }
 
-        System.out.println("[InitDB] Initialisation de la base de données...");
+        System.out.println("[InitDB] Initialisation de la base de données avec le profil " + configLoader.getProfile() + "...");
 
         try (Connection conn = DriverManager.getConnection(url, username, password);
              Statement stmt = conn.createStatement()) {
@@ -55,6 +42,7 @@ public final class InitDB {
             System.out.println("[InitDB] Base initialisée avec succès");
         }
     }
+
 
     private static void executeDDL(Statement stmt) throws SQLException {
         String[] ddlScripts = {

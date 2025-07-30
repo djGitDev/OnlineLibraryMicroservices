@@ -1,0 +1,215 @@
+version: '3'
+
+services:
+  webapp:
+    build: ./webApp_userInterface
+    expose:
+      - "5173"
+    environment:
+      - VITE_API_SERVICE_ORCHESTRE_URL_INTERNAL_NETWORK=http://orchestre:8080/api/workflow
+      - VITE_API_SERVICE_ORCHESTRE_URL_FROM_PROXY=http://localhost:80/api/workflow
+    volumes:
+      - ./webApp_userInterface:/app
+      - /app/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - orchestre
+
+  orchestre:
+    build: ./orchestreService
+    expose:
+      - "8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - PROFIL_SERVICE_URL=http://profil:8081
+    networks:
+      - app-network
+    depends_on:
+      - profil
+      - order
+      - cart
+      - payment
+      - inventary
+
+  cypress:
+    build:
+      context: ./cypressService
+      dockerfile: Dockerfile.headless
+    environment:
+      - CYPRESS_baseUrl=http://webapp:5173
+    volumes:
+      - cypress-cache:/home/node/.cache/Cypress
+    depends_on:
+      - webapp
+      - orchestre
+    networks:
+      - app-network
+
+  profil:
+    build: ./profilService
+    expose:
+      - "8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+    networks:
+      - app-network
+    depends_on:
+      - dbProfilTest
+
+  inventary:
+    build: ./inventaryService
+    expose:
+      - "8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://dbInventary:5432/InventaryServiceDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mypass
+    networks:
+      - app-network
+    depends_on:
+      - dbInventary
+
+  payment:
+    build: ./paymentService
+    expose:
+      - "8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+    networks:
+      - app-network
+    depends_on:
+      - dbPaymentTest
+
+  order:
+    build: ./orderService
+    expose:
+      - "8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+    networks:
+      - app-network
+    depends_on:
+      - dbOrderTest
+
+  cart:
+    build: ./cartService
+    expose:
+      - "8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+    networks:
+      - app-network
+    depends_on:
+      - dbCartTest
+
+  dbProfilTest:
+    image: postgres:17-alpine
+    container_name: db-profil-test
+    environment:
+      POSTGRES_DB: ProfilServiceTestDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    expose:
+      - "5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ProfilServiceTestDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dbInventary:
+    image: postgres:17-alpine
+    container_name: db-inventary
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: InventaryServiceDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    expose:
+      - "5432"
+    volumes:
+      - pgInventaryData:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d InventaryServiceDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+
+  dbPaymentTest:
+    image: postgres:17-alpine
+    container_name: db-payment-test
+    environment:
+      POSTGRES_DB: PaymentServiceTestDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    expose:
+      - "5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d PaymentServiceTestDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dbOrderTest:
+    image: postgres:17-alpine
+    container_name: db-order-test
+    environment:
+      POSTGRES_DB: OrderServiceTestDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    expose:
+      - "5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d OrderServiceTestDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5    
+
+  dbCartTest:
+    image: postgres:17-alpine
+    container_name: db-cart-test
+    environment:
+      POSTGRES_DB: CartServiceTestDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    expose:
+      - "5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d CartServiceTestDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgInventaryData:
+  cypress-cache:
+

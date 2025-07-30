@@ -1,9 +1,12 @@
 package com.onlineLibrary.order.Persistance.Implementations;
 
 import com.google.gson.JsonObject;
+import com.onlineLibrary.order.ControllerRestOrderApi.OrderRestController;
 import com.onlineLibrary.order.Entities.OrderLine;
 import com.onlineLibrary.order.Persistance.Interfaces.IDBConnection;
 import com.onlineLibrary.order.Persistance.Interfaces.IOrderLineRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +16,9 @@ import java.sql.ResultSet;
 
 @Repository
 public class OrderLineRepository implements IOrderLineRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderLineRepository.class);
+
     private final IDBConnection dbConnection;
 
     private static final String SQL_INSERT_LINE = """
@@ -48,7 +54,10 @@ public class OrderLineRepository implements IOrderLineRepository {
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
+                    int id = generatedKeys.getInt(1);
+                    logger.info("zzzzzzzzzzzzzz: {}", id);
+
+                    return id;
                 } else {
                     throw new Exception("failure to get order line generated ID.");
                 }

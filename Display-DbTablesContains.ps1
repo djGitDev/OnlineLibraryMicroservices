@@ -3,8 +3,8 @@
 # Container configurations
 $containers = @(
     @{
-        Name = "db-profil";
-        DB = "ProfilServiceDB";
+        Name = "db-profil-test";
+        DB = "ProfilServiceTestDB";
         User = "postgres";
         Password = "mypass"
     },
@@ -15,20 +15,20 @@ $containers = @(
         Password = "mypass"
     }
      @{
-        Name = "db-order";
-        DB = "OrderServiceDB";
+        Name = "db-order-test";
+        DB = "OrderServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }
     @{
-        Name = "db-payment";
-        DB = "PaymentServiceDB";
+        Name = "db-payment-test";
+        DB = "PaymentServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }
     @{
-        Name = "db-cart";
-        DB = "CartServiceDB";
+        Name = "db-cart-test";
+        DB = "CartServiceTestDB";
         User = "postgres";
         Password = "mypass"
     }

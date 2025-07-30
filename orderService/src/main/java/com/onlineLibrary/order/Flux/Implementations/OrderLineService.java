@@ -5,7 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.order.Entities.OrderLine;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderLineService;
+import com.onlineLibrary.order.Persistance.Implementations.OrderLineRepository;
 import com.onlineLibrary.order.Persistance.Interfaces.IOrderLineRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import java.util.List;
 
 @Service
 public class OrderLineService implements IOrderLineService {
+    private static final Logger logger = LoggerFactory.getLogger(OrderLineService.class);
 
     private IOrderLineRepository orderLineRepository;
 
@@ -27,7 +31,6 @@ public class OrderLineService implements IOrderLineService {
     @Override
     public List<OrderLine> convertCartItemsToOrderLines(JsonArray cartItems, int orderId) throws Exception {
         List<OrderLine> orderLines = new ArrayList<>();
-
         for (JsonElement item : cartItems) {
             JsonObject itemObj = item.getAsJsonObject();
             int bookId = itemObj.get("bookId").getAsInt();
@@ -35,7 +38,10 @@ public class OrderLineService implements IOrderLineService {
             OrderLine orderLine = new OrderLine(orderId,bookId,quantity);
             orderLine.setDeliveryStatut("PENDING DELIVERY");
             orderLine.setEffectifDeliveryDate(LocalDateTime.now().plusSeconds(10));
+            logger.info("zzzzzzzzzzzzzz: {}");
             int orderLineId = orderLineRepository.save(orderId,orderLine);
+            logger.info("zzzzzzzzzzzzzz: {}");
+
             orderLine.setId(orderLineId);
             orderLines.add(orderLine);
         }

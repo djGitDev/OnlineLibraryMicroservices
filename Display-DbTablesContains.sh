@@ -12,11 +12,11 @@ COLOR_RESET='\033[0m'
 
 # Container configurations
 declare -A CONTAINERS=(
-    ["db-profil"]="ProfilServiceDB:postgres:mypass"
+    ["db-profil-test"]="ProfilServiceTestDB:postgres:mypass"
     ["db-inventary"]="InventaryServiceDB:postgres:mypass"
-    ["db-order"]="OrderServiceDB:postgres:mypass"
-    ["db-payment"]="PaymentServiceDB:postgres:mypass"
-    ["db-cart"]="CartServiceDB:postgres:mypass"
+    ["db-order-test"]="OrderServiceTestDB:postgres:mypass"
+    ["db-payment-test"]="PaymentServiceTestDB:postgres:mypass"
+    ["db-cart-test"]="CartServiceTestDB:postgres:mypass"
 )
 
 # Function to print colored messages

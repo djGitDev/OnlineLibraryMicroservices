@@ -13,9 +13,14 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfig {
 
     @Bean
-    public IDBConnection dbConnection() {
-            return new PostgresDBConnection();
-        }
+    public LoaderConfig loaderConfig() {
+        return new LoaderConfig();
+    }
+
+    @Bean
+    public IDBConnection dbConnection(LoaderConfig loaderConfig) {
+        return new PostgresDBConnection(loaderConfig);
+    }
 
     @Bean
     public ISynchronizedOrderManager synchronizedOrderManager() {

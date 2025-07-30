@@ -3,11 +3,14 @@ package com.onlineLibrary.order.Flux.Implementations;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
+import com.onlineLibrary.order.ControllerRestOrderApi.OrderRestController;
 import com.onlineLibrary.order.Entities.*;
 import com.onlineLibrary.order.Flux.Interfaces.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.onlineLibrary.order.Persistance.Interfaces.IOrderEntityRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import static com.onlineLibrary.order.Util.ConvertJsonUtils.jacksonToGson;
 @Service
 public class OrderEntityService implements IOrderEntityService {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderEntityService.class);
 
 
     private InventaryMicroservicesClient microserviceClient;
@@ -52,6 +56,7 @@ public class OrderEntityService implements IOrderEntityService {
         ResponseEntity<JsonNode>  cartItemsJackson = cartMicroservicesClient.callGetItems(responseCart.get("cartId").getAsInt());
         JsonObject responseCartItems = jacksonToGson(cartItemsJackson.getBody());
         JsonArray itemsArray = responseCartItems.getAsJsonArray("items");
+
         for (JsonElement element : itemsArray) {
             JsonObject itemObj = element.getAsJsonObject();
 

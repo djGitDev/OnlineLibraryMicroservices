@@ -1,4 +1,10 @@
+
 package com.onlineLibrary.payment.Persistance;
+
+
+import com.onlineLibrary.payment.config.LoaderConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,24 +13,28 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@Service
 public class PostgresDBConnection implements IDBConnection {
+
 
     private Connection connection;
     private final String url;
     private final String username;
     private final String password;
+    private LoaderConfig loaderConfig;
 
-    public PostgresDBConnection() {
+    @Autowired
+    public PostgresDBConnection(LoaderConfig loaderConfigParam) {
         Properties props = new Properties();
-
+        loaderConfig = loaderConfigParam;
         try (InputStream input = PostgresDBConnection.class
                 .getClassLoader()
-                .getResourceAsStream("application.properties")) {
+                .getResourceAsStream(loaderConfig.getPropertiesFile())) {
 
 
             if (input == null) {
-                System.err.println("❌ ERREUR: Fichier application.properties introuvable dans le classpath!");
-                throw new RuntimeException("Fichier application.properties introuvable dans les ressources !");
+                System.err.println("❌ ERREUR: Fichier application-xxx.properties introuvable dans le classpath!");
+                throw new RuntimeException("Fichier application-xxx.properties introuvable dans les ressources !");
             }
 
             props.load(input);
@@ -40,7 +50,7 @@ public class PostgresDBConnection implements IDBConnection {
 
 
             if (url == null || username == null || password == null) {
-                throw new RuntimeException("Configuration de base de données incomplète dans application.properties");
+                throw new RuntimeException("Configuration de base de données incomplète dans application-dev.properties");
             }
 
         } catch (IOException e) {

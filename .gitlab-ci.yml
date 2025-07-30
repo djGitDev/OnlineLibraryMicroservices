@@ -1,0 +1,25 @@
+image: ubuntu:22.04
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - apt-get update -y
+  - apt-get install -y docker.io docker-compose net-tools iproute2
+  - dockerd --debug --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay2
+  - sleep 15   # attendre que dockerd démarre
+  - docker info
+  - docker compose version
+
+
+stages:
+  - test
+
+test_e2e:
+  stage: test
+  script:
+    - docker compose -f docker-compose.ci.yaml up -d --scale cypress=0
+    - docker compose -f docker-compose.ci.yaml run --rm cypress npx cypress run
+    - EXIT_CODE=$?
+    - docker compose -f docker-compose.ci.yaml down
+    - exit $EXIT_CODE

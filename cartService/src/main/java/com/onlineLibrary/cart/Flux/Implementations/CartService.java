@@ -9,6 +9,8 @@ import com.onlineLibrary.cart.Entities.CartItem;
 import com.onlineLibrary.cart.Flux.Interfaces.ICartItemsService;
 import com.onlineLibrary.cart.Flux.Interfaces.ICartService;
 import com.onlineLibrary.cart.Persistance.Interfaces.ICartRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import static com.onlineLibrary.cart.Util.ConvertJsonUtils.jacksonToGson;
 
 @Service
 public class CartService implements ICartService {
+    private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
     private InventaryMicroservicesClient microserviceClient;
     private ICartItemsService cartItemService;
@@ -174,6 +177,7 @@ public class CartService implements ICartService {
                 if (existingItem.isPresent()) {
                     cartItemService.updateCartItemQuantity(cart.getId(), bookId, quantity <= quantityAvailable ? quantity : quantityAvailable);
                 } else {
+
                     cartItemService.insertCartItem(new CartItem(cart.getId(), bookId, quantity <= quantityAvailable ? quantity : quantityAvailable, bookPrice));
                 }
             }
@@ -182,6 +186,7 @@ public class CartService implements ICartService {
         // Reconstruire la liste complète des items du panier
         JsonArray itemsArray = new JsonArray();
         List<CartItem> items = cartItemService.getItems(cart.getId());
+
         for (CartItem item : items) {
             JsonObject itemJson = new JsonObject();
             itemJson.addProperty("book_id", item.getBookId());

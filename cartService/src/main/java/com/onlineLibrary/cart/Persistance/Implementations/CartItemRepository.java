@@ -1,8 +1,11 @@
 package com.onlineLibrary.cart.Persistance.Implementations;
 
 import com.onlineLibrary.cart.Entities.CartItem;
+import com.onlineLibrary.cart.Flux.Implementations.CartService;
 import com.onlineLibrary.cart.Persistance.Interfaces.ICartItemRepository;
 import com.onlineLibrary.cart.Persistance.Interfaces.IDBConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +16,7 @@ import java.util.Optional;
 
 @Repository
 public class CartItemRepository implements ICartItemRepository {
+    private static final Logger logger = LoggerFactory.getLogger(CartItemRepository.class);
 
     private final IDBConnection dbConnection;
 
@@ -49,6 +53,7 @@ public class CartItemRepository implements ICartItemRepository {
     @Override
     public void save(CartItem item) throws Exception {
         String sql = "INSERT INTO cart_items (cart_id, book_id, quantity,book_price) VALUES (?, ?, ?,?)";
+        logger.info("DEBUG: item = {}", item.getCartId());
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -92,18 +97,34 @@ public class CartItemRepository implements ICartItemRepository {
 
     @Override
     public List<CartItem> findByCartId(int cartId) throws Exception {
-        String sql = "SELECT id, book_id, quantity, book_price FROM cart_items WHERE cart_id = ?";
+
+
+
+        try (Connection conn = dbConnection.getConnection();
+             Statement checkStmt = conn.createStatement();
+             ResultSet checkRs = checkStmt.executeQuery("SELECT COUNT(*) FROM cart_items")) {
+
+            if (checkRs.next()) {
+                int total = checkRs.getInt(1);
+                logger.info("DEBUG: Nombre total de lignes dans cart_items = {}", total);
+            }
+        }
+        String sql = "SELECT id,book_id, quantity, book_price FROM cart_items WHERE cart_id = ?";
+
+
         List<CartItem> items = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, cartId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     CartItem item = new CartItem();
+
                     item.setId(rs.getInt("id"));
-                    item.setCartId((int) cartId);
+                    item.setCartId(cartId);
                     item.setBookId(rs.getInt("book_id"));
                     item.setQuantity(rs.getInt("quantity"));
                     item.setBookPrice(rs.getDouble("book_price"));

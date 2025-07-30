@@ -28,7 +28,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_SERVICE_ORCHESTRE_URL=/api/workflow
+      - VITE_API_SERVICE_ORCHESTRE_URL_INTERNAL_NETWORK=http://orchestre:8080/api/workflow
+      - VITE_API_SERVICE_ORCHESTRE_URL_FROM_PROXY=http://localhost:80/api/workflow
     volumes:
       - ./webApp_userInterface:/app
       - /app/node_modules
@@ -37,6 +38,23 @@ services:
     depends_on:
       - orchestre
 
+  cypress:
+    build: ./cypressService
+    environment:
+      - DISPLAY=host.docker.internal:0
+      - CYPRESS_baseUrl=http://webapp:5173
+      - QT_X11_NO_MITSHM=1
+      - _X11_NO_MITSHM=1
+      - _MITSHM=0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  
+      - ~/.Xauthority:/home/node/.Xauthority 
+      - cypress_logs:/app/cypress-logs  
+    depends_on:
+      - webapp
+      - orchestre
+    networks:
+      - app-network
 
   orchestre:
     build: ./orchestreService
@@ -61,14 +79,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:postgresql://dbProfil:5432/ProfilServiceDB
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mypass
+      - SPRING_PROFILES_ACTIVE=test
+      # - SPRING_PROFILES_ACTIVE=dev
     networks:
       - app-network
     depends_on:
-      - dbProfil
+      # - dbProfil
+      - dbProfilTest
+
 
   inventary:
     build: ./inventaryService
@@ -89,60 +107,79 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:postgresql://dbPayment:5432/PaymentServiceDB
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mypass
+      - SPRING_PROFILES_ACTIVE=test
+      # - SPRING_PROFILES_ACTIVE=dev
     networks:
       - app-network
     depends_on:
-      - dbPayment
+      # - dbPayment
+      - dbPaymentTest
+
 
   order:
     build: ./orderService
     ports:
       - "8084:8084"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:postgresql://dbOrder:5432/OrderServiceDB
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mypass
+      - SPRING_PROFILES_ACTIVE=test
+      # - SPRING_PROFILES_ACTIVE=dev
     networks:
       - app-network
     depends_on:
-      - dbOrder
+      # - dbOrder
+      - dbOrderTest
 
   cart:
     build: ./cartService
     ports:
       - "8085:8085"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:postgresql://dbOrder:5432/CartServiceDB
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mypass
+      - SPRING_PROFILES_ACTIVE=test
+      # - SPRING_PROFILES_ACTIVE=dev
     networks:
       - app-network
     depends_on:
-      - dbCart       
+      # - dbCart   
+      - dbCartTest    
 
-  dbProfil:
+  # dbProfil:
+  #   image: postgres:17-alpine
+  #   container_name: db-profil
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ProfilServiceDB
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: mypass
+  #     POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
+  #   ports:
+  #     - "5432:5432"  
+  #   volumes:
+  #     - pgProfilData:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d ProfilServiceDB"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+
+  dbProfilTest:
     image: postgres:17-alpine
-    container_name: db-profil
-    restart: unless-stopped
+    container_name: db-profil-test
     environment:
-      POSTGRES_DB: ProfilServiceDB
+      POSTGRES_DB: ProfilServiceTestDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
+
     ports:
-      - "5432:5432"  
-    volumes:
-      - pgProfilData:/var/lib/postgresql/data
+      - "5532:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ProfilServiceDB"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ProfilServiceTestDB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -167,65 +204,130 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5 
-  dbPayment:
+
+  # dbPayment:
+  #   image: postgres:17-alpine
+  #   container_name: db-payment
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: PaymentServiceDB
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: mypass
+  #     POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+  #   ports:
+  #     - "5435:5432"
+  #   volumes:
+  #     - pgPaymentData:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d PaymentServiceDB"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5 
+
+  dbPaymentTest:
     image: postgres:17-alpine
-    container_name: db-payment
-    restart: unless-stopped
+    container_name: db-payment-test
     environment:
-      POSTGRES_DB: PaymentServiceDB
+      POSTGRES_DB: PaymentServiceTestDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
+
     ports:
-      - "5435:5432"
-    volumes:
-      - pgPaymentData:/var/lib/postgresql/data
+      - "5535:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d PaymentServiceDB"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d PaymentServiceTestDB"]
       interval: 5s
       timeout: 5s
-      retries: 5 
+      retries: 5
+    
 
-  dbOrder:
+  # dbOrder:
+  #   image: postgres:17-alpine
+  #   container_name: db-order
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: OrderServiceDB
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: mypass
+  #     POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+  #   ports:
+  #     - "5434:5432"
+  #   volumes:
+  #     - pgOrderData:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d OrderServiceDB"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5 
+
+  dbOrderTest:
     image: postgres:17-alpine
-    container_name: db-order
-    restart: unless-stopped
+    container_name: db-order-test
     environment:
-      POSTGRES_DB: OrderServiceDB
+      POSTGRES_DB: OrderServiceTestDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
+
     ports:
-      - "5434:5432"
-    volumes:
-      - pgOrderData:/var/lib/postgresql/data
+      - "5534:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d OrderServiceDB"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d OrderServiceTestDB"]
       interval: 5s
       timeout: 5s
-      retries: 5 
+      retries: 5    
 
-  dbCart:
+  # dbCart:
+  #   image: postgres:17-alpine
+  #   container_name: db-cart
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: CartServiceDB
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: mypass
+  #     POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+  #   ports:
+  #     - "5436:5432"
+  #   volumes:
+  #     - pgCartData:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d CartServiceDB"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5    
+
+  dbCartTest:
     image: postgres:17-alpine
-    container_name: db-cart
-    restart: unless-stopped
+    container_name: db-cart-test
     environment:
-      POSTGRES_DB: CartServiceDB
+      POSTGRES_DB: CartServiceTestDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256  
+
     ports:
-      - "5436:5432"
-    volumes:
-      - pgCartData:/var/lib/postgresql/data
+      - "5536:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d CartServiceDB"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d CartServiceTestDB"]
       interval: 5s
       timeout: 5s
       retries: 5     
@@ -236,10 +338,10 @@ networks:
     driver: bridge
 
 volumes:
-  pgProfilData:
+  # pgProfilData:
   pgInventaryData:
-  pgOrderData:
-  pgPaymentData:
-  pgCartData:
-
+  # pgOrderData:
+  # pgPaymentData:
+  # pgCartData:
+  cypress_logs:
 

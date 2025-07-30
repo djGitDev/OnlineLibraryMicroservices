@@ -124,6 +124,8 @@ public class CartRestController {
             logger.info("Getting specified cart items: {}", cartId);
             JsonObject resultGson = cartService.getItems(cartId);
             JsonNode result = gsonToJackson(resultGson);
+            logger.info("zzzzzzzzzzzzzz:{}",result);
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error getting cart from user: {}", cartId, e);
@@ -324,6 +326,8 @@ public class CartRestController {
             JsonArray books = requestBody.getAsJsonArray("books");
             JsonObject resultGson = cartService.addSearchedItemsToCart(userId, books, bookPrices);
             JsonNode result = gsonToJackson(resultGson);
+            logger.info("zzzzzzzzzzzzzz:{}",result);
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error adding searched items for user: {}", userId, e);

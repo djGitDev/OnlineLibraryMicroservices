@@ -1,12 +1,16 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.profil.Entities.User;
-import com.onlineLibrary.profil.Entities.Address;
+import com.onlineLibrary.profil.Entities.DAO.UserDAO;
+import com.onlineLibrary.profil.Entities.DAO.AddressDAO;
+import com.onlineLibrary.profil.Entities.DTO.AddressDTO;
+import com.onlineLibrary.profil.Entities.DTO.RegisterRequestDTO;
+import com.onlineLibrary.profil.Entities.DTO.RegisterResponseDTO;
+import com.onlineLibrary.profil.Entities.DTO.UserDTO;
 import com.onlineLibrary.profil.Persistance.IRepositoryAddress;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RegisterService implements IRegisterService {
@@ -23,49 +27,52 @@ public class RegisterService implements IRegisterService {
     }
 
     @Override
-    public JsonObject registerUser(JsonObject data) throws Exception {
-        User user = convertJsonToUser(data);
-        Address address = convertJsonToAddress(data);
-        user.setPassword(passwordHasher.encyptPassword(user.getPassword()));
-        JsonObject response = new JsonObject();
-        int userId = repositoryUser.createUser(user);
+    @Transactional
+    public RegisterResponseDTO registerUser(RegisterRequestDTO dataRequest) throws Exception {
+
+        UserDTO userDTO = dataRequest.getUser();
+        AddressDTO addressDTO = dataRequest.getAddress();
+
+        UserDAO userDAO = convertUserDTOToDAO(userDTO);
+        AddressDAO addressDAO = convertAddressDTOToDAO(addressDTO);
+
+        userDAO.setPassword(passwordHasher.encyptPassword(userDAO.getPassword()));
+        userDAO = repositoryUser.save(userDAO);
+        int userId = userDAO.getId();
+
         if (userId <= 0) {
             throw new Exception("Failed to save user");
         }
-        address.setUserId(userId);
-        int addressId = repositoryAddress.createAddressUser(address);
-        if (addressId > 0) {
-            response.addProperty("status", "success");
-            response.addProperty("user_id", userId);
-            response.addProperty("address_id", addressId);
-        } else {
-            response.addProperty("status", "partial_success");
-            response.addProperty("user_id", userId);
-            response.addProperty("message", "User saved but address failed");
+
+        addressDAO.setUserId(userId);
+        addressDAO = repositoryAddress.save(addressDAO);
+        int addressId = addressDAO.getId();
+
+        if (addressId <= 0) {
+            throw new Exception("Failed to save address");
         }
 
-        return response;
+        return new RegisterResponseDTO("success", userId, addressId);
     }
 
-    private User convertJsonToUser(JsonObject data) {
-        JsonObject userJson = data.getAsJsonObject("user");
-        return new User(
-                userJson.get("first_name").getAsString(),
-                userJson.get("last_name").getAsString(),
-                userJson.get("email").getAsString(),
-                userJson.get("phone").getAsString(),
-                userJson.get("password").getAsString()
-        );
+    private UserDAO convertUserDTOToDAO(UserDTO dto) {
+        UserDAO userDAO = new UserDAO();
+        userDAO.setFirstName(dto.getFirstName());
+        userDAO.setLastName(dto.getLastName());
+        userDAO.setEmail(dto.getEmail());
+        userDAO.setPhone(dto.getPhone());
+        userDAO.setPassword(dto.getPassword()); // pense à hasher après la conversion
+        return userDAO;
     }
 
-    private Address convertJsonToAddress(JsonObject data) {
-        JsonObject addressJson = data.getAsJsonObject("address");
-        Address address = new Address();
-        address.setStreet(addressJson.get("street").getAsString());
-        address.setCity(addressJson.get("city").getAsString());
-        address.setPostalCode(addressJson.get("postal_code").getAsString());
-        address.setProvince(addressJson.get("province").getAsString());
-        address.setCountry(addressJson.get("country").getAsString());
-        return address;
+    private AddressDAO convertAddressDTOToDAO(AddressDTO dto) {
+        AddressDAO addressDAO = new AddressDAO();
+        addressDAO.setStreet(dto.getStreet());
+        addressDAO.setCity(dto.getCity());
+        addressDAO.setPostalCode(dto.getPostalCode());
+        addressDAO.setProvince(dto.getProvince());
+        addressDAO.setCountry(dto.getCountry());
+        return addressDAO;
     }
+
 }

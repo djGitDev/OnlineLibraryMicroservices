@@ -1,9 +1,10 @@
+
 package com.onlineLibrary.profil.Persistance;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.profil.Entities.Address;
+import com.onlineLibrary.profil.Entities.DAO.AddressDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-public interface IRepositoryAddress {
-    int createAddressUser(Address address) throws Exception;
-    JsonObject findUserProfilById(int userId) throws Exception;
+public interface IRepositoryAddress extends JpaRepository<AddressDAO, Integer> {
+    Optional<AddressDAO> findUserProfilById(int userId);
 }

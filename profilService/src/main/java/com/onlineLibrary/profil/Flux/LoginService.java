@@ -1,8 +1,8 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.profil.Entities.Credential;
-import com.onlineLibrary.profil.Entities.User;
+import com.onlineLibrary.profil.Entities.DTO.LoginRequestDTO;
+import com.onlineLibrary.profil.Entities.DAO.UserDAO;
+import com.onlineLibrary.profil.Entities.DTO.LoginResponseDTO;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,41 +22,24 @@ public class LoginService implements ILoginService {
     }
 
     @Override
-    public JsonObject authentifyUser(JsonObject data) throws Exception {
-        Credential credentials = convertJsonToCredential(data);
+    public LoginResponseDTO authentifyUser(LoginRequestDTO credentials) throws Exception {
+
         String passEncrypted = hashService.encyptPassword(credentials.getPassword());
-        Optional<User> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
+        Optional<UserDAO> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
 
         if (userEncapsuled.isPresent()) {
-            User user = userEncapsuled.get();
+            UserDAO userDAO = userEncapsuled.get();
 
-            if (user.getPassword().equals(passEncrypted)) {
-                JsonObject response = new JsonObject();
-                response.addProperty("status", "success");
-                response.addProperty("user_id", user.getId());
-                response.addProperty("email", user.getEmail());
-                return response;
+            if (userDAO.getPassword().equals(passEncrypted)) {
+                return new LoginResponseDTO("success", userDAO.getId(), userDAO.getEmail());
             } else {
-                JsonObject response = new JsonObject();
-                response.addProperty("status", "failure");
-                response.addProperty("message", "Mot de passe incorrect");
-                return response;
+                throw new RuntimeException("Incorrect password");
             }
 
         } else {
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "failure");
-            response.addProperty("message", "Utilisateur non trouvé");
-            return response;
+            throw new RuntimeException("User not found");
         }
     }
 
-    private Credential convertJsonToCredential(JsonObject data) {
-        JsonObject credentialsJson = data.getAsJsonObject("credentials");
-        return new Credential(
-                credentialsJson.get("email").getAsString(),
-                credentialsJson.get("password").getAsString()
-        );
-    }
 }
 

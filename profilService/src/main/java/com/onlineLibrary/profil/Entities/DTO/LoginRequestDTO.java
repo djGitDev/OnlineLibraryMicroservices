@@ -1,10 +1,10 @@
-package com.onlineLibrary.profil.Entities;
+package com.onlineLibrary.profil.Entities.DTO;
 
-public class Credential {
+public class LoginRequestDTO {
     private String email;
     private String password;
 
-    public Credential(String email, String password) {
+    public LoginRequestDTO(String email, String password) {
         this.email = email;
         this.password = password;
     }

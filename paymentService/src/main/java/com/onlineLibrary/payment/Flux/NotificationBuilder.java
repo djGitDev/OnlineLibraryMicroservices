@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 public class NotificationBuilder {
 
     public static JsonObject buildPaymentNotification(JsonObject notificationResult, int orderId, int cartId, double totalPrice) throws Exception {
-        String firstName = notificationResult.get("firstName").getAsString();
+        String firstName = notificationResult.get("first_name").getAsString();
         String email = notificationResult.get("email").getAsString();
         String subject = "Confirmation de paiement";
         String message = String.format(

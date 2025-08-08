@@ -1,18 +1,24 @@
-package com.onlineLibrary.profil.Entities;
+package com.onlineLibrary.profil.Entities.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User {
-    private int id;
+public class UserDTO {
+    private int id;  // Optionnel
+
+    @JsonProperty("first_name")
     private String firstName;
+
+    @JsonProperty("last_name")
     private String lastName;
+
     private String email;
     private String phone;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    public User() {
-    }
 
-    public User(String firstName, String lastName, String email, String phone, String password) {
+    public UserDTO(String firstName, String lastName, String email, String phone, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -20,7 +26,8 @@ public class User {
         this.password = password;
     }
 
-    // Getters et Setters
+    // Getters & Setters
+
     public int getId() {
         return id;
     }
@@ -67,17 +74,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", password='[PROTECTED]'" +
-                '}';
     }
 }

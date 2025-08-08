@@ -1,7 +1,8 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.profil.Entities.DTO.RegisterRequestDTO;
+import com.onlineLibrary.profil.Entities.DTO.RegisterResponseDTO;
 
 public interface IRegisterService {
-    JsonObject registerUser(JsonObject data) throws Exception;
+    RegisterResponseDTO  registerUser(RegisterRequestDTO dataRequest) throws Exception;
 }

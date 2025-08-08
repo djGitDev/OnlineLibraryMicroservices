@@ -191,7 +191,7 @@ public class WorkFlowProcessController {
                     break;
                 case "login":
                     result = profilHandler.handleLogin(task);
-                    workFlowStateManager.addUserId(result.get("user_id").getAsInt());
+                    workFlowStateManager.addUserId(result.get("userId").getAsInt());
                     break;
                 case "find_book_by_id":
                     result = inventaryHandler.handleFindBookById(task);

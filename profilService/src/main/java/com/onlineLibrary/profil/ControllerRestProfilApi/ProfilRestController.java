@@ -1,8 +1,10 @@
 package com.onlineLibrary.profil.ControllerRestProfilApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlineLibrary.profil.Entities.DTO.*;
 import com.onlineLibrary.profil.Flux.IProfilServiceDispatcher;
-import com.onlineLibrary.profil.Util.ConvertJsonUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -14,12 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.onlineLibrary.profil.Util.ConvertJsonUtils.gsonToJackson;
-import static com.onlineLibrary.profil.Util.ConvertJsonUtils.jacksonToGson;
 
 @RestController
 @RequestMapping("/api/profil")
@@ -27,11 +26,14 @@ public class ProfilRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfilRestController.class);
 
-    private IProfilServiceDispatcher dispatcher;
+    private final IProfilServiceDispatcher dispatcher;
+    private final ObjectMapper objectMapper;
+
 
     @Autowired
-    public ProfilRestController(IProfilServiceDispatcher dispatcher) {
+    public ProfilRestController(IProfilServiceDispatcher dispatcher,ObjectMapper objectMapper) {
         this.dispatcher = dispatcher;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -86,16 +88,14 @@ public class ProfilRestController {
     )
     @PostMapping(path = "/register")
     public ResponseEntity<JsonNode> registerUser(@RequestBody JsonNode dataJacksson) throws Exception {
-        logger.info("Début de l'enregistrement utilisateur - Données reçues: {}", dataJacksson);
+        logger.info("start registering user - received data: {}", dataJacksson);
         try {
-            JsonObject data = jacksonToGson(dataJacksson);
-            JsonObject resultGson = dispatcher.handleRegistration(data);
-            JsonNode result = gsonToJackson(resultGson);
-            ResponseEntity<JsonNode> response = ResponseEntity
+            RegisterRequestDTO requestDto = objectMapper.treeToValue(dataJacksson, RegisterRequestDTO.class);
+            RegisterResponseDTO responseDto = dispatcher.handleRegistration(requestDto);
+            JsonNode result = objectMapper.valueToTree(responseDto);
+            return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(result);
-
-            return response;
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(errorResponse(e).getBody());
         }
@@ -145,13 +145,15 @@ public class ProfilRestController {
     )
     @PostMapping(path = "/login")
     public ResponseEntity<JsonNode> authentifyUser(@RequestBody JsonNode dataJacksson) throws Exception {
-        logger.info("Tentative de connexion - Données reçues: {}", dataJacksson);
+        logger.info("check user, connection ... - received data : {}", dataJacksson);
         try {
-            JsonObject data = jacksonToGson(dataJacksson);
-            JsonObject resultGson = dispatcher.handleLogin(data);
-            JsonNode result = gsonToJackson(resultGson);
-
-            return ResponseEntity.ok(result);
+            JsonNode credentialsNode = dataJacksson.get("credentials");
+            LoginRequestDTO loginRequestDTO = objectMapper.treeToValue(credentialsNode, LoginRequestDTO.class);
+            LoginResponseDTO responseDto = dispatcher.handleLogin(loginRequestDTO);
+            JsonNode result = objectMapper.valueToTree(responseDto);
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse(e).getBody());
         }
@@ -195,8 +197,8 @@ public class ProfilRestController {
     public ResponseEntity<JsonNode> getUserProfil(@PathVariable int userId) throws Exception {
         logger.info("Fetch  profile by user ID: {}", userId);
         try {
-            JsonObject resultGson = dispatcher.getProfile(userId);
-            JsonNode result = gsonToJackson(resultGson);
+            AddressDTO addressDTO = dispatcher.getProfile(userId);
+            JsonNode result = objectMapper.valueToTree(addressDTO);
 
             if (result == null) {
                 logger.warn("Profile not found with user ID: {}", userId);
@@ -249,8 +251,8 @@ public class ProfilRestController {
     public ResponseEntity<JsonNode> getUserData(@PathVariable int userId) throws Exception {
         logger.info("Fetch user date with user ID: {}", userId);
         try {
-            JsonObject resultGson = dispatcher.getUserData(userId);
-            JsonNode result = gsonToJackson(resultGson);
+            UserDTO userDTO = dispatcher.getUserData(userId);
+            JsonNode result = objectMapper.valueToTree(userDTO);
 
             if (result == null) {
                 logger.warn("Data not found with user ID: {}", userId);
@@ -265,10 +267,10 @@ public class ProfilRestController {
     }
 
     private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
-        JsonObject gsonError = new JsonObject();
-        gsonError.addProperty("error", e.getMessage());
-        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
-        return ResponseEntity.internalServerError().body(jacksonError);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("error", e.getMessage());
+        return ResponseEntity.internalServerError().body(errorNode);
     }
 
 }

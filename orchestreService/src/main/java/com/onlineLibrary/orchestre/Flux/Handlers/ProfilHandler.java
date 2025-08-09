@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
+import java.util.function.Supplier;
 
 import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.gsonToJackson;
 import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jacksonToGson;
@@ -52,6 +57,25 @@ public class ProfilHandler {
         JsonNode loginPayload = gsonToJackson(loginPayloadGson);
         ResponseEntity<JsonNode> responseLoginJackson = profilMicroserviceClient.callLogin(loginPayload);
         result = jacksonToGson(responseLoginJackson.getBody());
+        String jwt = result.get("jwt").getAsString();
+        String bearerToken = "Bearer " + jwt;
+
+        result.addProperty("responseAdminAuth",
+                callEndpointSafely(() -> profilMicroserviceClient.callAdminEndpoint(bearerToken))
+        );
+
+        result.addProperty("responseUserAuth",
+                callEndpointSafely(() -> profilMicroserviceClient.callUserEndpoint(bearerToken))
+        );
+
         return result;
+    }
+
+    private String callEndpointSafely(Supplier<String> endpointCall) {
+        try {
+            return endpointCall.get();
+        } catch (Exception e) {
+            return "Error: " + e.getClass().getSimpleName();
+        }
     }
 }

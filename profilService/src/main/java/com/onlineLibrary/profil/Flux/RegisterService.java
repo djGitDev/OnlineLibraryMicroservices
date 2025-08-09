@@ -39,6 +39,7 @@ public class RegisterService implements IRegisterService {
         userDAO.setPassword(passwordHasher.encyptPassword(userDAO.getPassword()));
         userDAO = repositoryUser.save(userDAO);
         int userId = userDAO.getId();
+        String role = userDAO.getRole();
 
         if (userId <= 0) {
             throw new Exception("Failed to save user");
@@ -52,7 +53,7 @@ public class RegisterService implements IRegisterService {
             throw new Exception("Failed to save address");
         }
 
-        return new RegisterResponseDTO("success", userId, addressId);
+        return new RegisterResponseDTO("success", role, userId, addressId);
     }
 
     private UserDAO convertUserDTOToDAO(UserDTO dto) {
@@ -61,7 +62,8 @@ public class RegisterService implements IRegisterService {
         userDAO.setLastName(dto.getLastName());
         userDAO.setEmail(dto.getEmail());
         userDAO.setPhone(dto.getPhone());
-        userDAO.setPassword(dto.getPassword()); // pense à hasher après la conversion
+        userDAO.setPassword(dto.getPassword());// pense à hasher après la conversion
+        userDAO.setRole(dto.getRole());
         return userDAO;
     }
 

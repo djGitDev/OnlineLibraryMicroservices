@@ -27,6 +27,9 @@ public class UserDAO {
     @Column(length = 255, nullable = false)
     private String password;
 
+    @Column(nullable = false, length = 20)
+    private String role = "ROLE_USER";
+
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
@@ -91,6 +94,14 @@ public class UserDAO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public LocalDateTime getCreatedAt() {

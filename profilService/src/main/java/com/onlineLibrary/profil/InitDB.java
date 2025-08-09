@@ -159,6 +159,7 @@ public final class InitDB {
                                   email VARCHAR(255) UNIQUE NOT NULL,
                                   phone VARCHAR(20),
                                   password VARCHAR(255) NOT NULL,
+                                  role VARCHAR(20) NOT NULL DEFAULT 'ROLE_USER',
                                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                               );

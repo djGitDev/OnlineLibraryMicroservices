@@ -1,6 +1,7 @@
 [
   "purchaseFlowTestCase.json",
   "TestCaseRegister&Login.json",
+  "TestCaseRegister&LoginWithAdminRole",
   "TestCaseFindBookById.json",
   "TestCaseFindBookByIsbn.json",
   "TestCaseGetAllBooks.json",

@@ -7,6 +7,7 @@ public class LoginResponseDTO {
     private String email;
 
 
+
     public LoginResponseDTO(String status, int userId, String email) {
         this.status = status;
         this.userId = userId;

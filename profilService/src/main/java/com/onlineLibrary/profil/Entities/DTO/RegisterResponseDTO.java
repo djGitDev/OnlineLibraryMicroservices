@@ -3,13 +3,13 @@ package com.onlineLibrary.profil.Entities.DTO;
 public class RegisterResponseDTO {
 
     private String status;
+    private String role;
     private int userId;
     private int addressId;
 
-
-
-    public RegisterResponseDTO(String status, int userId, int addressId) {
+    public RegisterResponseDTO(String status, String role, int userId, int addressId) {
         this.status = status;
+        this.role = role;
         this.userId = userId;
         this.addressId = addressId;
     }
@@ -38,5 +38,12 @@ public class RegisterResponseDTO {
 
     public void setAddressId(int addressId) {
         this.addressId = addressId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
     }
 }

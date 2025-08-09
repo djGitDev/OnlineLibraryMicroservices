@@ -34,13 +34,8 @@ public class ProfilHandler {
         JsonObject registerPayloadGson = new JsonObject();
         registerPayloadGson.add("user", task.get("user"));
         registerPayloadGson.add("address", task.get("address"));
-
-        logger.debug("Appel du microservice register avec payload: {}", registerPayloadGson);
         JsonNode registerPayload = gsonToJackson(registerPayloadGson);
-        logger.info("Payload JACKSON envoyé: {}", registerPayload.toString());
-
         ResponseEntity<JsonNode> responseRegisterJackson = profilMicroserviceClient.callRegister(registerPayload);
-        logger.info("Réponse du microservice register reçue");
         result = jacksonToGson(responseRegisterJackson.getBody());
         return result;
     }

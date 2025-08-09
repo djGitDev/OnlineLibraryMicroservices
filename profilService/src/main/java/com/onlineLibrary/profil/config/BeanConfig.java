@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+
 @Configuration
 public class BeanConfig {
 
@@ -12,6 +13,8 @@ public class BeanConfig {
     public LoaderConfig loaderConfig() {
         return new LoaderConfig();
     }
+
+
 
 }
 

@@ -24,13 +24,15 @@ public class LoginService implements ILoginService {
     @Override
     public LoginResponseDTO authentifyUser(LoginRequestDTO credentials) throws Exception {
 
-        String passEncrypted = hashService.encyptPassword(credentials.getPassword());
+//        String passEncrypted = hashService.encyptPassword(credentials.getPassword());
+        String  enteredPassword = credentials.getPassword();
         Optional<UserDAO> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
 
         if (userEncapsuled.isPresent()) {
             UserDAO userDAO = userEncapsuled.get();
+            String storedHash = userDAO.getPassword();
 
-            if (userDAO.getPassword().equals(passEncrypted)) {
+            if (hashService.verify(enteredPassword,storedHash)) {
                 return new LoginResponseDTO("success", userDAO.getId(), userDAO.getEmail());
             } else {
                 throw new RuntimeException("Incorrect password");

@@ -14,26 +14,30 @@ public class LoginService implements ILoginService {
 
     private final IRepositoryUser repositoryUser;
     private final IHashService hashService;
+    private final JwtService jwtService;
 
     @Autowired
-    public LoginService(IRepositoryUser repositoryUser,IHashService hashService) {
+    public LoginService(IRepositoryUser repositoryUser,IHashService hashService,JwtService jwtService) {
         this.repositoryUser = repositoryUser;
         this.hashService = hashService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public LoginResponseDTO authentifyUser(LoginRequestDTO credentials) throws Exception {
 
-//        String passEncrypted = hashService.encyptPassword(credentials.getPassword());
         String  enteredPassword = credentials.getPassword();
         Optional<UserDAO> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
 
         if (userEncapsuled.isPresent()) {
             UserDAO userDAO = userEncapsuled.get();
             String storedHash = userDAO.getPassword();
+            String role = userDAO.getRole();
+            String email = userDAO.getEmail();
+            String jwt = jwtService.generateToken(email,role);
 
             if (hashService.verify(enteredPassword,storedHash)) {
-                return new LoginResponseDTO("success", userDAO.getId(), userDAO.getEmail());
+                return new LoginResponseDTO("success", userDAO.getId(), email, jwt);
             } else {
                 throw new RuntimeException("Incorrect password");
             }

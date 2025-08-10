@@ -66,3 +66,18 @@ h1 {
   text-align: center;
   margin-bottom: 20px;
 }
+
+.facebook-button {
+  background-color: #1877f2; /* bleu Facebook */
+  color: white;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.facebook-button:hover {
+  background-color: #145dbf;
+}

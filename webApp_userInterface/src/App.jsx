@@ -100,77 +100,89 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <h1>Supported Workflows List</h1>
-
-      <div style={{ marginBottom: "20px" }}>
-        <button onClick={handleFacebookAuth} className="action-button process">
+    <>
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <h1 style={{ margin: 0, flexGrow: 1 }}>Facebook Oauth</h1>
+        <button onClick={handleFacebookAuth} className="facebook-button">
           Connect with Facebook account
         </button>
-        {fbAuthError && <p style={{ color: "red" }}>{fbAuthError}</p>}
+        {fbAuthError && (
+          <p style={{ color: "red", marginLeft: "10px" }}>{fbAuthError}</p>
+        )}
       </div>
 
-      {/* État initial - Liste des fichiers */}
-      {!selectedFile && !apiResponse && (
-        <ul className="file-list">
-          {Array.isArray(files) &&
-            files.map((file, i) => (
-              <li key={i}>
-                <button
-                  onClick={() => setSelectedFile(file)}
-                  className="file-button"
-                >
-                  {file}
-                </button>
-              </li>
-            ))}
-        </ul>
-      )}
+      <div className="app-container">
+        <h1>Supported Workflows List</h1>
 
-      {/* État fichier sélectionné */}
-      {selectedFile && !apiResponse && (
-        <div className="selected-content">
-          <h2>Selected File: {selectedFile}</h2>
+        {!selectedFile && !apiResponse && (
+          <ul className="file-list">
+            {Array.isArray(files) &&
+              files.map((file, i) => (
+                <li key={i}>
+                  <button
+                    onClick={() => setSelectedFile(file)}
+                    className="file-button"
+                  >
+                    {file}
+                  </button>
+                </li>
+              ))}
+          </ul>
+        )}
 
-          {content ? (
-            <pre className="json-box">{JSON.stringify(content, null, 2)}</pre>
-          ) : (
-            <p>Loading file content...</p>
-          )}
+        {selectedFile && !apiResponse && (
+          <div className="selected-content">
+            <h2>Selected File: {selectedFile}</h2>
 
-          <div className="action-buttons">
-            <button
-              onClick={handleProcess}
-              className="action-button process"
-              disabled={isProcessing}
-            >
-              {isProcessing ? "Processing..." : "Process Workflow"}
-            </button>
-            <button onClick={handleCancel} className="action-button cancel">
-              Cancel
-            </button>
+            {content ? (
+              <pre className="json-box">{JSON.stringify(content, null, 2)}</pre>
+            ) : (
+              <p>Loading file content...</p>
+            )}
+
+            <div className="action-buttons">
+              <button
+                onClick={handleProcess}
+                className="action-button process"
+                disabled={isProcessing}
+              >
+                {isProcessing ? "Processing..." : "Process Workflow"}
+              </button>
+              <button onClick={handleCancel} className="action-button cancel">
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* État réponse API */}
-      {apiResponse && (
-        <div className="selected-content">
-          <h2>API Response</h2>
+        {apiResponse && (
+          <div className="selected-content">
+            <h2>API Response</h2>
 
-          <pre className="json-box">{JSON.stringify(apiResponse, null, 2)}</pre>
+            <pre className="json-box">
+              {JSON.stringify(apiResponse, null, 2)}
+            </pre>
 
-          <div className="action-buttons">
-            <button
-              onClick={handleBackFromResponse}
-              className="action-button cancel"
-            >
-              Back
-            </button>
+            <div className="action-buttons">
+              <button
+                onClick={handleBackFromResponse}
+                className="action-button cancel"
+              >
+                Back
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 

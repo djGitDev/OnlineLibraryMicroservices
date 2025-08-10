@@ -1,13 +1,26 @@
 
-http://localhost:80 {
+:80 {
+
+    # Proxy pour suppression données spécifique, priorité haute
+    handle /api/profil/facebook/delete_data {
+          reverse_proxy profil:8081
+    }
+    
     # Proxy API
     handle /api/* {
     reverse_proxy orchestre:8080
-}
+    }
 
     # Proxy frontend
+    #handle /* {
+    #     reverse_proxy webapp:5173
+    #}
+
+        
     handle /* {
-        reverse_proxy webapp:5173
+        root * /usr/share/caddy
+        file_server
+        try_files {path} /index.html
     }
 }
 

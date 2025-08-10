@@ -1,10 +1,12 @@
 
 :80 {
 
-    # Proxy pour suppression données spécifique, priorité haute
-    handle /api/profil/facebook/delete_data {
+   
+    # Proxy pour Facebook AUTH
+    handle /api/profil/facebook/* {
           reverse_proxy profil:8081
     }
+
     
     # Proxy API
     handle /api/* {

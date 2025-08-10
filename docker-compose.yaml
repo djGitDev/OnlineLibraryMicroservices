@@ -18,6 +18,7 @@ services:
       - "80:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./webApp_userInterface/dist:/usr/share/caddy:ro
     depends_on:
       - orchestre
       - webapp   

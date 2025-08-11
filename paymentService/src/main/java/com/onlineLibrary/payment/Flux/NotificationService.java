@@ -13,23 +13,24 @@ public class NotificationService implements INotificationService {
 
 
     private ProfilMicroservicesClient profilMicroservicesClient;
-    private NotificationBuilder notificationBuilder;
+    private NotificationBuilderEvent notificationBuilderEvent;
     private NotificationProducer notificationProducer;
 
     @Autowired
-    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilder notificationBuilder, NotificationProducer notificationProducer) {
+    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilderEvent notificationBuilderEvent, NotificationProducer notificationProducer) {
         this.profilMicroservicesClient = profilMicroservicesClient;
-        this.notificationBuilder = notificationBuilder;
+        this.notificationBuilderEvent = notificationBuilderEvent;
         this.notificationProducer = notificationProducer;
     }
 
 
     @Override
-    public JsonObject notifyUser(int userId, int orderId, int cardId,double totalPrice) throws Exception {
+    public JsonObject notifyUser(int userId, int orderId,int cardId,double totalPrice) throws Exception {
         ResponseEntity<JsonNode> responseJackson = profilMicroservicesClient.callGetUserData(userId);
-        JsonObject notificationResult = jacksonToGson(responseJackson.getBody()).getAsJsonObject();
-        notificationProducer.sendNotification(notificationResult.toString());
-        return notificationBuilder.buildPaymentNotification(notificationResult,orderId,cardId,totalPrice);
+        JsonObject dataUser= jacksonToGson(responseJackson.getBody()).getAsJsonObject();
+        JsonObject notificationEvent = notificationBuilderEvent.buildPaymentNotification(dataUser,orderId,cardId,totalPrice);
+        notificationProducer.sendNotification(notificationEvent.toString());
+        return notificationEvent;
     }
 }
 

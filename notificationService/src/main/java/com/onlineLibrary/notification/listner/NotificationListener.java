@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class NotificationListener {
 
-    private static final String SUBJECT = "Payment notification";
+    private static final String SUBJECT_DELIVERY = "delivery notification";
+
     private static final Logger logger = LoggerFactory.getLogger(NotificationListener.class);
     private EmailService emailService;
 
@@ -27,14 +28,29 @@ public class NotificationListener {
 
 
 
-    @KafkaListener(topics = "topic-notification", groupId = "notification-service-group")
-    public void listen(String message) {
+    @KafkaListener(topics = "topic-notification-payment", groupId = "notification-service-group")
+    public void listenPayment(String message) {
         try {
-            logger.info("Received Kafka message zzzzzzzzzzzzz: {}", message);
+            JsonNode jsonNode = objectMapper.readTree(message);
+            String email = jsonNode.get("to").asText();
+            String subject = jsonNode.get("subject").asText();
+            String messageToSend = jsonNode.get("message").asText();
+
+            emailService.sendEmail(email,subject,messageToSend);
+            logger.info("Payment done notification sent to email: {}", email);
+
+        } catch (Exception e) {
+            System.err.println("Error processing message: " + e.getMessage());
+        }
+    }
+
+    @KafkaListener(topics = "topic-notification-delivery", groupId = "notification-service-group")
+    public void listenDelivery(String message) {
+        try {
             JsonNode jsonNode = objectMapper.readTree(message);
             String email = jsonNode.get("email").asText();
-            emailService.sendEmail(email,SUBJECT,message);
-            logger.info("Payment done notification sent to email: {}", email);
+            emailService.sendEmail(email,SUBJECT_DELIVERY,message);
+            logger.info("Delivery done notification sent to email: {}", email);
 
         } catch (Exception e) {
             System.err.println("Error processing message: " + e.getMessage());

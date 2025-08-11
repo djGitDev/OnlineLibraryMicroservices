@@ -11,4 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface ProfilMicroservicesClient {
     @GetMapping(path = "/api/profil/{user_id}")
     ResponseEntity<JsonNode> callGetUserProfil(@PathVariable("user_id") int user_id);
+
+    @GetMapping(path = "/api/profil/data/{user_id}")
+    ResponseEntity<JsonNode> callGetUserData(@PathVariable("user_id") int userId);
 }

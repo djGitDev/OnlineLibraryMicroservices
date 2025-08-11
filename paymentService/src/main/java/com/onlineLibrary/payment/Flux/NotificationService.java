@@ -14,11 +14,13 @@ public class NotificationService implements INotificationService {
 
     private ProfilMicroservicesClient profilMicroservicesClient;
     private NotificationBuilder notificationBuilder;
+    private NotificationProducer notificationProducer;
 
     @Autowired
-    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilder notificationBuilder) {
+    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilder notificationBuilder, NotificationProducer notificationProducer) {
         this.profilMicroservicesClient = profilMicroservicesClient;
         this.notificationBuilder = notificationBuilder;
+        this.notificationProducer = notificationProducer;
     }
 
 
@@ -26,6 +28,7 @@ public class NotificationService implements INotificationService {
     public JsonObject notifyUser(int userId, int orderId, int cardId,double totalPrice) throws Exception {
         ResponseEntity<JsonNode> responseJackson = profilMicroservicesClient.callGetUserData(userId);
         JsonObject notificationResult = jacksonToGson(responseJackson.getBody()).getAsJsonObject();
+        notificationProducer.sendNotification(notificationResult.toString());
         return notificationBuilder.buildPaymentNotification(notificationResult,orderId,cardId,totalPrice);
     }
 }

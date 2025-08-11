@@ -50,6 +50,7 @@ function App() {
 
     try {
       let response;
+
       try {
         // 1er essai : via Caddy (localhost:80)
         response = await axios.post(backendUrlFromProxy, content, {
@@ -79,7 +80,7 @@ function App() {
   const handleFacebookAuth = async () => {
     setFbAuthError(null);
     try {
-      const res = await axios.get("/api/profil/facebook/auth_url"); 
+      const res = await axios.get("/api/profil/facebook/auth_url");
       const authUrl = res.data.auth_url;
       if (authUrl) {
         window.open(authUrl, "FacebookAuth", "width=600,height=700");

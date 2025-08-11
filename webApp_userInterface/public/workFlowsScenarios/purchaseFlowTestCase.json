@@ -4,7 +4,7 @@
     "user": {
       "first_name": "Lucas",
       "last_name": "Dupuis",
-      "email": "lucas.dupuis8@example.com",
+      "email": "djmail.info13@gmail.com",
       "phone": "+14165551234",
       "password": "Passw0rd!2025"
     },
@@ -19,7 +19,7 @@
    {
     "action": "login",
     "credentials": {
-      "email": "lucas.dupuis8@example.com",
+      "email": "djmail.info13@gmail.com",
       "password": "Passw0rd!2025"
     }
   },

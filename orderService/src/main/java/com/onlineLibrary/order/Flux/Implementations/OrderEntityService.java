@@ -111,7 +111,7 @@ public class OrderEntityService implements IOrderEntityService {
     @Override
     public void scheduleAutoDelivery(int userId) {
         int orderId = orderEntityRepository.getOrderByUserId(userId);
-        deliveryService.scheduleAutoDelivery(orderId);
+        deliveryService.scheduleAutoDelivery(orderId,userId);
     }
 
     int[] extractOrderIds(JsonArray ordersArray) {

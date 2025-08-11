@@ -1,7 +1,7 @@
 package com.onlineLibrary.payment.config;
 
 
-import com.onlineLibrary.payment.Flux.NotificationBuilder;
+import com.onlineLibrary.payment.Flux.NotificationBuilderEvent;
 import com.onlineLibrary.payment.Persistance.IDBConnection;
 import com.onlineLibrary.payment.Persistance.PostgresDBConnection;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +22,6 @@ public class BeanConfig {
     }
 
     @Bean
-    public NotificationBuilder notificationBuilder() { return new NotificationBuilder();}
+    public NotificationBuilderEvent notificationBuilder() { return new NotificationBuilderEvent();}
 }
 

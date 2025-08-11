@@ -2,7 +2,7 @@ package com.onlineLibrary.payment.Flux;
 
 import com.google.gson.JsonObject;
 
-public class NotificationBuilder {
+public class NotificationBuilderEvent {
 
     public static JsonObject buildPaymentNotification(JsonObject notificationResult, int orderId, int cartId, double totalPrice) throws Exception {
         String firstName = notificationResult.get("first_name").getAsString();

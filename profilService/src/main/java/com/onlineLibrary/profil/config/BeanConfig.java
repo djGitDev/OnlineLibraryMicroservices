@@ -14,7 +14,5 @@ public class BeanConfig {
         return new LoaderConfig();
     }
 
-
-
 }
 

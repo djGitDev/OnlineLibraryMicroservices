@@ -1,7 +1,7 @@
 package com.onlineLibrary.payment.Flux;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.payment.Entities.DTO.InvoiceDTO;
 
 public interface IInvoiceService {
-    JsonObject generateInvoice(int cartId) throws Exception;
+    InvoiceDTO generateInvoice(int cartId) throws Exception;
 }

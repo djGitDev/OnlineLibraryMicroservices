@@ -1,14 +1,27 @@
-package com.onlineLibrary.payment.Entities;
+package com.onlineLibrary.payment.Entities.DAO;
 
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
-public class Invoice {
+@Entity
+@Table(name = "invoices")
+public class InvoiceDAO {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int noInvoice;
+
+    @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
     private double totalPrice;
 
-    public Invoice(LocalDate date, double totalPrice) {
+    public InvoiceDAO() {
+    }
+
+    public InvoiceDAO(LocalDate date, double totalPrice) {
         this.date = date;
         this.totalPrice = totalPrice;
     }
@@ -37,5 +50,4 @@ public class Invoice {
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
-
 }

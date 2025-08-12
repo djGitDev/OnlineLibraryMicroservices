@@ -1,10 +1,9 @@
 package com.onlineLibrary.payment.Flux;
 
-import com.google.gson.JsonObject;
-
+import com.onlineLibrary.payment.Entities.DTO.NotificationResponseDTO;
 
 
 public interface IPaymentService {
 
-    JsonObject processPaiement(int cartId,int userId) throws Exception;
+    NotificationResponseDTO processPaiement(int cartId, int userId) throws Exception;
 }

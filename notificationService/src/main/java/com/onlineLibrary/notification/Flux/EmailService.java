@@ -23,15 +23,4 @@ public class EmailService {
         mailSender.send(message);
     }
 
-//    /**
-//     * Envoie une notification paiement done.
-//     */
-//    public void sendPaymentDoneNotification(String to, String firstName, double amount) {
-//        String subject = "Confirmation de paiement";
-//        String body = String.format(
-//                "Bonjour %s,\n\nVotre paiement de %.2f $ a bien été pris en compte.\nMerci pour votre confiance.\n\nCordialement,\nL'équipe Online Library",
-//                firstName, amount
-//        );
-//        sendEmail(to, subject, body);
-//    }
 }

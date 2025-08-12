@@ -1,35 +1,43 @@
 package com.onlineLibrary.payment.Flux;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlineLibrary.payment.Entities.DTO.NotificationResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static com.onlineLibrary.payment.Util.ConvertJsonUtils.jacksonToGson;
 
 @Service
 public class NotificationService implements INotificationService {
 
 
-    private ProfilMicroservicesClient profilMicroservicesClient;
-    private NotificationBuilderEvent notificationBuilderEvent;
-    private NotificationProducer notificationProducer;
+    private final ProfilMicroservicesClient profilMicroservicesClient;
+    private final NotificationBuilderEvent notificationBuilderEvent;
+    private final NotificationProducer notificationProducer;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilderEvent notificationBuilderEvent, NotificationProducer notificationProducer) {
+    public NotificationService(ProfilMicroservicesClient profilMicroservicesClient, NotificationBuilderEvent notificationBuilderEvent, NotificationProducer notificationProducer,ObjectMapper objectMapper) {
         this.profilMicroservicesClient = profilMicroservicesClient;
         this.notificationBuilderEvent = notificationBuilderEvent;
         this.notificationProducer = notificationProducer;
+        this.objectMapper = objectMapper;
     }
 
 
     @Override
-    public JsonObject notifyUser(int userId, int orderId,int cardId,double totalPrice) throws Exception {
+    public NotificationResponseDTO notifyUser(int userId, int orderId,int cardId,double totalPrice) throws Exception {
         ResponseEntity<JsonNode> responseJackson = profilMicroservicesClient.callGetUserData(userId);
-        JsonObject dataUser= jacksonToGson(responseJackson.getBody()).getAsJsonObject();
-        JsonObject notificationEvent = notificationBuilderEvent.buildPaymentNotification(dataUser,orderId,cardId,totalPrice);
-        notificationProducer.sendNotification(notificationEvent.toString());
+        JsonNode dataUser = responseJackson.getBody();
+        NotificationResponseDTO notificationEvent = notificationBuilderEvent.buildPaymentNotification(
+                dataUser,
+                orderId,
+                cardId,
+                totalPrice
+        );
+        JsonNode notificationEventJson = objectMapper.valueToTree(notificationEvent);
+        notificationProducer.sendNotification(notificationEventJson.toString());
         return notificationEvent;
     }
 }

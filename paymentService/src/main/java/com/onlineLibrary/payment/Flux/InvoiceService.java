@@ -1,42 +1,43 @@
 package com.onlineLibrary.payment.Flux;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonObject;
-import com.onlineLibrary.payment.Entities.Invoice;
-import com.onlineLibrary.payment.Persistance.IInvoiceRepository;
+import com.onlineLibrary.payment.Entities.DAO.InvoiceDAO;
+import com.onlineLibrary.payment.Entities.DTO.InvoiceDTO;
+import com.onlineLibrary.payment.Persistance.IRepositoryInvoice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static com.onlineLibrary.payment.Util.ConvertJsonUtils.jacksonToGson;
 import static java.time.LocalDate.now;
 
 @Service
 public class InvoiceService implements IInvoiceService {
 
     private CartMicroservicesClient  cartMicroservicesClient;
-
-    private IInvoiceRepository invoiceRepository;
+    private IRepositoryInvoice invoiceRepository;
 
     @Autowired
-    public InvoiceService(CartMicroservicesClient  cartMicroservicesClient, IInvoiceRepository invoiceRepository) {
+    public InvoiceService(CartMicroservicesClient  cartMicroservicesClient, IRepositoryInvoice invoiceRepository) {
         this.cartMicroservicesClient = cartMicroservicesClient;
         this.invoiceRepository = invoiceRepository;
     }
 
 
     @Override
-    public JsonObject generateInvoice(int cartId) throws Exception {
+    public InvoiceDTO generateInvoice(int cartId) throws Exception {
         ResponseEntity<JsonNode> responseJackson = cartMicroservicesClient.callGetTotalPriceCart(cartId);
-        JsonObject response = jacksonToGson(responseJackson.getBody());
-        JsonObject jsonTotalPrice =  response.getAsJsonObject();
-        double totalPrice = jsonTotalPrice.get("total_price").getAsDouble();
-        Invoice invoice = new Invoice(now(), totalPrice);
-        int invoiceId =  invoiceRepository.save(invoice);
-        JsonObject invoiceJson = new JsonObject();
-        invoiceJson.addProperty("invoice_id", invoiceId);
-        invoiceJson.addProperty("date", String.valueOf(invoice.getDate()) );
-        invoiceJson.addProperty("total_price", totalPrice);
-        return invoiceJson;
+        double totalPrice = responseJackson.getBody()
+                .get("total_price")
+                .asDouble();
+        InvoiceDAO invoice = new InvoiceDAO(now(), totalPrice);
+        invoice =  invoiceRepository.save(invoice);
+
+        InvoiceDTO invoiceDTO = new InvoiceDTO(
+                invoice.getNoInvoice(),
+                invoice.getDate(),
+                totalPrice
+        );
+
+        return invoiceDTO;
     }
 }

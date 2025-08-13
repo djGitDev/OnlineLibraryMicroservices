@@ -1,12 +1,10 @@
 package com.onlineLibrary.inventary.Persistance;
 
-import com.onlineLibrary.inventary.Entities.Book;
+import com.onlineLibrary.inventary.Entities.DAO.BookDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface IBookRepository {
-     List<Book> getBooks() throws Exception;
-     Book getBookById(int id) throws Exception;
-     boolean updateBook(int id, Book book) throws Exception;
-     Book findBookByIsbn(String isbn) throws Exception;
+public interface IBookRepository extends JpaRepository<BookDAO, Integer> {
+     Optional<BookDAO> findByIsbn(String isbn);
 }

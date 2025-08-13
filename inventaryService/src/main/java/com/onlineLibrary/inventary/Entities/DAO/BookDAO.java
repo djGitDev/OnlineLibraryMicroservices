@@ -1,90 +1,81 @@
-package com.onlineLibrary.inventary.Entities;
+package com.onlineLibrary.inventary.Entities.DAO;
 
+import jakarta.persistence.*;
 import java.util.Date;
 
-public class Book {
+@Entity
+@Table(name = "books")
+public class BookDAO {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false, unique = true)
     private String isbn;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 2000)
     private String description;
+
+    @Column(name = "parution_date")
+    @Temporal(TemporalType.DATE)
     private Date parutionDate;
+
     private double price;
+
     private int quantity;
+
+    @Column(name = "publisher_id")
     private int publisherId;
 
-    public Book(int id, String isbn, String title, String description,Date parutionDate, double price, int quantity, int PublisherId) {
-        this.id = id;
+    public BookDAO() {}
+
+    public BookDAO(String isbn, String title, String description, Date parutionDate, double price, int quantity, int publisherId) {
         this.isbn = isbn;
         this.title = title;
         this.description = description;
         this.parutionDate = parutionDate;
         this.price = price;
         this.quantity = quantity;
-        this.publisherId = PublisherId;
+        this.publisherId = publisherId;
     }
-
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Date getParutionDate() {
         return parutionDate;
-    }
-
-    public void setParutionDate(Date parutionDate) {
-        this.parutionDate = parutionDate;
     }
 
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public int getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public int getPublisherId() {
         return publisherId;
     }
-    public void setPublisherId(int publisherId) {
-        this.publisherId = publisherId;
+
+    public void setQuantity(int newQuantity) {
+        this.quantity = newQuantity;
     }
 }

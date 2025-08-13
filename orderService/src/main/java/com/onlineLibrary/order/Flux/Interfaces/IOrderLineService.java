@@ -1,13 +1,13 @@
 package com.onlineLibrary.order.Flux.Interfaces;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.OrderLine;
+import com.onlineLibrary.order.Entities.DAO.OrderLineDAO;
+import com.onlineLibrary.order.Entities.DTO.ItemDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IOrderLineService {
-    List<OrderLine> convertCartItemsToOrderLines(JsonArray cartItems, int orderId) throws Exception;
-    JsonObject markAsDelivred(int orderId);
+    List<OrderLineDAO> convertCartItemsToOrderLines(List<ItemDTO> Items, int orderId) throws Exception;
+    Optional<List<OrderLineDAO>> markAsDelivred(int orderId);
 }
 

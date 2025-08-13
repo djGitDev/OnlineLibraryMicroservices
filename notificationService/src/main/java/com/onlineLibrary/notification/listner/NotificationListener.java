@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class NotificationListener {
 
-    private static final String SUBJECT_DELIVERY = "delivery notification";
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationListener.class);
     private EmailService emailService;
@@ -21,39 +20,33 @@ public class NotificationListener {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public  NotificationListener(ObjectMapper objectMapper, EmailService emailService){
+    public NotificationListener(ObjectMapper objectMapper, EmailService emailService) {
         this.emailService = emailService;
         this.objectMapper = objectMapper;
     }
 
 
-
     @KafkaListener(topics = "topic-notification-payment", groupId = "notification-service-group")
     public void listenPayment(String message) {
+        processNotificationMessage(message, "Payment done notification");
+    }
+
+    @KafkaListener(topics = "topic-notification-delivery", groupId = "notification-service-group")
+    public void listenDelivery(String message) {
+        processNotificationMessage(message, "Delivery done notification");
+    }
+
+    private void processNotificationMessage(String message, String logPrefix) {
         try {
             JsonNode jsonNode = objectMapper.readTree(message);
             String email = jsonNode.get("to").asText();
             String subject = jsonNode.get("subject").asText();
             String messageToSend = jsonNode.get("message").asText();
 
-            emailService.sendEmail(email,subject,messageToSend);
-            logger.info("Payment done notification sent to email: {}", email);
-
+            emailService.sendEmail(email, subject, messageToSend);
+            logger.info("{} sent to email: {}", logPrefix, email);
         } catch (Exception e) {
-            System.err.println("Error processing message: " + e.getMessage());
-        }
-    }
-
-    @KafkaListener(topics = "topic-notification-delivery", groupId = "notification-service-group")
-    public void listenDelivery(String message) {
-        try {
-            JsonNode jsonNode = objectMapper.readTree(message);
-            String email = jsonNode.get("email").asText();
-            emailService.sendEmail(email,SUBJECT_DELIVERY,message);
-            logger.info("Delivery done notification sent to email: {}", email);
-
-        } catch (Exception e) {
-            System.err.println("Error processing message: " + e.getMessage());
+            logger.error("Error processing message: {}", e.getMessage());
         }
     }
 }

@@ -1,20 +1,17 @@
 package com.onlineLibrary.order.Flux.Implementations;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.OrderLine;
+
+import com.onlineLibrary.order.Entities.DAO.OrderLineDAO;
+import com.onlineLibrary.order.Entities.DTO.ItemDTO;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderLineService;
-import com.onlineLibrary.order.Persistance.Implementations.OrderLineRepository;
-import com.onlineLibrary.order.Persistance.Interfaces.IOrderLineRepository;
+import com.onlineLibrary.order.Persistance.IOrderLineRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderLineService implements IOrderLineService {
@@ -29,27 +26,23 @@ public class OrderLineService implements IOrderLineService {
 
 
     @Override
-    public List<OrderLine> convertCartItemsToOrderLines(JsonArray cartItems, int orderId) throws Exception {
-        List<OrderLine> orderLines = new ArrayList<>();
-        for (JsonElement item : cartItems) {
-            JsonObject itemObj = item.getAsJsonObject();
-            int bookId = itemObj.get("bookId").getAsInt();
-            int quantity = itemObj.get("quantity").getAsInt();
-            OrderLine orderLine = new OrderLine(orderId,bookId,quantity);
+    public List<OrderLineDAO> convertCartItemsToOrderLines(List<ItemDTO> Items, int orderId) throws Exception {
+        List<OrderLineDAO> orderLines = new ArrayList<>();
+        for (ItemDTO item : Items) {
+            int bookId = item.getBookId();
+            int quantity = item.getQuantity();
+            OrderLineDAO orderLine = new OrderLineDAO(orderId,bookId,quantity);
             orderLine.setDeliveryStatut("PENDING DELIVERY");
-            orderLine.setEffectifDeliveryDate(LocalDateTime.now().plusSeconds(10));
-            logger.info("zzzzzzzzzzzzzz: {}");
-            int orderLineId = orderLineRepository.save(orderId,orderLine);
-            logger.info("zzzzzzzzzzzzzz: {}");
-
-            orderLine.setId(orderLineId);
+            orderLine = orderLineRepository.save(orderLine);
             orderLines.add(orderLine);
         }
 
-        return orderLines;    }
+        return orderLines;
+    }
 
     @Override
-    public JsonObject markAsDelivred(int orderId) {
-        return orderLineRepository.markAsDelivred(orderId);
+    public Optional<List<OrderLineDAO>> markAsDelivred(int orderId) {
+        orderLineRepository.markAsDeliveredByOrderId(orderId);
+        return orderLineRepository.findByOrderId(orderId);
     }
 }

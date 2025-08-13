@@ -1,14 +1,17 @@
 package com.onlineLibrary.order.Flux.Interfaces;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.order.Entities.DAO.OrderLineDAO;
+import com.onlineLibrary.order.Entities.DTO.DeliveryDTO;
+import com.onlineLibrary.order.Entities.DTO.OrderResponseDTO;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+
 
 public interface IOrderService {
-    
 
-    JsonObject placeOrder(int userId,boolean autoDelivery) throws Exception;
-    JsonObject deliveryOrder(int orderId);
-    JsonObject displayAllOrders();
-    JsonObject displayOrders();
+
+    OrderResponseDTO placeOrder(int userId, boolean autoDelivery) throws Exception;
+    Optional<List<OrderLineDAO>> deliveryOrder(int userId, int orderId);
+    List<DeliveryDTO> displayAllOrders();
 }

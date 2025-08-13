@@ -1,16 +1,16 @@
 package com.onlineLibrary.cart.Flux.Interfaces;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.onlineLibrary.cart.Entities.DTO.*;
 
 import java.util.Map;
 
 public interface ICartService {
-    JsonObject clearCart(int userId);
-    JsonObject clearBooks(int userId, JsonArray books);
-    JsonObject getCart(int userId) throws Exception;
-    JsonObject getItems(int id) throws Exception;
-    JsonObject addSearchedItemsToCart(int userId, JsonArray books, Map<Integer,Double> searchedBooksIds) throws Exception;
-    JsonObject getTotalPrice(int cartId) throws Exception;
+    ClearCartResponseDTO clearCart(int userId);
+    ClearBooksResponseDTO clearBooks(int userId, JsonNode books);
+    CartDTO getCart(int userId) throws Exception;
+    CartItemsResponseDTO getItems(int id) throws Exception;
+    AddBooksResponseDTO addSearchedItemsToCart(int userId, JsonNode books, Map<Integer,Double> searchedBooksIds) throws Exception;
+    CartTotalPriceDTO getTotalPrice(int cartId) throws Exception;
 }
 

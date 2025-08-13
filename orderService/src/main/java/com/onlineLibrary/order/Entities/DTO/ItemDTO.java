@@ -1,5 +1,9 @@
 package com.onlineLibrary.order.Entities.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemDTO {
     private int bookId;
     private int quantity;

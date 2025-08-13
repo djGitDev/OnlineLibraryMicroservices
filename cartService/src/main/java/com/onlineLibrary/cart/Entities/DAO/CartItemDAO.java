@@ -1,15 +1,31 @@
-package com.onlineLibrary.cart.Entities;
+package com.onlineLibrary.cart.Entities.DAO;
 
-public class CartItem {
-    private int id;          // Optionnel, clé primaire en base
-    private int cartId;      // FK vers le panier
-    private int bookId;      // Livre concerné
-    private int quantity;     // Quantité du livre dans le panier
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "cart_items")
+public class CartItemDAO {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "cart_id", nullable = false)
+    private int cartId;
+
+    @Column(name = "book_id", nullable = false)
+    private int bookId;
+
+    @Column(nullable = false)
+    private int quantity;
+
+    @Column(name = "book_price", nullable = false)
     private double bookPrice;
 
-    public CartItem() {}
+    public CartItemDAO() {}
 
-    public CartItem(int cartId, int bookId, int quantity, double bookPrice) {
+    public CartItemDAO(int cartId, int bookId, int quantity, double bookPrice) {
         this.cartId = cartId;
         this.bookId = bookId;
         this.quantity = quantity;

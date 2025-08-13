@@ -29,10 +29,10 @@ public interface OrderMicroservicesClient {
 
 
     @PostMapping(
-            value = "/api/order/{orderId}/deliver",
+            value = "/api/order/users/{userId}/orders/{orderId}/deliver",
             produces = "application/json"
     )
-    ResponseEntity<JsonNode> callDeliveryOrder(@PathVariable("orderId") int orderId);
+    ResponseEntity<JsonNode> callDeliveryOrder(@PathVariable("userId") int userId, @PathVariable("orderId") int orderId);
 
 
 }

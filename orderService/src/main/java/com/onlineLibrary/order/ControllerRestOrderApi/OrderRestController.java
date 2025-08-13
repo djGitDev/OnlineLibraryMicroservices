@@ -3,9 +3,13 @@
 package com.onlineLibrary.order.ControllerRestOrderApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlineLibrary.order.Entities.DAO.OrderLineDAO;
+import com.onlineLibrary.order.Entities.DTO.DeliveryDTO;
+import com.onlineLibrary.order.Entities.DTO.OrderResponseDTO;
 import com.onlineLibrary.order.Flux.Interfaces.IOrderService;
-import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Util.ConvertJsonUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,6 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order")
@@ -77,9 +87,10 @@ public class OrderRestController {
             @RequestParam(defaultValue = "true") boolean isAutoDelivery) throws Exception {
         try {
             logger.info("Placing order for user: {}, autoDelivery: {}", userId, isAutoDelivery);
-            JsonObject resultGson = orderService.placeOrder(userId, isAutoDelivery);
-            JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
-            return ResponseEntity.ok(result);
+            OrderResponseDTO result = orderService.placeOrder(userId, isAutoDelivery);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode resultJsonNode = mapper.valueToTree(result);
+            return ResponseEntity.ok(resultJsonNode);
         } catch (Exception e) {
             logger.error("Error placing order for user: {}", userId, e);
             return errorResponse(e);
@@ -91,14 +102,21 @@ public class OrderRestController {
             summary = "Mark order as delivered",
             description = "Updates order status to mark it as delivered",
             parameters = {
-                    @Parameter(
-                            name = "orderId",
-                            description = "ID of the order to mark as delivered",
-                            required = true,
-                            example = "6",
-                            in = ParameterIn.PATH
-                    )
-            },
+        @Parameter(
+            name = "userId",
+            description = "ID of the user who owns the order",
+            required = true,
+            example = "3",
+            in = ParameterIn.PATH
+        ),
+        @Parameter(
+            name = "orderId",
+            description = "ID of the order to mark as delivered",
+            required = true,
+            example = "6",
+            in = ParameterIn.PATH
+        )
+    },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -118,11 +136,16 @@ public class OrderRestController {
                     )
             }
     )
-    @PostMapping(value = "/{orderId}/deliver")
-    public ResponseEntity<JsonNode> deliverOrder(@PathVariable int orderId) throws Exception {
-        logger.info("Delivering order: {}", orderId);
-        JsonObject resultGson = orderService.deliveryOrder(orderId);
-        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
+    @PostMapping(value = "/users/{userId}/orders/{orderId}/deliver")
+    public ResponseEntity<JsonNode> deliverOrder(
+            @PathVariable int userId,
+            @PathVariable int orderId) throws Exception {
+
+        logger.info("Delivering order {} for user {}", orderId, userId);
+
+        Optional<List<OrderLineDAO>> orderLinesDelivered = orderService.deliveryOrder(userId,orderId);
+        JsonNode result = convertOrderLinesToJson(orderLinesDelivered);
+
         return ResponseEntity.ok(result);
     }
 
@@ -192,16 +215,45 @@ public class OrderRestController {
     @GetMapping()
     public ResponseEntity<JsonNode> getAllOrders() throws Exception {
         logger.info("Fetching all orders");
-        JsonObject resultGson = orderService.displayAllOrders();
-        JsonNode result = ConvertJsonUtils.gsonToJackson(resultGson);
-        return ResponseEntity.ok(result);
+        List<DeliveryDTO> deliveries = orderService.displayAllOrders();
+        List<Map<String, Object>> ordersWithStatus = deliveries.stream()
+                .map(d -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("order_id", d.getOrderId());
+                    map.put("status", d.getStatut());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode wrapper = mapper.createObjectNode();
+        wrapper.set("orders_with_status", mapper.valueToTree(ordersWithStatus));
+
+        return ResponseEntity.ok(wrapper);
+    }
+
+    private JsonNode convertOrderLinesToJson(Optional<List<OrderLineDAO>> orderLinesOpt) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode responseNode = mapper.createObjectNode();
+
+        responseNode.put("status", "success delivery");
+
+        if (orderLinesOpt.isPresent()) {
+            ArrayNode orderLinesArray = mapper.valueToTree(orderLinesOpt.get());
+            responseNode.set("order_lines", orderLinesArray);
+        } else {
+            responseNode.putArray("order_lines");
+        }
+
+        return responseNode;
     }
 
 
     private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
-        JsonObject gsonError = new JsonObject();
-        gsonError.addProperty("error", e.getMessage());
-        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
-        return ResponseEntity.internalServerError().body(jacksonError);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("error", e.getMessage());
+        return ResponseEntity.internalServerError().body(errorNode);
     }
 }

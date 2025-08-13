@@ -1,5 +1,9 @@
 package com.onlineLibrary.inventary.Persistance;
 
-public interface ICategoryBookRepository {
-    int createRelation(int idBook, int idCategory);
+import com.onlineLibrary.inventary.Entities.DAO.BookCategoryDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ICategoryBookRepository extends JpaRepository<BookCategoryDAO, Integer> {
 }

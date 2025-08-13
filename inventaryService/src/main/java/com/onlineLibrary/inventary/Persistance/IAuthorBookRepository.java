@@ -1,5 +1,7 @@
 package com.onlineLibrary.inventary.Persistance;
 
-public interface IAuthorBookRepository {
-    int createRelation(int idBook, int idAuthor);
+import com.onlineLibrary.inventary.Entities.DAO.AuthorBookDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface IAuthorBookRepository extends JpaRepository<AuthorBookDAO, Integer> {
 }

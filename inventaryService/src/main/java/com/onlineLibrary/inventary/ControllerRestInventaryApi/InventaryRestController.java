@@ -1,8 +1,11 @@
 package com.onlineLibrary.inventary.ControllerRestInventaryApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.onlineLibrary.inventary.Util.ConvertJsonUtils;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlineLibrary.inventary.Entities.DTO.BookQuantityResponseDTO;
+import com.onlineLibrary.inventary.Entities.DTO.BookResponseDTO;
+import com.onlineLibrary.inventary.Entities.DTO.BooksResponseDTO;
 import com.onlineLibrary.inventary.Flux.IBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import static com.onlineLibrary.inventary.Util.ConvertJsonUtils.gsonToJackson;
 
 @RestController
 @RequestMapping("/api/books")
@@ -23,10 +25,13 @@ public class InventaryRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventaryRestController.class);
     private final IBookService bookService;
+    private final ObjectMapper mapper;
+
 
     @Autowired
-    public InventaryRestController(IBookService bookService) {
+    public InventaryRestController(IBookService bookService,ObjectMapper mapper) {
         this.bookService = bookService;
+        this.mapper = mapper;
     }
 
 
@@ -106,9 +111,9 @@ public class InventaryRestController {
     public ResponseEntity<JsonNode> getAllBooks() throws Exception {
         try {
             logger.info("Fetching all books");
-            JsonObject resultGson = bookService.getBooks();
-            JsonNode response = gsonToJackson(resultGson);
-            return ResponseEntity.ok(response);
+            BooksResponseDTO resultDTO = bookService.getBooks();
+            JsonNode result = mapper.valueToTree(resultDTO);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error fetching books", e);
             return errorResponse(e);
@@ -170,9 +175,9 @@ public class InventaryRestController {
             @RequestParam int quantity) throws Exception {
         try {
             logger.info("Updating quantity for book ID {} with quantity {}", id, quantity);
-            JsonObject resultGson = bookService.decreaseBookQuantity(id, quantity);
-            JsonNode response = gsonToJackson(resultGson);
-            return ResponseEntity.ok(response);
+            BookQuantityResponseDTO resultDTO = bookService.decreaseBookQuantity(id, quantity);
+            JsonNode result = mapper.valueToTree(resultDTO);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error updating quantity for book ID {}", id, e);
             return errorResponse(e);
@@ -223,9 +228,9 @@ public class InventaryRestController {
     public ResponseEntity<JsonNode> getBookById(@PathVariable int id) throws Exception {
         try {
             logger.info("Fetching book by ID: {}", id);
-            JsonObject resultGson = bookService.getBookById(id);
-            JsonNode response = gsonToJackson(resultGson);
-            return ResponseEntity.ok(response);
+            BookResponseDTO resultDTO = bookService.getBookById(id);
+            JsonNode result = mapper.valueToTree(resultDTO);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error fetching book by ID {}", id, e);
             return errorResponse(e);
@@ -276,20 +281,18 @@ public class InventaryRestController {
     public ResponseEntity<JsonNode> getBookByIsbn( @PathVariable String isbn) throws Exception {
         try {
             logger.info("Searching book by ISBN: {}", isbn);
-            JsonObject resultGson = bookService.findBookByIsbn(isbn);
-            JsonNode response = gsonToJackson(resultGson);
-            return ResponseEntity.ok(response);
+            BookResponseDTO resultDTO = bookService.findBookByIsbn(isbn);
+            JsonNode result = mapper.valueToTree(resultDTO);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error searching book by ISBN {}", isbn, e);
             return errorResponse(e);
         }
     }
 
-
-    private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
-        JsonObject gsonError = new JsonObject();
-        gsonError.addProperty("error", e.getMessage());
-        JsonNode jacksonError = ConvertJsonUtils.gsonToJackson(gsonError);
-        return ResponseEntity.internalServerError().body(jacksonError);
+    private ResponseEntity<JsonNode> errorResponse(Exception e) {
+        ObjectNode errorNode = mapper.createObjectNode();
+        errorNode.put("error", e.getMessage());
+        return ResponseEntity.internalServerError().body(errorNode);
     }
 }

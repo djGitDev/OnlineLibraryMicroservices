@@ -1,0 +1,64 @@
+<!-- login.html -->
+<div class="login-container" style="max-width: 400px; margin: auto; padding-top: 50px;">
+  <h2 style="text-align: center; margin-bottom: 30px;">Login</h2>
+
+  <!-- Login form -->
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+    <!-- Email -->
+    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        type="email"
+        name="email"
+        required
+        [(ngModel)]="email"
+        placeholder="Enter your email"
+      />
+    </mat-form-field>
+
+    <!-- Password -->
+    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        type="password"
+        name="password"
+        required
+        [(ngModel)]="password"
+        placeholder="Enter your password"
+      />
+    </mat-form-field>
+
+    <!-- Login button -->
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      style="width: 100%; margin-bottom: 15px;"
+      [disabled]="!loginForm.form.valid"
+    >
+      Login
+    </button>
+  </form>
+
+  <!-- Divider -->
+  <mat-divider></mat-divider>
+
+  <!-- Facebook login button -->
+  <button
+    mat-raised-button
+    style="width: 100%; margin-top: 15px; background-color: #1877f2; color: white;"
+    (click)="loginWithFacebook()"
+  >
+    Login with Facebook
+  </button>
+
+  <!-- Register link -->
+  <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #555;">
+    Don't have an account?
+    <a routerLink="/register" style="color: #1976d2; text-decoration: none; font-weight: 500;">
+      Register
+    </a>
+  </div>
+</div>

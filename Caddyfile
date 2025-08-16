@@ -1,28 +1,22 @@
 
+
 :80 {
 
-   
     # Proxy pour Facebook AUTH
     handle /api/profil/facebook/* {
-          reverse_proxy profil:8081
+        reverse_proxy profil:8081
     }
 
+  
+
+    # Proxy pour workflow général
+    handle /api/workflow/* {
+        reverse_proxy orchestre:8080
+    }
     
-    # Proxy API
-    handle /api/* {
-    reverse_proxy orchestre:8080
-    }
 
-    # Proxy frontend
-    #handle /* {
-    #     reverse_proxy webapp:5173
-    #}
-
-        
-    handle /* {
-        root * /usr/share/caddy
-        file_server
-        try_files {path} /index.html
+    handle {
+        reverse_proxy webapp-interactive:4200
     }
+    
 }
-

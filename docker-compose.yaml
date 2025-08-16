@@ -4,14 +4,16 @@ services:
 
   # nginx:
   #   image: nginx:latest
-  #   ports:
-  #     - "80:80"
   #   volumes:
   #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  #   ports:
+  #     - "80:80"
   #   depends_on:
-  #     orchestre:
-  #       condition: service_started
-      
+  #     - webapp-interactive
+  #     - orchestre
+  #     - profil   
+  #   networks:
+  #     - app-network    
   caddy:
     image: caddy:latest
     ports:
@@ -21,7 +23,8 @@ services:
       - ./webApp_userInterface/dist:/usr/share/caddy:ro
     depends_on:
       - orchestre
-      - webapp   
+      - webapp 
+      - webapp-interactive
     networks:
       - app-network
   webapp:
@@ -38,6 +41,16 @@ services:
       - app-network
     depends_on:
       - orchestre
+
+  webapp-interactive:
+    build: ./webApp_interactive
+    ports:
+      - "4200:4200"
+
+    depends_on:
+      - orchestre
+    networks:
+      - app-network
 
   kafka:
     image: bitnami/kafka:latest

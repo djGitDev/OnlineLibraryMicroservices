@@ -56,9 +56,13 @@ public class ProfilHandler {
 
         JsonNode loginPayload = gsonToJackson(loginPayloadGson);
         ResponseEntity<JsonNode> responseLoginJackson = profilMicroserviceClient.callLogin(loginPayload);
+
         result = jacksonToGson(responseLoginJackson.getBody());
-        String jwt = result.get("jwt").getAsString();
+
+        String jwt = result.get("accessToken").getAsString();
+
         String bearerToken = "Bearer " + jwt;
+
 
         result.addProperty("responseAdminAuth",
                 callEndpointSafely(() -> profilMicroserviceClient.callAdminEndpoint(bearerToken))

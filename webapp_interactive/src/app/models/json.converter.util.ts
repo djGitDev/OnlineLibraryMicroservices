@@ -9,7 +9,8 @@ export class JsonConverter {
         last_name: model.user.last_name,
         email: model.user.email,
         phone: model.user.phone,
-        password: model.user.password
+        password: model.user.password,
+        role: model.user.role
       },
       address: {
         street: model.address.street,

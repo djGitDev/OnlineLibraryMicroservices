@@ -12,11 +12,18 @@ public class JwtConfig {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
+
     public String getSecretKey() {
         return secretKey;
     }
 
     public long getExpiration() {
         return expiration;
+    }
+
+    public long getRefreshExpiration() {
+        return refreshExpiration;
     }
 }

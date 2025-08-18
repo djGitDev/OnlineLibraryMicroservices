@@ -3,7 +3,7 @@
 :80 {
 
     # Proxy pour Facebook AUTH
-    handle /api/profil/facebook/* {
+    handle /api/profil/* {
         reverse_proxy profil:8081
     }
 

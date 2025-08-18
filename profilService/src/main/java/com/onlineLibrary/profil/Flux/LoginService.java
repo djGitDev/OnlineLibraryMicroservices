@@ -3,6 +3,7 @@ package com.onlineLibrary.profil.Flux;
 import com.onlineLibrary.profil.Entities.DTO.LoginRequestDTO;
 import com.onlineLibrary.profil.Entities.DAO.UserDAO;
 import com.onlineLibrary.profil.Entities.DTO.LoginResponseDTO;
+import com.onlineLibrary.profil.Entities.DTO.RefreshTokenResponseDTO;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,10 @@ public class LoginService implements ILoginService {
             String role = userDAO.getRole();
             String email = userDAO.getEmail();
             String jwt = jwtService.generateToken(email,role);
+            String refreshToken = jwtService.generateRefreshToken(email,role);
 
             if (hashService.verify(enteredPassword,storedHash)) {
-                return new LoginResponseDTO("success", userDAO.getId(), email, jwt);
+                return new LoginResponseDTO("success", userDAO.getId(), email, jwt, refreshToken,role);
             } else {
                 throw new RuntimeException("Incorrect password");
             }
@@ -45,6 +47,14 @@ public class LoginService implements ILoginService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @Override
+    public RefreshTokenResponseDTO generateAccesTokenFromRefresh(String refreshToken) {
+        String email = jwtService.extractEmail(refreshToken);
+        String role = jwtService.extractRole(refreshToken);
+        String newAccessToken = jwtService.generateToken(email, role);
+        return new RefreshTokenResponseDTO("success", newAccessToken);
     }
 
 }

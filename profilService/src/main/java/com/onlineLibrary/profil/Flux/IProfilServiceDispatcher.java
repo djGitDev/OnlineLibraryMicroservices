@@ -8,4 +8,5 @@ public interface IProfilServiceDispatcher {
     LoginResponseDTO handleLogin(LoginRequestDTO credential) throws Exception;
     AddressDTO getProfile(int userId) throws Exception;
     UserDTO getUserData(int userId) throws Exception;
+    RefreshTokenResponseDTO handleRefreshToken(String refreshToken);
 }

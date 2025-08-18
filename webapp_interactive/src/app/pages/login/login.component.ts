@@ -8,8 +8,9 @@ import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
 import {AuthService} from '../../services/auth';
-import {RegisterModel} from '../../models/register/register.model';
 import {Credentials} from '../../models/login/credentials.model';
+import {Store} from '@ngrx/store';
+import {loginSuccess} from '../../store/auth/auth.actions';
 
 @Component({
   selector: 'login-page',
@@ -28,20 +29,30 @@ export class LoginComponent {
   email = '';
   password = '';
 
-  constructor(private router: Router, private authService:AuthService) {}
+  constructor(private router: Router, private authService:AuthService, private store: Store
+  ) {}
 
 
   onLogin() {
     const credentials = new Credentials(this.email, this.password);
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('Login réussi', response);
-        // redirection après succès
-        // this.router.navigate(['/dashboard']);
+        console.log('Login success', response);
+        const {accessToken, email,role} = response;
+        this.store.dispatch(loginSuccess({ accessToken: accessToken , email, role }));
+        this.store.subscribe(state => {
+          console.log('🔥 State AFTER loginSuccess:', state);
+        });
+        if (role === 'ROLE_ADMIN') {
+          this.router.navigate(['/dashboard-admin']);
+        } else if (role === 'ROLE_USER') {
+          this.router.navigate(['/dashboard-user']);
+        } else {
+          this.router.navigate(['/login']); // fallback
+        }
       },
       error: (err) => {
         console.error('Erreur login', err);
-        // afficher un message d'erreur à l'utilisateur si nécessaire
       }
     });
   }

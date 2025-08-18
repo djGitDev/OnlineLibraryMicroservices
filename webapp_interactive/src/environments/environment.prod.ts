@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api/workflow'
+  apiUrlProfil: '/api/profil'
 };

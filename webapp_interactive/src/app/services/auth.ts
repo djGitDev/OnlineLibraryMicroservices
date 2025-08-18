@@ -13,14 +13,14 @@ import {Credentials} from '../models/login/credentials.model';
 })
 export class AuthService {
 
-  private apiUrl = environment.apiUrl;
+  private apiUrlProfil = environment.apiUrlProfil;
 
   constructor(private http: HttpClient) {}
 
   register(data: RegisterModel): Observable<any> {
     const jsonData = JsonConverter.RegisterToJsonObject(data);
     console.log('JSON à envoyer:', jsonData);
-    return this.http.post(`${this.apiUrl}/register`, jsonData,
+    return this.http.post(`${this.apiUrlProfil}/register`, jsonData,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -33,12 +33,14 @@ export class AuthService {
     const jsonData = JsonConverter.CredentialsToJson(credentials);
     console.log('JSON à envoyer:', jsonData);
 
-    return this.http.post(`${this.apiUrl}/login`, jsonData,
+    return this.http.post(`${this.apiUrlProfil}/login`, jsonData,
       {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        }
+        },
+        withCredentials: true
+
       });
   }
 }

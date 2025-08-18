@@ -6,8 +6,8 @@ services:
     expose:
       - "5173"
     environment:
-      - VITE_API_SERVICE_ORCHESTRE_URL_INTERNAL_NETWORK=http://orchestre:8080/api/workflow
-      - VITE_API_SERVICE_ORCHESTRE_URL_FROM_PROXY=http://localhost:80/api/workflow
+      - VITE_API_SERVICE_ORCHESTRE_URL_INTERNAL_NETWORK=http://orchestre:8080/api/workflow/orchestrate
+      - VITE_API_SERVICE_ORCHESTRE_URL_FROM_PROXY=http://localhost:80/api/workflow/orchestrate
     volumes:
       - ./webApp_userInterface:/app
       - /app/node_modules

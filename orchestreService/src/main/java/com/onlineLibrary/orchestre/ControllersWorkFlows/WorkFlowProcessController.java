@@ -73,33 +73,33 @@ public class WorkFlowProcessController {
 //        }
 //    }
 
-    @PostMapping("/register")
-    public ResponseEntity<JsonNode> register(@RequestBody JsonNode task) throws Exception {
-        logger.info("Received register request: {}", task);
-        JsonObject result;
-        try {
-            result = profilHandler.handleRegister(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
-            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
-        } catch (Exception e) {
-            JsonObject error = new JsonObject();
-            error.addProperty("error", "Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
-        }
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<JsonNode> register(@RequestBody JsonNode task) throws Exception {
+//        logger.info("Received register request: {}", task);
+//        JsonObject result;
+//        try {
+//            result = profilHandler.handleRegister(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
+//            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
+//        } catch (Exception e) {
+//            JsonObject error = new JsonObject();
+//            error.addProperty("error", "Registration failed: " + e.getMessage());
+//            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
+//        }
+//    }
 
-    @PostMapping("/login")
-    public ResponseEntity<JsonNode> login(@RequestBody JsonNode task) throws Exception {
-        logger.info("Received register request: {}", task);
-        JsonObject result;
-        try {
-            result = profilHandler.handleLogin(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
-            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
-        } catch (Exception e) {
-            JsonObject error = new JsonObject();
-            error.addProperty("error", "Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<JsonNode> login(@RequestBody JsonNode task) throws Exception {
+//        logger.info("Received register request: {}", task);
+//        JsonObject result;
+//        try {
+//            result = profilHandler.handleLogin(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
+//            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
+//        } catch (Exception e) {
+//            JsonObject error = new JsonObject();
+//            error.addProperty("error", "Registration failed: " + e.getMessage());
+//            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
+//        }
+//    }
 
 
 

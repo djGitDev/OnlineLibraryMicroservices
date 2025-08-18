@@ -1,6 +1,5 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
 import com.onlineLibrary.profil.Entities.DAO.AddressDAO;
 import com.onlineLibrary.profil.Entities.DAO.UserDAO;
 import com.onlineLibrary.profil.Entities.DTO.*;
@@ -84,6 +83,11 @@ public class ProfilServiceDispatcher implements IProfilServiceDispatcher{
        );
         dto.setId(user.getId());
         return dto;
+    }
+
+    @Override
+    public RefreshTokenResponseDTO handleRefreshToken(String refreshToken) {
+        return loginService.generateAccesTokenFromRefresh(refreshToken);
     }
 }
 

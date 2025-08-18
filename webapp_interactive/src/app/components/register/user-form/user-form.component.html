@@ -29,4 +29,12 @@
     <mat-label>Password</mat-label>
     <input matInput type="password" [(ngModel)]="user.password" name="password" required>
   </mat-form-field>
+  <!-- Role Select -->
+  <mat-form-field appearance="fill" style="grid-column: 1 / -1;">
+    <mat-label>Role</mat-label>
+    <mat-select [(ngModel)]="user.role" name="role">
+      <mat-option value="ROLE_USER">User</mat-option>
+      <mat-option value="ROLE_ADMIN">Admin</mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>

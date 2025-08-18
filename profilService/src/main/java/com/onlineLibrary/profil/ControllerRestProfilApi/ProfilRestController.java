@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ public class ProfilRestController {
 
     private final IProfilServiceDispatcher dispatcher;
     private final ObjectMapper objectMapper;
+    private ObjectNode userId;
 
 
     @Autowired
@@ -136,26 +140,78 @@ public class ProfilRestController {
                     {
                       "status": "success",
                       "user_id": 1,
-                      "email": "lucas.dupuis2@example.com"
+                      "email": "lucas.dupuis2@example.com",
+                      "accessToken": 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkam1haWwuZGVudGFsM…DM4fQ.RAh_vzSlbphtzMqLc0e-M4ETDS5YPuwiMS97OXquwBQ'
                     }"""
                                     )
                             )
                     ),
             }
     )
-    @PostMapping(path = "/login")
-    public ResponseEntity<JsonNode> authentifyUser(@RequestBody JsonNode dataJacksson) throws Exception {
+    @PostMapping("/login")
+    public ResponseEntity<JsonNode> authentifyUser(@RequestBody JsonNode dataJacksson,
+                                          HttpServletResponse response) throws Exception {
         logger.info("check user, connection ... - received data : {}", dataJacksson);
         try {
-            JsonNode credentialsNode = dataJacksson.get("credentials");
-            LoginRequestDTO loginRequestDTO = objectMapper.treeToValue(credentialsNode, LoginRequestDTO.class);
-            LoginResponseDTO responseDto = dispatcher.handleLogin(loginRequestDTO);
-            JsonNode result = objectMapper.valueToTree(responseDto);
-            return ResponseEntity
-                    .status(HttpStatus.ACCEPTED)
-                    .body(result);
+
+        JsonNode credentialsNode = dataJacksson.get("credentials");
+        LoginRequestDTO loginRequestDTO = objectMapper.treeToValue(credentialsNode, LoginRequestDTO.class);
+        LoginResponseDTO login = dispatcher.handleLogin(loginRequestDTO);
+
+        // create  cookie HttpOnly for  refresh token
+        Cookie refreshCookie = new Cookie("refreshToken", login.getRefreshToken());
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true); // if https
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 3600); // 7 days
+        response.addCookie(refreshCookie);
+
+        // Body to send only acces token
+        ObjectNode result = objectMapper.createObjectNode();
+        result.put("status", "success");
+        result.put("user_id",login.getUserId());
+        result.put("email", login.getEmail());
+        result.put("accessToken", login.getJwt());
+        result.put("role", login.getRole());
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse(e).getBody());
+        }
+    }
+
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JsonNode> refreshToken(HttpServletRequest request) {
+        try {
+            Cookie[] cookies = request.getCookies();
+            if (cookies == null) {
+                ObjectNode error = objectMapper.createObjectNode();
+                error.put("error", "Refresh token missing");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+            }
+
+            String refreshToken = null;
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+            if (refreshToken == null ) {
+                ObjectNode error = objectMapper.createObjectNode();
+                error.put("error", "Invalid refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+            }
+
+            RefreshTokenResponseDTO responseDto = dispatcher.handleRefreshToken(refreshToken);
+            JsonNode result = objectMapper.valueToTree(responseDto);
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            ObjectNode error = objectMapper.createObjectNode();
+            error.put("error", e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 

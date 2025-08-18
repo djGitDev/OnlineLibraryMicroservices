@@ -54,7 +54,9 @@ function App() {
       try {
         // 1er essai : via Caddy (localhost:80)
         response = await axios.post(backendUrlFromProxy, content, {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
       } catch (e) {
         console.warn(
@@ -63,7 +65,9 @@ function App() {
         );
         // 2ème essai : accès direct au backend
         response = await axios.post(backendUrlInternalNetwork, content, {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
       }
 

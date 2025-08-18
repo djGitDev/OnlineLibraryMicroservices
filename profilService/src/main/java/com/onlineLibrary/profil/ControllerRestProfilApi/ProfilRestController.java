@@ -169,7 +169,7 @@ public class ProfilRestController {
         // Body to send only acces token
         ObjectNode result = objectMapper.createObjectNode();
         result.put("status", "success");
-        result.put("user_id",login.getUserId());
+        result.put("userId",login.getUserId());
         result.put("email", login.getEmail());
         result.put("accessToken", login.getJwt());
         result.put("role", login.getRole());

@@ -58,52 +58,6 @@ public class WorkFlowProcessController {
         this.workFlowStateManager = workFlowStateManager;
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<JsonObject> register(@RequestBody JsonObject task) {
-//        logger.info("Received register request: {}", task);
-//        JsonObject result;
-//        try {
-//            result = profilHandler.handleRegister(task);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            logger.error("Error during register: {}", e.getMessage(), e);
-//            JsonObject error = new JsonObject();
-//            error.addProperty("error", "Registration failed: " + e.getMessage());
-//            return ResponseEntity.badRequest().body(error);
-//        }
-//    }
-
-//    @PostMapping("/register")
-//    public ResponseEntity<JsonNode> register(@RequestBody JsonNode task) throws Exception {
-//        logger.info("Received register request: {}", task);
-//        JsonObject result;
-//        try {
-//            result = profilHandler.handleRegister(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
-//            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
-//        } catch (Exception e) {
-//            JsonObject error = new JsonObject();
-//            error.addProperty("error", "Registration failed: " + e.getMessage());
-//            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
-//        }
-//    }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<JsonNode> login(@RequestBody JsonNode task) throws Exception {
-//        logger.info("Received register request: {}", task);
-//        JsonObject result;
-//        try {
-//            result = profilHandler.handleLogin(ConvertJsonUtils.jacksonToGson(task)); // Assure-toi que handleRegister renvoie JsonNode
-//            return ResponseEntity.ok(ConvertJsonUtils.gsonToJackson(result));
-//        } catch (Exception e) {
-//            JsonObject error = new JsonObject();
-//            error.addProperty("error", "Registration failed: " + e.getMessage());
-//            return ResponseEntity.badRequest().body(ConvertJsonUtils.gsonToJackson(error));
-//        }
-//    }
-
-
-
-
     @Operation(
             summary = "Vérifie l'état du service",
             description = "Retourne un statut simple indiquant si le service est opérationnel.",
@@ -125,33 +79,6 @@ public class WorkFlowProcessController {
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "UP"));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //--------------------------React webapp Endpoints------------------------------------------
-
 
 
 
@@ -217,7 +144,7 @@ public class WorkFlowProcessController {
                     )
             }
     )
-    @PostMapping()
+    @PostMapping("/orchestrate")
     public ResponseEntity<ArrayNode> orchestrate(@RequestBody ArrayNode inputArrayJackson) throws Exception {
         logger.info("Starting request processing - Received array of {} elements", inputArrayJackson.size());
         System.out.println("[DEBUG] Request received: " + inputArrayJackson);

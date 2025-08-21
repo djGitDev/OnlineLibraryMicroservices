@@ -7,7 +7,7 @@ import { AddressFormComponent } from '../../components/register/address-form/add
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import {AuthService} from '../../services/auth';
+import {AuthService} from '../../services/auth.service';
 import {User} from '../../models/register/user.model';
 import {Address} from '../../models/register/address.model';
 

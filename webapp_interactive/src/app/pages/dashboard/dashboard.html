@@ -1,5 +1,32 @@
 <div class="dashboard-container">
-  <h2>Bienvenue sur ton Dashboard</h2>
-  <p>Tu es connecté avec l'email : {{ userEmail | async }}</p>
+  <app-cart
+    [cartItems]="cartItems"
+    (removeItemEvent)="removeFromCart($event.bookId, $event.quantity)"
+    (paymentEvent)="payment()"
+    (cartUpdated)="onCartUpdated($event)"
+    class="floating-cart">
+  </app-cart>
+
+  <h2>Books List</h2>
+  <div class="books-list">
+    @for (book of books; track book.id) {
+      <app-book-card
+        [book]="book"
+        [updatedItem]="cartItemsMap.get(book.id)"
+        (addToCart)="addToCart($event.bookId, $event.quantity,$event.price)">
+      </app-book-card>
+    }
+  </div>
+
+  @if (books.length === 0) {
+    <p>No books found.</p>
+  }
+
+  <mat-divider style="margin: 24px 0;"></mat-divider>
+
+  <div class="logout-container">
+    <app-logout></app-logout>
+  </div>
 </div>
+
 

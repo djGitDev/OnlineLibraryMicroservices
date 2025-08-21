@@ -9,6 +9,11 @@ export const selectIsAuthenticated = createSelector(
   state => !!state.accessToken
 );
 
+export const selectUserId = createSelector(
+  selectAuth,
+  state => state.userId
+);
+
 export const selectUserEmail = createSelector(
   selectAuth,
   state => state.email
@@ -17,4 +22,9 @@ export const selectUserEmail = createSelector(
 export const selectUserRole = createSelector(
   selectAuth,
   state => state.role
+);
+
+export const selectCartId = createSelector(
+  selectAuth,
+  (auth: AuthState) => auth.cartId
 );

@@ -1,6 +1,8 @@
 package com.onlineLibrary.profil.ControllerRestProfilApi;
 
 import com.onlineLibrary.profil.Flux.JwtService;
+import io.jsonwebtoken.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,44 +61,91 @@ public class FacebookAuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/callback")
-    public ResponseEntity<?> facebookCallback(@RequestParam("code") String code) {
-        // Construire URL pour récupérer le token
-        URI tokenRequestUri = UriComponentsBuilder.fromHttpUrl(tokenUrl)
-                .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", redirectUri)
-                .queryParam("client_secret", clientSecret)
-                .queryParam("code", code)
-                .build()
-                .toUri();
+//    @GetMapping("/callback")
+//    public ResponseEntity<?> facebookCallback(@RequestParam("code") String code) {
+//        // Construire URL pour récupérer le token
+//        URI tokenRequestUri = UriComponentsBuilder.fromHttpUrl(tokenUrl)
+//                .queryParam("client_id", clientId)
+//                .queryParam("redirect_uri", redirectUri)
+//                .queryParam("client_secret", clientSecret)
+//                .queryParam("code", code)
+//                .build()
+//                .toUri();
+//
+//        try {
+//            // Appeler Facebook pour obtenir le token
+//            Map<String, Object> tokenResponse = restTemplate.getForObject(tokenRequestUri, Map.class);
+//
+//            if (tokenResponse != null && tokenResponse.containsKey("access_token")) {
+//                String accessToken = (String) tokenResponse.get("access_token");
+//                String graphUrl = facebookGraphApiUrl + accessToken;
+//                ResponseEntity<Map> graphResponse = restTemplate.getForEntity(graphUrl, Map.class);
+//
+//                Map<String, Object> userData = graphResponse.getBody();
+//                String email = (String) userData.get("email");
+//
+//                String appJwtToken = jwtService.generateToken(email, "ROLE_USER");
+//
+//
+//                return ResponseEntity.ok(Map.of(
+//                        "facebook_access_token", accessToken,
+//                        "app_jwt_token", appJwtToken,
+//                        "user_email", email
+//                ));
+//            } else {
+//                return ResponseEntity.status(400).body("Erreur lors de la récupération du token");
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Exception: " + e.getMessage());
+//        }
+//    }
+@GetMapping("/callback")
+public void facebookCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException, java.io.IOException {
+    // fetch Facebook token
+    URI tokenRequestUri = UriComponentsBuilder.fromHttpUrl(tokenUrl)
+            .queryParam("client_id", clientId)
+            .queryParam("redirect_uri", redirectUri)
+            .queryParam("client_secret", clientSecret)
+            .queryParam("code", code)
+            .build()
+            .toUri();
 
-        try {
-            // Appeler Facebook pour obtenir le token
-            Map<String, Object> tokenResponse = restTemplate.getForObject(tokenRequestUri, Map.class);
+    Map<String, Object> tokenResponse = restTemplate.getForObject(tokenRequestUri, Map.class);
 
-            if (tokenResponse != null && tokenResponse.containsKey("access_token")) {
-                String accessToken = (String) tokenResponse.get("access_token");
-                String graphUrl = facebookGraphApiUrl + accessToken;
-                ResponseEntity<Map> graphResponse = restTemplate.getForEntity(graphUrl, Map.class);
+    if (tokenResponse != null && tokenResponse.containsKey("access_token")) {
+        String accessToken = (String) tokenResponse.get("access_token");
 
-                Map<String, Object> userData = graphResponse.getBody();
-                String email = (String) userData.get("email");
+        // Fetch user data
+        String graphUrl = facebookGraphApiUrl + accessToken;
+        ResponseEntity<Map> graphResponse = restTemplate.getForEntity(graphUrl, Map.class);
+        Map<String, Object> userData = graphResponse.getBody();
+        String email = (String) userData.get("email");
+        String role = "ROLE_FB-USER";
 
-                String appJwtToken = jwtService.generateToken(email, "ROLE_USER");
+        String appJwtToken = jwtService.generateToken(email, role);
 
+        // build json response
+        String html = "<!DOCTYPE html>" +
+                "<html><head><title>Facebook Auth</title></head><body>" +
+                "<script>" +
+                "const data = {" +
+                "facebook_access_token: '" + accessToken + "'," +
+                "app_jwt_token: '" + appJwtToken + "'," +
+                "user_email: '" + email + "'," +
+                "role: '" + role + "'" +
+                "};" +
+                "window.opener.postMessage(data, window.location.origin);" +
+                "window.close();" +
+                "</script>" +
+                "<p>Authentification réussie. Vous pouvez fermer cette fenêtre.</p>" +
+                "</body></html>";
 
-                return ResponseEntity.ok(Map.of(
-                        "facebook_access_token", accessToken,
-                        "app_jwt_token", appJwtToken,
-                        "user_email", email
-                ));
-            } else {
-                return ResponseEntity.status(400).body("Erreur lors de la récupération du token");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Exception: " + e.getMessage());
-        }
+        response.setContentType("text/html");
+        response.getWriter().write(html);
+    } else {
+        response.sendError(400, "Erreur lors de la récupération du token");
     }
+}
 
 
     @GetMapping("/delete_data")

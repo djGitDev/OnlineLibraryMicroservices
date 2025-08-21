@@ -1,15 +1,22 @@
+import {Role} from '../../models/Role';
 
 
 export interface AuthState {
   accessToken: string | null;
-  email: string | null
-  role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_FB-USER' | null;
+  email: string | null;
+  userId: number | null;
+  role: Role | null
+  cartId: number | null;
+
 
 }
 
 export const initialState: AuthState = {
   accessToken: null,
   email: null,
-  role: null
+  userId: null,
+  role: null,
+  cartId: null
+
 
 };

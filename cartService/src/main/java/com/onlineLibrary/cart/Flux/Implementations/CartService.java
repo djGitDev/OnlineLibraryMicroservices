@@ -86,6 +86,23 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
     }
 }
 
+    @Override
+    public ClearBooksResponseDTO clearItem(int userId, int bookId, int quantity) {
+        try {
+            Optional<CartDAO> optionalCart = cartRepository.findByUserId(userId);
+
+            if (optionalCart.isEmpty()) {
+                return new ClearBooksResponseDTO("error", "No cart found for the user.");
+            }
+
+            CartDAO cart = optionalCart.get();
+            processItemRemoval(cart, bookId, quantity);
+
+            return new ClearBooksResponseDTO("success", "Item removed from cart.");
+        } catch (Exception e) {
+            return new ClearBooksResponseDTO("error", "Failed to remove item: " + e.getMessage());
+        }
+    }
 
     private void processBooksRemoval(CartDAO cart, JsonNode booksNode) throws Exception {
         for (JsonNode bookNode : booksNode) {
@@ -107,6 +124,21 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
         }
     }
 
+    private void processItemRemoval(CartDAO cart,int bookId,int quantityToRemove) throws Exception {
+        Optional<CartItemDAO> optionalItem = cartItemService.cartItemExists(cart.getId(), bookId);
+
+        if (optionalItem.isPresent()) {
+            CartItemDAO existingItem = optionalItem.get();
+            int updatedQuantity = existingItem.getQuantity() - quantityToRemove;
+
+            if (updatedQuantity <= 0) {
+                cartItemService.deleteCartItem(cart.getId(), bookId);
+            } else {
+                cartItemService.updateCartItemQuantity(cart.getId(), bookId, -quantityToRemove);
+            }
+        }
+    }
+
 
     @Override
     public CartDTO getCart(int userId) throws Exception {
@@ -124,14 +156,8 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
 
     @Override
     public AddBooksResponseDTO addSearchedItemsToCart(int userId, JsonNode booksNode, Map<Integer, Double> searchedBooksIds) throws Exception {
-        Optional<CartDAO> optionalCart = cartRepository.findByUserId(userId);
-        CartDAO cart;
-        if (optionalCart.isPresent()) {
-            cart = optionalCart.get();
-        } else {
-            cart = new CartDAO(userId);
-            cartRepository.save(cart);
-        }
+
+        CartDAO cart =getOrCreateCart(userId);
 
         if (booksNode.isArray()) {
             processBooksForCart(cart, booksNode, searchedBooksIds);
@@ -147,17 +173,30 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
         );
     }
 
+    @Override
+    public AddBookResponseDTO addSingleItemToCart(int userId, int bookId, int quantity, double price) throws Exception {
+        CartDAO cart =getOrCreateCart(userId);
+        processSingleBook(cart,bookId,quantity,price);
+        return new AddBookResponseDTO(
+                "success",
+                "Book added to cart",
+                cart.getId()
+        );
+    }
+
+
+
     private void processBooksForCart(CartDAO cart, JsonNode booksNode, Map<Integer, Double> searchedBooksIds) throws Exception {
         for (JsonNode bookNode : booksNode) {
-            processSingleBook(cart, bookNode, searchedBooksIds);
+            int bookId = bookNode.get("book_id").asInt();
+            int quantity = bookNode.get("quantity").asInt();
+            double bookPrice = searchedBooksIds.get(bookId);
+            processSingleBook(cart, bookId,quantity,bookPrice);
         }
     }
 
-    private void processSingleBook(CartDAO cart, JsonNode bookNode, Map<Integer, Double> searchedBooksIds) throws Exception {
-        int bookId = bookNode.get("book_id").asInt();
-        int quantity = bookNode.get("quantity").asInt();
-        double bookPrice = searchedBooksIds.get(bookId);
 
+    private void processSingleBook(CartDAO cart,int bookId, int quantity,double bookPrice) throws Exception {
         ResponseEntity<JsonNode> response = microserviceClient.callFindBookById(bookId);
         JsonNode jsonBook = response.getBody();
         JsonNode bookInInventary = jsonBook.get("book");
@@ -178,9 +217,22 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
         }
     }
 
+    private CartDAO getOrCreateCart(int userId) {
+        Optional<CartDAO> optionalCart = cartRepository.findByUserId(userId);
+        if (optionalCart.isPresent()) {
+            return optionalCart.get();
+        } else {
+            CartDAO cart = new CartDAO(userId);
+            cartRepository.save(cart);
+            return cart;
+        }
+    }
+
     @Override
     public CartTotalPriceDTO getTotalPrice(int cartId) throws Exception {
         return cartItemService.getTotalPrice(cartId);
     }
+
+
 
 }

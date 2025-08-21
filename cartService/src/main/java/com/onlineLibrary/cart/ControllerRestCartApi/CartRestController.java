@@ -243,6 +243,20 @@ public class CartRestController {
         return ResponseEntity.ok(result);
     }
 
+    @DeleteMapping("/{userId}/clear-item")
+    public ResponseEntity<JsonNode> clearItem(
+            @PathVariable int userId,
+            @RequestParam int bookId,
+            @RequestParam int quantity) {
+
+        logger.info("Clearing specific book for user: {}, bookId={}, quantity={}", userId, bookId, quantity);
+
+        ClearBooksResponseDTO resultDTO = cartService.clearItem(userId, bookId, quantity);
+        JsonNode result = mapper.valueToTree(resultDTO);
+
+        return ResponseEntity.ok(result);
+    }
+
 
     @Operation(
             summary = "Add searched items to cart",
@@ -326,6 +340,27 @@ public class CartRestController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error adding searched items for user: {}", userId, e);
+            return errorResponse(e);
+        }
+    }
+
+
+    @PostMapping("/{userId}/add-item")
+    public ResponseEntity<JsonNode> addItemToCart(
+            @PathVariable int userId,
+            @RequestParam int bookId,
+            @RequestParam int quantity,
+            @RequestParam double price) {
+        try {
+            logger.info("Adding single item to cart: userId={}, bookId={}, quantity={}, price={}",
+                    userId, bookId, quantity, price);
+
+            AddBookResponseDTO resultDTO = cartService.addSingleItemToCart(userId, bookId, quantity, price);
+            JsonNode result = mapper.valueToTree(resultDTO);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error adding item to cart for user: {}", userId, e);
             return errorResponse(e);
         }
     }

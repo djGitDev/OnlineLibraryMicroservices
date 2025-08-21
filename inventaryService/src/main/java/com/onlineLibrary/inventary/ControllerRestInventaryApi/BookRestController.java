@@ -3,6 +3,7 @@ package com.onlineLibrary.inventary.ControllerRestInventaryApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlineLibrary.inventary.Entities.DTO.BookDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BookQuantityResponseDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BookResponseDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BooksResponseDTO;
@@ -21,20 +22,90 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/books")
-public class InventaryRestController {
+public class BookRestController {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventaryRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BookRestController.class);
     private final IBookService bookService;
     private final ObjectMapper mapper;
 
 
     @Autowired
-    public InventaryRestController(IBookService bookService,ObjectMapper mapper) {
+    public BookRestController(IBookService bookService, ObjectMapper mapper) {
         this.bookService = bookService;
         this.mapper = mapper;
     }
 
-
+    // ================== Ajouter un Book ==================
+    @Operation(
+            summary = "Add a new book",
+            description = "Creates a new book in the database",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                        {
+                                          "isbn": "9780321751041",
+                                          "title": "New Book",
+                                          "description": "Description of the new book",
+                                          "parutionDate": "Aug 21, 2025",
+                                          "price": 29.99,
+                                          "quantity": 10,
+                                          "publisherId": 1,
+                                          "authorIds": [1,2],
+                                          "categoryIds": [1,3]
+                                        }"""
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Book added successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                        {
+                                          "status": "OK",
+                                          "book": {
+                                            "id": 6,
+                                            "isbn": "9780321751041",
+                                            "title": "New Book",
+                                            "description": "Description of the new book",
+                                            "parutionDate": "Aug 21, 2025",
+                                            "price": 29.99,
+                                            "quantity": 10,
+                                            "publisherId": 1,
+                                            "authorIds": [1,2],
+                                            "categoryIds": [1,3]
+                                          }
+                                        }"""
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Error adding book",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
+    @PostMapping("/add")
+    public ResponseEntity<JsonNode> addBook(@RequestBody JsonNode body) {
+        try {
+            BookDTO bookDTO = mapper.treeToValue(body, BookDTO.class);
+            BookResponseDTO savedBook = bookService.addBook(bookDTO);
+            ObjectNode result = mapper.createObjectNode();
+            result.put("status", "OK");
+            result.set("book", mapper.valueToTree(savedBook));
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error adding book", e);
+            return errorResponse(e);
+        }
+    }
     @Operation(
             summary = "Get all books",
             description = "Retrieves a list of all books in the database",
@@ -107,7 +178,7 @@ public class InventaryRestController {
                     )
             }
     )
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<JsonNode> getAllBooks() throws Exception {
         try {
             logger.info("Fetching all books");

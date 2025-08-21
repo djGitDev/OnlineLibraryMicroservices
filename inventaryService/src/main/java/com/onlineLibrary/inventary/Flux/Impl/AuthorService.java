@@ -2,12 +2,16 @@ package com.onlineLibrary.inventary.Flux.Impl;
 
 import com.onlineLibrary.inventary.Entities.DAO.AuthorBookDAO;
 import com.onlineLibrary.inventary.Entities.DAO.AuthorDAO;
+import com.onlineLibrary.inventary.Entities.DTO.AuthorsResponseDTO;
 import com.onlineLibrary.inventary.Flux.IAuthorService;
 import com.onlineLibrary.inventary.Persistance.IAuthorBookRepository;
 import com.onlineLibrary.inventary.Persistance.IAuthorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorService implements IAuthorService {
@@ -28,6 +32,22 @@ public class AuthorService implements IAuthorService {
         AuthorBookDAO relation = new AuthorBookDAO(idBook,idAuthor);
         relation = authorBookRepository.save(relation);
         return relation.getId();
+    }
+
+    @Override
+    public AuthorsResponseDTO getAuthors() {
+        List<AuthorDAO> authors = authorRepository.findAll();
+        return new AuthorsResponseDTO(authors);
+    }
+
+    @Override
+    public AuthorDAO addAuthor(String name) {
+        Optional<AuthorDAO> existing = authorRepository.findByName(name);
+        if (existing.isPresent()) {
+            return existing.get(); // retourne l'auteur existant
+        }
+        AuthorDAO newAuthor = new AuthorDAO(name);
+        return authorRepository.save(newAuthor); // sauvegarde et retourne le DAO
     }
 
     @Transactional

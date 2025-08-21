@@ -1,0 +1,26 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.floating-cart {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background-color: rgba(187, 222, 251, 0.2); /* 80% transparent */
+  backdrop-filter: blur(8px); /* Effet de flou derrière */
+  padding: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  z-index: 1000; /* au-dessus de tout */
+}
+
+

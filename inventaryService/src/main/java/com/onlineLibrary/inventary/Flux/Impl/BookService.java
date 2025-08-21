@@ -1,12 +1,20 @@
 package com.onlineLibrary.inventary.Flux.Impl;
 
 
+import com.onlineLibrary.inventary.Entities.DAO.AuthorDAO;
 import com.onlineLibrary.inventary.Entities.DAO.BookDAO;
+import com.onlineLibrary.inventary.Entities.DAO.CategoryDAO;
+import com.onlineLibrary.inventary.Entities.DTO.BookDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BookQuantityResponseDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BookResponseDTO;
 import com.onlineLibrary.inventary.Entities.DTO.BooksResponseDTO;
+import com.onlineLibrary.inventary.Flux.IAuthorService;
 import com.onlineLibrary.inventary.Flux.IBookService;
+import com.onlineLibrary.inventary.Flux.ICategoryService;
+import com.onlineLibrary.inventary.Persistance.IAuthorBookRepository;
 import com.onlineLibrary.inventary.Persistance.IBookRepository;
+import com.onlineLibrary.inventary.Persistance.ICategoryBookRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,13 +23,20 @@ import java.util.Optional;
 @Service
 public class BookService implements IBookService {
 
-
-    private  IBookRepository bookRepository;
+    private final ICategoryService categoryService;
+    private final IAuthorService authorService;
+    private final IBookRepository bookRepository;
 
 
     @Autowired
-    public BookService(IBookRepository bookRepository){
+    public BookService(
+            ICategoryService categoryService,
+            IAuthorService authorService,
+            IBookRepository bookRepository) {
+        this.categoryService = categoryService;
+        this.authorService = authorService;
         this.bookRepository = bookRepository;
+
     }
 
     @Override
@@ -57,6 +72,34 @@ public class BookService implements IBookService {
         updateBookQuantity(bookDAO, newQuantity);
 
         return new BookQuantityResponseDTO("OK", "Book quantity updated");
+    }
+
+    @Override
+    @Transactional
+    public BookResponseDTO addBook(BookDTO body) {
+
+        BookDAO book = new BookDAO(
+                body.getIsbn(),
+                body.getTitle(),
+                body.getDescription(),
+                body.getParutionDate(),
+                body.getPrice(),
+                body.getQuantity(),
+                body.getPublisherId()
+        );
+        book = bookRepository.save(book);
+        if (body.getCategories() != null) {
+            for (String catName : body.getCategories()) {
+              categoryService.generateRetlationBookCategorie(catName, book.getId());
+            }
+        }
+        if (body.getAuthors() != null) {
+            for (String authorName : body.getAuthors()) {
+                authorService.generateRelationBookAuthor(authorName, book.getId());
+            }
+        }
+        BookResponseDTO response = new BookResponseDTO("Book added successfully",book);
+        return response;
     }
 
     @Override

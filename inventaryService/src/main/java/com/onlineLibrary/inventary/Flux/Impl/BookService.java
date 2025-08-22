@@ -1,135 +1,136 @@
 package com.onlineLibrary.inventary.Flux.Impl;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.onlineLibrary.inventary.Entities.Book;
+
+import com.onlineLibrary.inventary.Entities.DAO.AuthorDAO;
+import com.onlineLibrary.inventary.Entities.DAO.BookDAO;
+import com.onlineLibrary.inventary.Entities.DAO.CategoryDAO;
+import com.onlineLibrary.inventary.Entities.DTO.BookDTO;
+import com.onlineLibrary.inventary.Entities.DTO.BookQuantityResponseDTO;
+import com.onlineLibrary.inventary.Entities.DTO.BookResponseDTO;
+import com.onlineLibrary.inventary.Entities.DTO.BooksResponseDTO;
 import com.onlineLibrary.inventary.Flux.IAuthorService;
 import com.onlineLibrary.inventary.Flux.IBookService;
 import com.onlineLibrary.inventary.Flux.ICategoryService;
-import com.onlineLibrary.inventary.Flux.IPublisherService;
+import com.onlineLibrary.inventary.Persistance.IAuthorBookRepository;
 import com.onlineLibrary.inventary.Persistance.IBookRepository;
+import com.onlineLibrary.inventary.Persistance.ICategoryBookRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService implements IBookService {
 
+    private final ICategoryService categoryService;
+    private final IAuthorService authorService;
+    private final IBookRepository bookRepository;
 
-    private  IBookRepository bookRepository;
-    private  IAuthorService authorService;
-    private  ICategoryService categoryService;
-    private  IPublisherService publisherService;
 
     @Autowired
-    public BookService(IBookRepository bookRepository,IAuthorService authorService,ICategoryService categoryService,IPublisherService publisherService) {
-        this.bookRepository = bookRepository;
-        this.authorService = authorService;
+    public BookService(
+            ICategoryService categoryService,
+            IAuthorService authorService,
+            IBookRepository bookRepository) {
         this.categoryService = categoryService;
-        this.publisherService = publisherService;
+        this.authorService = authorService;
+        this.bookRepository = bookRepository;
+
     }
 
     @Override
-    public JsonObject getBooks() throws Exception {
-        List<Book> books = bookRepository.getBooks();
+    public BooksResponseDTO getBooks() throws Exception {
+        List<BookDAO> books = bookRepository.findAll();
        return buildBooksResponse(books);
     }
 
     @Override
-    public JsonObject getBookById(int id) throws Exception {
-        Book book = bookRepository.getBookById(id);
-        return buildBookResponse(book);
+    public BookResponseDTO getBookById(int id) throws Exception {
+        Optional<BookDAO> book = bookRepository.findById(id);
+        return book
+                .map(this::buildBookResponse)
+                .orElseGet(() -> new BookResponseDTO("NOT_FOUND", "Book not found"));
     }
 
 
     @Override
-    public JsonObject decreaseBookQuantity(int id, int quantity) throws Exception {
-        Book book = bookRepository.getBookById(id);
-        if(book == null){
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "NOT FOUND");
-            response.addProperty("message", "Book not found");
-            return response;
+    public BookQuantityResponseDTO decreaseBookQuantity(int id, int quantity) throws Exception {
+        Optional<BookDAO> bookOpt = bookRepository.findById(id);
+
+        if (!bookOpt.isPresent()) {
+            return new BookQuantityResponseDTO("NOT_FOUND", "Book not found");
         }
-        int newQuantity = book.getQuantity() - quantity;
-        if(newQuantity < 0){
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "FAILED");
-            response.addProperty("message", "Not enough books in stock");
-            return response;
+
+        BookDAO bookDAO = bookOpt.get();
+        int newQuantity = bookDAO.getQuantity() - quantity;
+
+        if (newQuantity < 0) {
+            return new BookQuantityResponseDTO("FAILED", "Not enough books in stock");
         }
-        if(updateBookQuantity(book, newQuantity)){
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "OK");
-            response.addProperty("message", "Book quantity updated");
-            return response;
-        }else{
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "FAILED");
-            response.addProperty("message", "Failed to update book quantity");
-            return response;
-        }
+
+        updateBookQuantity(bookDAO, newQuantity);
+
+        return new BookQuantityResponseDTO("OK", "Book quantity updated");
     }
 
     @Override
-    public JsonObject findBookByIsbn(String isbn) throws Exception {
-        Book book = bookRepository.findBookByIsbn(isbn);
-       return buildBookResponse(book);
-    }
+    @Transactional
+    public BookResponseDTO addBook(BookDTO body) {
 
-
-    /**
-     * Convertit une liste de livre en json
-     * @param books la liste de livre
-     * @return un jsonObject contenant un jsonArray de livre
-     */
-    private JsonObject buildBooksResponse(List<Book> books) {
-        JsonObject response = new JsonObject();
-        JsonArray booksArray = new JsonArray();
-        if(books.isEmpty()){
-            response.addProperty("status", "NOT FOUND");
-            return response;
+        BookDAO book = new BookDAO(
+                body.getIsbn(),
+                body.getTitle(),
+                body.getDescription(),
+                body.getParutionDate(),
+                body.getPrice(),
+                body.getQuantity(),
+                body.getPublisherId()
+        );
+        book = bookRepository.save(book);
+        if (body.getCategories() != null) {
+            for (String catName : body.getCategories()) {
+              categoryService.generateRetlationBookCategorie(catName, book.getId());
+            }
         }
-        response.addProperty("status", "OK");
-        Gson gson = new Gson();
-        for (Book book : books) {
-            booksArray.add(gson.toJsonTree(book));
+        if (body.getAuthors() != null) {
+            for (String authorName : body.getAuthors()) {
+                authorService.generateRelationBookAuthor(authorName, book.getId());
+            }
         }
-        response.add("books", booksArray);
+        BookResponseDTO response = new BookResponseDTO("Book added successfully",book);
         return response;
     }
 
-    /**
-     * Convertit un objet livre en json
-     * @param book le livre à convertir
-     * @return un jsonObject contenant les informations du livre
-     */
-    private JsonObject buildBookResponse(Book book){
-        JsonObject response = new JsonObject();
-        Gson gson = new Gson();
+    @Override
+    public BookResponseDTO findBookByIsbn(String isbn) throws Exception {
+        Optional<BookDAO> book = bookRepository.findByIsbn(isbn);
+        return book
+                .map(this::buildBookResponse)
+                .orElseGet(() -> new BookResponseDTO("NOT_FOUND", "Book not found for ISBN: " + isbn));
+    }
 
+
+
+    private BooksResponseDTO buildBooksResponse(List<BookDAO> books) {
+        if (books.isEmpty()) {
+            return new BooksResponseDTO("NOT_FOUND", "No books found");
+        }
+        return new BooksResponseDTO("OK", "Books retrieved successfully", books);
+    }
+
+
+    private BookResponseDTO buildBookResponse(BookDAO book){
         if (book != null) {
-            response.addProperty("status", "OK");
-            response.add("book", gson.toJsonTree(book));
+            return new BookResponseDTO("OK", book);
         } else {
-            response.addProperty("status", "NOT_FOUND");
+            return new BookResponseDTO("NOT_FOUND", "Book not found");
         }
-
-        return response;
     }
 
-    /**
-     * Met à jour la quantité en stock d'un livre
-     * @param book le livre à mettre à jour
-     * @param newQuantity la nouvelle quantité en stock
-     * @return true en cas de succès false sinon
-     * @throws Exception
-     */
-    private boolean updateBookQuantity(Book book, int newQuantity) throws Exception {
+    private BookDAO updateBookQuantity(BookDAO book, int newQuantity) throws Exception {
         book.setQuantity(newQuantity);
-        return bookRepository.updateBook(book.getId(), book);
+        return bookRepository.save(book);
     }
 
 

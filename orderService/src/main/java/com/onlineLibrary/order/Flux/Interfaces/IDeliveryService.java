@@ -1,11 +1,16 @@
 package com.onlineLibrary.order.Flux.Interfaces;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.order.Entities.Delivery;
+import com.onlineLibrary.order.Entities.DTO.AddressDTO;
+import com.onlineLibrary.order.Entities.DTO.DeliveryDTO;
+
+import java.util.Optional;
 
 public interface IDeliveryService {
-    Delivery scheduleDelivery(int orderId, JsonObject adresse) throws Exception;
-    JsonObject deliverOrder(int orderId);
-    JsonObject findDelivryByOrderId(int orderId);
-    void scheduleAutoDelivery(int orderId);
+    DeliveryDTO scheduleDelivery(int orderId, AddressDTO adresse) throws Exception;
+    void deliverOrder(int userId, int orderId );
+    Optional<DeliveryDTO> findDelivryByOrderId(int orderId);
+    void scheduleAutoDelivery(int userId, int orderId);
 }
+
+
+

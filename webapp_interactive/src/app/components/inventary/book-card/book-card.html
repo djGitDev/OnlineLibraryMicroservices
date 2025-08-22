@@ -1,0 +1,38 @@
+<mat-card class="book-card">
+  <mat-card-header>
+    <mat-card-title>{{ book.title }}</mat-card-title>
+    <mat-card-subtitle>ISBN: {{ book.isbn }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p><strong>Description:</strong> {{ book.description }}</p>
+    <p><strong>Publication Date:</strong> {{ book.parutionDate }}</p>
+    <p><strong>Price:</strong> {{ book.price }} $</p>
+    <p><strong>Quantity available:</strong> {{ book.quantity }}</p>
+    <p><strong>Publisher ID:</strong> {{ book.publisherId }}</p>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <!-- Qantity selector -->
+    <mat-form-field appearance="outline" style="width: 80px; margin-right: 10px;">
+      <mat-label>Qty</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="selectedQuantity"
+        [min]="1"
+        [max]="book.quantity"
+      />
+    </mat-form-field>
+
+    <!-- Bouton add to cart -->
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onAddToCart()"
+      [disabled]="selectedQuantity < 1 || selectedQuantity > book.quantity"
+    >
+      Add to Cart
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -1,10 +1,6 @@
 package com.onlineLibrary.order.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlineLibrary.order.Flux.Implementations.SynchronizedOrderManager;
-import com.onlineLibrary.order.Flux.Interfaces.ISynchronizedOrderManager;
-import com.onlineLibrary.order.Persistance.Implementations.PostgresDBConnection;
-import com.onlineLibrary.order.Persistance.Interfaces.IDBConnection;
 import feign.codec.Encoder;
 import feign.jackson.JacksonEncoder;
 import org.springframework.beans.factory.annotation.Autowired;

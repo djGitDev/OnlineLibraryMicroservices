@@ -1,8 +1,9 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.profil.Entities.Credential;
-import com.onlineLibrary.profil.Entities.User;
+import com.onlineLibrary.profil.Entities.DTO.LoginRequestDTO;
+import com.onlineLibrary.profil.Entities.DAO.UserDAO;
+import com.onlineLibrary.profil.Entities.DTO.LoginResponseDTO;
+import com.onlineLibrary.profil.Entities.DTO.RefreshTokenResponseDTO;
 import com.onlineLibrary.profil.Persistance.IRepositoryUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,49 +15,47 @@ public class LoginService implements ILoginService {
 
     private final IRepositoryUser repositoryUser;
     private final IHashService hashService;
+    private final JwtService jwtService;
 
     @Autowired
-    public LoginService(IRepositoryUser repositoryUser,IHashService hashService) {
+    public LoginService(IRepositoryUser repositoryUser,IHashService hashService,JwtService jwtService) {
         this.repositoryUser = repositoryUser;
         this.hashService = hashService;
+        this.jwtService = jwtService;
     }
 
     @Override
-    public JsonObject authentifyUser(JsonObject data) throws Exception {
-        Credential credentials = convertJsonToCredential(data);
-        String passEncrypted = hashService.encyptPassword(credentials.getPassword());
-        Optional<User> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
+    public LoginResponseDTO authentifyUser(LoginRequestDTO credentials) throws Exception {
+
+        String  enteredPassword = credentials.getPassword();
+        Optional<UserDAO> userEncapsuled = repositoryUser.findUserByEmail(credentials.getEmail());
 
         if (userEncapsuled.isPresent()) {
-            User user = userEncapsuled.get();
+            UserDAO userDAO = userEncapsuled.get();
+            String storedHash = userDAO.getPassword();
+            String role = userDAO.getRole();
+            String email = userDAO.getEmail();
+            String jwt = jwtService.generateToken(email,role);
+            String refreshToken = jwtService.generateRefreshToken(email,role);
 
-            if (user.getPassword().equals(passEncrypted)) {
-                JsonObject response = new JsonObject();
-                response.addProperty("status", "success");
-                response.addProperty("user_id", user.getId());
-                response.addProperty("email", user.getEmail());
-                return response;
+            if (hashService.verify(enteredPassword,storedHash)) {
+                return new LoginResponseDTO("success", userDAO.getId(), email, jwt, refreshToken,role);
             } else {
-                JsonObject response = new JsonObject();
-                response.addProperty("status", "failure");
-                response.addProperty("message", "Mot de passe incorrect");
-                return response;
+                throw new RuntimeException("Incorrect password");
             }
 
         } else {
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "failure");
-            response.addProperty("message", "Utilisateur non trouvé");
-            return response;
+            throw new RuntimeException("User not found");
         }
     }
 
-    private Credential convertJsonToCredential(JsonObject data) {
-        JsonObject credentialsJson = data.getAsJsonObject("credentials");
-        return new Credential(
-                credentialsJson.get("email").getAsString(),
-                credentialsJson.get("password").getAsString()
-        );
+    @Override
+    public RefreshTokenResponseDTO generateAccesTokenFromRefresh(String refreshToken) {
+        String email = jwtService.extractEmail(refreshToken);
+        String role = jwtService.extractRole(refreshToken);
+        String newAccessToken = jwtService.generateToken(email, role);
+        return new RefreshTokenResponseDTO("success", newAccessToken);
     }
+
 }
 

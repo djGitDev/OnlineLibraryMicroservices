@@ -1,8 +1,10 @@
 package com.onlineLibrary.payment.ControllerRestPaymentApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlineLibrary.payment.Entities.DTO.NotificationResponseDTO;
 import com.onlineLibrary.payment.Flux.IPaymentService;
-import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.onlineLibrary.payment.Util.ConvertJsonUtils.gsonToJackson;
 
 
 @RestController
@@ -24,9 +25,11 @@ public class PaymentRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentRestController.class);
     private final IPaymentService paymentService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public PaymentRestController(IPaymentService paymentService) {
+    public PaymentRestController(IPaymentService paymentService,ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         this.paymentService = paymentService;
     }
 
@@ -80,8 +83,10 @@ public class PaymentRestController {
         try {
             logger.info("Processing payment for user: {}, cart: {}, autoDelivery: {}",
                     userId, cartId, autoDelivery);
-            JsonObject resultGson = paymentService.processPaiement(cartId, userId);
-            return ResponseEntity.ok(gsonToJackson(resultGson));
+            NotificationResponseDTO response= paymentService.processPaiement(cartId, userId);
+            JsonNode result = objectMapper.valueToTree(response);
+
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error processing payment for user: {}", userId, e);
             return errorResponse(e);
@@ -89,9 +94,9 @@ public class PaymentRestController {
     }
 
     private ResponseEntity<JsonNode> errorResponse(Exception e) throws Exception {
-        JsonObject gsonError = new JsonObject();
-        gsonError.addProperty("error", e.getMessage());
-        JsonNode jacksonError = gsonToJackson(gsonError);
-        return ResponseEntity.internalServerError().body(jacksonError);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("error", e.getMessage());
+        return ResponseEntity.internalServerError().body(errorNode);
     }
 }

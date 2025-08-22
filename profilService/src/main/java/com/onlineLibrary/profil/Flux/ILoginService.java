@@ -1,7 +1,10 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.profil.Entities.DTO.LoginRequestDTO;
+import com.onlineLibrary.profil.Entities.DTO.LoginResponseDTO;
+import com.onlineLibrary.profil.Entities.DTO.RefreshTokenResponseDTO;
 
 public interface ILoginService {
-    JsonObject authentifyUser(JsonObject data) throws Exception;
+    LoginResponseDTO authentifyUser(LoginRequestDTO credential) throws Exception;
+    RefreshTokenResponseDTO generateAccesTokenFromRefresh(String refreshToken);
 }

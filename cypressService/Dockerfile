@@ -8,17 +8,20 @@ ENV DISPLAY=host.docker.internal:0\
 RUN rm -f /etc/apt/sources.list.d/google-chrome.list || true && \
     apt-get update && \
     apt-get install -y \
-      xauth \
-      libgtk2.0-0 \
-      libnotify-dev \
-      libgconf-2-4 \
-      libnss3 \
-      libxss1 \
-      libasound2 && \
+    xauth \
+    libgtk2.0-0 \
+    libnotify-dev \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
+
+RUN mkdir -p /app/cypress/screenshots /app/cypress/videos && \
+    chown -R node:node /app/cypress
 
 RUN mkdir -p /app/cypress-logs && \
     chown -R node:node /app/cypress-logs && \

@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
+import java.util.function.Supplier;
 
 import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.gsonToJackson;
 import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jacksonToGson;
@@ -34,13 +39,8 @@ public class ProfilHandler {
         JsonObject registerPayloadGson = new JsonObject();
         registerPayloadGson.add("user", task.get("user"));
         registerPayloadGson.add("address", task.get("address"));
-
-        logger.debug("Appel du microservice register avec payload: {}", registerPayloadGson);
         JsonNode registerPayload = gsonToJackson(registerPayloadGson);
-        logger.info("Payload JACKSON envoyé: {}", registerPayload.toString());
-
         ResponseEntity<JsonNode> responseRegisterJackson = profilMicroserviceClient.callRegister(registerPayload);
-        logger.info("Réponse du microservice register reçue");
         result = jacksonToGson(responseRegisterJackson.getBody());
         return result;
     }
@@ -56,7 +56,30 @@ public class ProfilHandler {
 
         JsonNode loginPayload = gsonToJackson(loginPayloadGson);
         ResponseEntity<JsonNode> responseLoginJackson = profilMicroserviceClient.callLogin(loginPayload);
+
         result = jacksonToGson(responseLoginJackson.getBody());
+
+        String jwt = result.get("accessToken").getAsString();
+
+        String bearerToken = "Bearer " + jwt;
+
+
+        result.addProperty("responseAdminAuth",
+                callEndpointSafely(() -> profilMicroserviceClient.callAdminEndpoint(bearerToken))
+        );
+
+        result.addProperty("responseUserAuth",
+                callEndpointSafely(() -> profilMicroserviceClient.callUserEndpoint(bearerToken))
+        );
+
         return result;
+    }
+
+    private String callEndpointSafely(Supplier<String> endpointCall) {
+        try {
+            return endpointCall.get();
+        } catch (Exception e) {
+            return "Error: " + e.getClass().getSimpleName();
+        }
     }
 }

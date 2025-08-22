@@ -1,10 +1,12 @@
 package com.onlineLibrary.profil.Flux;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.profil.Entities.DTO.*;
 
 public interface IProfilServiceDispatcher {
-    JsonObject handleRegistration(JsonObject data) throws Exception;
-    JsonObject handleLogin(JsonObject data) throws Exception;
-    JsonObject getProfile(int userId) throws Exception;
-    JsonObject getUserData(int userId) throws Exception;
+
+    RegisterResponseDTO  handleRegistration(RegisterRequestDTO dataRequest) throws Exception;
+    LoginResponseDTO handleLogin(LoginRequestDTO credential) throws Exception;
+    AddressDTO getProfile(int userId) throws Exception;
+    UserDTO getUserData(int userId) throws Exception;
+    RefreshTokenResponseDTO handleRefreshToken(String refreshToken);
 }

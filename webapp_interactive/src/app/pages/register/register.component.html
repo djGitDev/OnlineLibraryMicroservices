@@ -1,0 +1,20 @@
+
+<div class="register-container" style="max-width: 640px; margin: auto;">
+  <h2 style="text-align:center;">Register</h2>
+
+  <form (ngSubmit)="onRegister()">
+    <app-user-form [user]="user"></app-user-form>
+    <app-address-form [address]="address"></app-address-form>
+
+    <button mat-raised-button color="primary" style="width:100%; margin-top:20px;">
+      Create Account
+    </button>
+  </form>
+
+  <mat-divider style="margin: 24px 0;"></mat-divider>
+  <button mat-raised-button
+          (click)="goBackToLogin()"
+          style="width: 100%; color: red; margin-bottom: 16px;">
+    ← Back to Login
+  </button>
+</div>

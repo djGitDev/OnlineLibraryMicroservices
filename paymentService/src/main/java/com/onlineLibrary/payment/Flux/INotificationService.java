@@ -1,7 +1,7 @@
 package com.onlineLibrary.payment.Flux;
 
-import com.google.gson.JsonObject;
+import com.onlineLibrary.payment.Entities.DTO.NotificationResponseDTO;
 
 public interface INotificationService {
-    JsonObject notifyUser(int userId, int orderId, int cartId, double totalPrice)throws Exception;
+    NotificationResponseDTO notifyUser(int userId, int orderId, int cartId, double totalPrice)throws Exception;
 }

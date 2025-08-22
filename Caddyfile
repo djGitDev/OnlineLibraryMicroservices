@@ -1,13 +1,37 @@
 
-http://localhost:80 {
-    # Proxy API
-    handle /api/* {
-    reverse_proxy orchestre:8080
-}
 
-    # Proxy frontend
-    handle /* {
-        reverse_proxy webapp:5173
+:80 {
+
+    # Proxy to workflow test
+    handle /api/workflow/* {
+        reverse_proxy orchestre:8080
     }
-}
+    
+    
+    # Proxy to profil service including Facebook AUTH
+    handle /api/profil/* {
+        reverse_proxy profil:8081
+    }
 
+      
+    # Proxy to inventary service
+    handle /api/books/* {
+        reverse_proxy inventary:8082
+    }
+
+    # Proxy to inventary service
+    handle /api/payment/* {
+        reverse_proxy payment:8083
+    }
+
+    # Proxy to cart service
+    handle /api/cart/* {
+        reverse_proxy cart:8085
+    }
+    
+    # proxy to webapp angular
+    handle {
+        reverse_proxy webapp-interactive:4200
+    }
+    
+}

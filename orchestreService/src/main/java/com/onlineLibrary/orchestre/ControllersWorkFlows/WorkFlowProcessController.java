@@ -1,8 +1,11 @@
 
 package com.onlineLibrary.orchestre.ControllersWorkFlows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.onlineLibrary.orchestre.Flux.Handlers.*;
+import com.onlineLibrary.orchestre.Util.ConvertJsonUtils;
 import com.onlineLibrary.orchestre.Util.WorkFlowStateManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,8 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.arrayNodeToJsonArray;
-import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.jsonArrayToArrayNode;
+import static com.onlineLibrary.orchestre.Util.ConvertJsonUtils.*;
 
 
 @RestController
@@ -56,9 +58,6 @@ public class WorkFlowProcessController {
         this.workFlowStateManager = workFlowStateManager;
     }
 
-
-
-
     @Operation(
             summary = "Vérifie l'état du service",
             description = "Retourne un statut simple indiquant si le service est opérationnel.",
@@ -80,6 +79,9 @@ public class WorkFlowProcessController {
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "UP"));
     }
+
+
+
     @Operation(
             summary = "Workflow orchestration",
             description = "Receives an array of actions and returns an array of results.",
@@ -142,7 +144,7 @@ public class WorkFlowProcessController {
                     )
             }
     )
-    @PostMapping()
+    @PostMapping("/orchestrate")
     public ResponseEntity<ArrayNode> orchestrate(@RequestBody ArrayNode inputArrayJackson) throws Exception {
         logger.info("Starting request processing - Received array of {} elements", inputArrayJackson.size());
         System.out.println("[DEBUG] Request received: " + inputArrayJackson);
@@ -191,7 +193,7 @@ public class WorkFlowProcessController {
                     break;
                 case "login":
                     result = profilHandler.handleLogin(task);
-                    workFlowStateManager.addUserId(result.get("user_id").getAsInt());
+                    workFlowStateManager.addUserId(result.get("userId").getAsInt());
                     break;
                 case "find_book_by_id":
                     result = inventaryHandler.handleFindBookById(task);

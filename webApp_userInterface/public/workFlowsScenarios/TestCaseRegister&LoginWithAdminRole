@@ -1,0 +1,27 @@
+[
+  {
+    "action": "register",
+    "user": {
+      "first_name": "Sophie",
+      "last_name": "Lefebvre",
+      "email": "sophie.lefebvre@example.ca",
+      "phone": "+15149991234",
+      "password": "AdminSuperSecure2025!",
+      "role": "ROLE_ADMIN"
+    },
+    "address": {
+      "street": "789 Boulevard René-Lévesque Ouest",
+      "city": "Montreal",
+      "postal_code": "H3B 2K4",
+      "province": "QC",
+      "country": "Canada"
+    }
+  },
+  {
+    "action": "login",
+    "credentials": {
+      "email": "sophie.lefebvre@example.ca",
+      "password": "AdminSuperSecure2025!"
+    }
+  }
+]

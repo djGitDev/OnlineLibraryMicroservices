@@ -1,0 +1,112 @@
+<div style="max-width: 640px; margin: auto;">
+  <mat-card class="add-book-card" style="padding:16px; border-radius:16px;">
+    <mat-card-title style="text-align:center;">Add a Book</mat-card-title>
+    <mat-card-content>
+      <form (ngSubmit)="addBook()" #bookForm="ngForm">
+
+        <!-- ISBN -->
+        <mat-form-field appearance="outline" style="width:48%; margin:4px;">
+          <mat-label>ISBN</mat-label>
+          <input matInput name="isbn" [(ngModel)]="newBook.isbn">
+        </mat-form-field>
+
+        <!-- Title -->
+        <mat-form-field appearance="outline" style="width:48%; margin:4px;">
+          <mat-label>Title</mat-label>
+          <input matInput name="title" [(ngModel)]="newBook.title">
+        </mat-form-field>
+
+        <!-- Quantity (Obligatoire) -->
+        <mat-form-field appearance="outline" style="width:30%; margin:4px;">
+          <mat-label>Quantity *</mat-label>
+          <input matInput type="number" name="quantity" [(ngModel)]="newBook.quantity" required>
+        </mat-form-field>
+
+        <!-- Price (Obligatoire) -->
+        <mat-form-field appearance="outline" style="width:30%; margin:4px;">
+          <mat-label>Price ($) *</mat-label>
+          <input matInput type="number" step="0.01" name="price" [(ngModel)]="newBook.price" required>
+        </mat-form-field>
+
+        <!-- Editor (Obligatoire) -->
+        <mat-form-field appearance="outline" style="width:34%; margin:4px;">
+          <mat-label>Editor *</mat-label>
+          <mat-select name="publisherId" [(ngModel)]="newBook.publisherId" required>
+            @for (pub of publishers; track pub.id){
+            <mat-option [value]="pub.id">{{ pub.name }}</mat-option>
+            }
+            <mat-button-toggle class="add-new-option" (click)="addPublisher()">
+              <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
+              <span style="margin-left:4px; color:#4caf50;">Add new</span>
+            </mat-button-toggle>
+          </mat-select>
+        </mat-form-field>
+
+
+
+
+        <!-- Divider après les champs obligatoires -->
+        <mat-divider style="margin:16px 0;"></mat-divider>
+
+        <!-- Release date -->
+        <mat-form-field appearance="outline" style="width:48%; margin:4px;">
+          <mat-label>Release date</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="newBook.parutionDate" name="parutionDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Authors -->
+        <mat-form-field appearance="outline" style="width:48%; margin:4px;">
+          <mat-label>Authors</mat-label>
+          <mat-select name="authorIds" [(ngModel)]="newBook.authorIds" multiple>
+            @for (author of authors; track author.id){
+            <mat-option [value]="author.name">{{ author.name }}</mat-option>
+            }
+            <mat-button-toggle class="add-new-option" (click)="addAuthor()">
+              <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
+              <span style="margin-left:4px; color:#4caf50;">Add new</span>
+            </mat-button-toggle>
+          </mat-select>
+        </mat-form-field>
+
+
+        <!-- Categories -->
+        <mat-form-field appearance="outline" style="width:48%; margin:4px;">
+          <mat-label>Category</mat-label>
+          <mat-select name="categoryIds" [(ngModel)]="newBook.categoryIds" multiple>
+            @for (cat of categories; track cat.id){
+            <mat-option [value]="cat.name">{{ cat.name }}</mat-option>
+            }
+            <mat-button-toggle class="add-new-option" (click)="addCategory()">
+              <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
+              <span style="margin-left:4px; color:#4caf50;">Add new</span>
+            </mat-button-toggle>
+          </mat-select>
+        </mat-form-field>
+
+
+        <!-- Divider avant Description -->
+        <mat-divider style="margin:16px 0;"></mat-divider>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" style="width:100%; margin:4px;">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="3" name="description" [(ngModel)]="newBook.description"></textarea>
+        </mat-form-field>
+
+        <!-- Divider avant boutons -->
+        <mat-divider style="margin:16px 0;"></mat-divider>
+
+        <!-- Buttons -->
+        <div style="display:flex; justify-content:center; gap:12px;">
+          <button mat-raised-button color="primary" type="submit" [disabled]="bookForm.invalid">
+            <mat-icon>add</mat-icon> Add
+          </button>
+          <button mat-button type="button" (click)="resetForm()">Reset</button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

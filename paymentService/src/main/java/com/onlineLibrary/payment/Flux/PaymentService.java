@@ -1,12 +1,12 @@
 package com.onlineLibrary.payment.Flux;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonObject;
+import com.onlineLibrary.payment.Entities.DTO.InvoiceDTO;
+import com.onlineLibrary.payment.Entities.DTO.NotificationResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static com.onlineLibrary.payment.Util.ConvertJsonUtils.jacksonToGson;
 
 @Service
 public class PaymentService implements IPaymentService {
@@ -26,12 +26,11 @@ public class PaymentService implements IPaymentService {
 
 
     @Override
-    public JsonObject processPaiement(int cartId,int userId) throws Exception {
-        JsonObject invoiceResult = invoiceService.generateInvoice(cartId);
-        double totalPrice = invoiceResult.get("total_price").getAsDouble();
+    public NotificationResponseDTO processPaiement(int cartId, int userId) throws Exception {
+        InvoiceDTO invoiceResult = invoiceService.generateInvoice(cartId);
+        double totalPrice = invoiceResult.getTotalPrice();
         ResponseEntity<JsonNode> responseJackson = orderMicroservicesClient.callPlaceOrder(userId,true);
-        JsonObject orderResult = jacksonToGson(responseJackson.getBody());
-        int orderId = orderResult.get("orderId").getAsInt();
+        int orderId = responseJackson.getBody().get("orderId").asInt();
         return notificationService.notifyUser(userId,orderId,cartId,totalPrice);
     }
 }

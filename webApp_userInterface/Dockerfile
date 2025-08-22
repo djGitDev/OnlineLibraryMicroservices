@@ -18,3 +18,4 @@ EXPOSE 5173
 
 # Lance le serveur Vite
 CMD ["npm", "run", "dev"]
+

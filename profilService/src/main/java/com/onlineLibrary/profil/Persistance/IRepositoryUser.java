@@ -1,12 +1,14 @@
+
+
 package com.onlineLibrary.profil.Persistance;
 
-import com.google.gson.JsonObject;
-import com.onlineLibrary.profil.Entities.User;
+import com.onlineLibrary.profil.Entities.DAO.UserDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface IRepositoryUser {
-    int createUser(User user) throws Exception;
-    Optional<User> findUserByEmail(String email) throws Exception;
-    JsonObject findUserDataById(int userId) throws Exception;
+@Repository
+public interface IRepositoryUser extends JpaRepository<UserDAO, Integer> {
+    Optional<UserDAO> findUserByEmail(String email);
 }

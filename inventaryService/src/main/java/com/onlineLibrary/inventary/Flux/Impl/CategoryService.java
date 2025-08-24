@@ -17,6 +17,7 @@ import java.util.Optional;
 @Service
 public class CategoryService implements ICategoryService {
 
+
     private  ICategoryRepository categoryRepository;
     private  ICategoryBookRepository categoryBookRepository;
 
@@ -27,11 +28,10 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public int generateRetlationBookCategorie(String category, int idBook) {
+    public void generateRetlationBookCategorie(String category, int idBook) {
         int idCategory = findCategoryByNameElseCreate(category);
         BookCategoryDAO relation = new BookCategoryDAO(idBook,idCategory);
-        relation = categoryBookRepository.save(relation);
-        return relation.getId();
+        categoryBookRepository.save(relation);
     }
 
     @Override
@@ -49,6 +49,18 @@ public class CategoryService implements ICategoryService {
         CategoryDAO newCategory = new CategoryDAO(name);
         return categoryRepository.save(newCategory); // sauvegarde et retourne le DAO
     }
+
+    @Override
+    @Transactional
+    public void removeRelationsByBookId(int id) {
+        categoryBookRepository.deleteAllByBookId(id);
+    }
+
+    @Override
+    public Optional<CategoryDAO> getCategoryById(int categoryId) {
+        return categoryRepository.findById(categoryId);
+    }
+
     @Transactional
     protected int findCategoryByNameElseCreate(String categoryName) {
         Optional<CategoryDAO> optionalCategory = categoryRepository.findByName(categoryName);

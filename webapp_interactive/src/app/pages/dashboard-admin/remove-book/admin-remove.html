@@ -1,0 +1,17 @@
+<div class="admin-remove-container" style="max-width: 900px; margin:auto; padding:16px;">
+  <h1 style="text-align:center; margin-bottom:24px;">Manage Inventory - Remove Books</h1>
+
+  <div class="books-list" style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
+    @for (book of books; track book.id) {
+      <app-book-card
+        [book]="book"
+        [showDelete]="true"
+        (deleteEvent)="onDeleteBook($event)">
+      </app-book-card>
+    }
+  </div>
+
+  @if (books.length === 0) {
+    <p style="text-align:center; margin-top:32px;">No books found.</p>
+  }
+</div>

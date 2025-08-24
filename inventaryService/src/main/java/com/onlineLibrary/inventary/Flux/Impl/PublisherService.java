@@ -24,12 +24,6 @@ public class PublisherService implements IPublisherService {
 
 
     @Override
-    public int getPublisherByName(String publisher) {
-        int idPublisher = findPublisherByNameElseCreate(publisher);
-        return idPublisher;
-    }
-
-    @Override
     public PublishersResponseDTO getPublishers() {
         List<PublisherDAO> publishers = publisherRepository.findAll();
         return new PublishersResponseDTO(publishers);
@@ -43,6 +37,11 @@ public class PublisherService implements IPublisherService {
         }
         PublisherDAO newPublisher = new PublisherDAO(name);
         return publisherRepository.save(newPublisher); // sauvegarde et retourne le DAO
+    }
+
+    @Override
+    public Optional<PublisherDAO> getPublisherById(int publisherId) {
+        return publisherRepository.findById(publisherId);
     }
 
     @Transactional

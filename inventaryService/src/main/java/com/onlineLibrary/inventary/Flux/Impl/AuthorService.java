@@ -27,11 +27,10 @@ public class AuthorService implements IAuthorService {
 
 
     @Override
-    public int generateRelationBookAuthor(String author, int idBook) {
+    public void generateRelationBookAuthor(String author, int idBook) {
         int idAuthor = this.findAuthorByNameElseCreate(author);
         AuthorBookDAO relation = new AuthorBookDAO(idBook,idAuthor);
-        relation = authorBookRepository.save(relation);
-        return relation.getId();
+        authorBookRepository.save(relation);
     }
 
     @Override
@@ -48,6 +47,17 @@ public class AuthorService implements IAuthorService {
         }
         AuthorDAO newAuthor = new AuthorDAO(name);
         return authorRepository.save(newAuthor); // sauvegarde et retourne le DAO
+    }
+
+    @Override
+    @Transactional
+    public void removeRelationsByBookId(int id) {
+        authorBookRepository.deleteAllByBookId(id);
+    }
+
+    @Override
+    public Optional<AuthorDAO> getAuthorById(int authorId) {
+        return authorRepository.findById(authorId);
     }
 
     @Transactional

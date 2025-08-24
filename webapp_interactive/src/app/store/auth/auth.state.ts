@@ -7,8 +7,6 @@ export interface AuthState {
   userId: number | null;
   role: Role | null
   cartId: number | null;
-
-
 }
 
 export const initialState: AuthState = {
@@ -17,6 +15,4 @@ export const initialState: AuthState = {
   userId: null,
   role: null,
   cartId: null
-
-
 };

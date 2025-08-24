@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class BookDTO {
-
+    private int id;
     private String isbn;
     private String title;
     private String description;
@@ -12,13 +12,21 @@ public class BookDTO {
     private double price;
     private int quantity;
     private int publisherId;
+    private String publisherName;
 
-    private List<String> categories;
-    private List<String> authors;
+    private List<String> categoryNames;
+    private List<String> authorNames;
 
     public BookDTO() {}
 
     // Getters et setters
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getIsbn() { return isbn; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
 
@@ -37,12 +45,36 @@ public class BookDTO {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public int getPublisherId() { return publisherId; }
-    public void setPublisherId(int publisherId) { this.publisherId = publisherId; }
+    public int getPublisherId() {
+        return publisherId;
+    }
+    public void setPublisherId(int publisherId) {
+        this.publisherId = publisherId;
+    }
+    public String getPublisherName() { return publisherName; }
+    public void setPublisherName(String publisherName) { this.publisherName = publisherName; }
 
-    public List<String> getCategories() { return categories; }
-    public void setCategories(List<String> categories) { this.categories = categories; }
+    public List<String> getAuthorNames() { return authorNames; }
+    public void setAuthorNames(List<String> authorNames) { this.authorNames = authorNames; }
 
-    public List<String> getAuthors() { return authors; }
-    public void setAuthors(List<String> authors) { this.authors = authors; }
+    public List<String> getCategoryNames() { return categoryNames; }
+    public void setCategoryNames(List<String> categoryNames) { this.categoryNames = categoryNames; }
+
+    @Override
+    public String toString() {
+        return "BookDTO{" +
+                "id=" + id +
+                "isbn='" + isbn + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", parutionDate=" + parutionDate +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", publisherId=" + publisherId +
+                ", publisherName=" + publisherName +
+                ", categories=" + (categoryNames != null ? String.join(", ", categoryNames) : "[]") +
+                ", authors=" + (authorNames != null ? String.join(", ", authorNames) : "[]") +
+                '}';
+    }
+
 }

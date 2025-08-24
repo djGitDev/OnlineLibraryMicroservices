@@ -13,7 +13,6 @@ public class CategoryDAO {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    // Constructeur vide obligatoire pour JPA
     public CategoryDAO() {}
 
     public CategoryDAO(String name) {

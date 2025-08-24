@@ -8,7 +8,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { routes } from './app.routes';
 import { authReducer } from './store/auth/auth.reducer';
-import { MY_DATE_FORMATS } from './pages/dashboard-admin/dashboard-admin';
+import { MY_DATE_FORMATS } from './pages/dashboard-admin/add-book/admin-add';
 
 export const appConfig: ApplicationConfig = {
   providers: [

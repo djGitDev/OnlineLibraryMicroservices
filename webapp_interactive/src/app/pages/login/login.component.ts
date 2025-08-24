@@ -7,7 +7,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
-import {AuthService} from '../../services/auth.service';
+import {AuthService} from '../../services/Profil/auth.service';
 import {Credentials} from '../../models/login/credentials.model';
 import {Store} from '@ngrx/store';
 import {loginSuccess} from '../../store/auth/auth.actions';

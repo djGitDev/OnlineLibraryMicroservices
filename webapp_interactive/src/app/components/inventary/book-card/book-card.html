@@ -1,3 +1,4 @@
+
 <mat-card class="book-card">
   <mat-card-header>
     <mat-card-title>{{ book.title }}</mat-card-title>
@@ -9,30 +10,46 @@
     <p><strong>Publication Date:</strong> {{ book.parutionDate }}</p>
     <p><strong>Price:</strong> {{ book.price }} $</p>
     <p><strong>Quantity available:</strong> {{ book.quantity }}</p>
-    <p><strong>Publisher ID:</strong> {{ book.publisherId }}</p>
+    <p><strong>Publisher Name:</strong> {{ book.publisherName }}</p>
+
+    <!-- Authors -->
+    @if (book.authorNames.length > 0) {
+      <p><strong>Authors:</strong> {{ book.authorNames.join(', ') }}</p>
+    }
+
+    <!-- Categories -->
+    @if (book.categoryNames.length > 0) {
+      <p><strong>Categories:</strong> {{ book.categoryNames.join(', ') }}</p>
+    }
   </mat-card-content>
 
   <mat-card-actions>
-    <!-- Qantity selector -->
-    <mat-form-field appearance="outline" style="width: 80px; margin-right: 10px;">
-      <mat-label>Qty</mat-label>
-      <input
-        matInput
-        type="number"
-        [(ngModel)]="selectedQuantity"
-        [min]="1"
-        [max]="book.quantity"
-      />
-    </mat-form-field>
+    @if (!showDelete) {
+      <mat-form-field appearance="outline" style="width: 80px; margin-right: 10px;">
+        <mat-label>Qty</mat-label>
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="selectedQuantity"
+          [min]="1"
+          [max]="book.quantity"
+        />
+      </mat-form-field>
 
-    <!-- Bouton add to cart -->
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onAddToCart()"
-      [disabled]="selectedQuantity < 1 || selectedQuantity > book.quantity"
-    >
-      Add to Cart
-    </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onAddToCart()"
+        [disabled]="isAddDisabled()"
+      >
+        Add to Cart
+      </button>
+    }
+
+    @if (showDelete) {
+      <button mat-raised-button color="warn" (click)="onDeleteClick()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    }
   </mat-card-actions>
 </mat-card>

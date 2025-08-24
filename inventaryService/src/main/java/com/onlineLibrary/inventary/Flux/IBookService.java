@@ -12,4 +12,5 @@ public interface IBookService {
      BookResponseDTO findBookByIsbn(String isbn) throws Exception;
      BookQuantityResponseDTO decreaseBookQuantity(int id, int quantity) throws Exception;
      BookResponseDTO addBook(BookDTO body);
+     boolean removeBook(int id);
 }

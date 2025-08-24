@@ -1,0 +1,19 @@
+<div style="text-align:center; margin-top:50px;">
+  <h1>Manage Inventory</h1>
+
+  <div style="display:flex; justify-content:center; gap:40px; margin-top:40px;">
+    <!-- Bouton Add Book -->
+    <button mat-raised-button color="primary"
+            (click)="goToAddBook()"
+            style="width:200px; height:80px; font-size:20px;">
+      <mat-icon style="vertical-align:middle;">add</mat-icon> Add Book
+    </button>
+
+    <!-- Bouton Remove Book -->
+    <button mat-raised-button color="warn"
+            (click)="goToRemoveBook()"
+            style="width:200px; height:80px; font-size:20px;">
+      <mat-icon style="vertical-align:middle;">delete</mat-icon> Remove Book
+    </button>
+  </div>
+</div>

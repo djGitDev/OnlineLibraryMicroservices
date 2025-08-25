@@ -257,6 +257,46 @@ public class CartRestController {
         return ResponseEntity.ok(result);
     }
 
+    @Operation(
+            summary = "Remove all items with specific bookId from all carts",
+            description = "Removes all items that reference the given bookId in every user's cart",
+            parameters = {
+                    @Parameter(
+                            name = "bookId",
+                            description = "ID of the book to remove from all carts",
+                            required = true,
+                            example = "1",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "All items removed successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "ItemsClearedByBookId",
+                                            value = """
+                {
+                  "status": "success",
+                  "message": "All cart items with Book ID 1 have been deleted."
+                }"""
+                                    )
+                            )
+                    )
+            }
+    )
+    @DeleteMapping("/clearItemsByBook/{bookId}")
+    public ResponseEntity<JsonNode> clearItemsByBook(@PathVariable int bookId) {
+        logger.info("Clearing all cart items with bookId={}", bookId);
+        cartService.clearItemsByBookId(bookId);  // Appelle la méthode du service
+        ObjectNode result = mapper.createObjectNode();
+        result.put("status", "success");
+        result.put("message", "All cart items with Book ID " + bookId + " have been deleted.");
+        return ResponseEntity.ok(result);
+    }
+
 
     @Operation(
             summary = "Add searched items to cart",

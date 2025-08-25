@@ -61,6 +61,11 @@ public class CartItemService implements ICartItemsService {
         return new CartTotalPriceDTO( cartId, total,"success");
     }
 
+    @Override
+    public void deleteByBookId(int bookId) {
+        cartItemRepository.deleteByBookId(bookId);
+    }
+
 
     @Override
     public List<CartItemDAO> getItems(int cartId) throws Exception {

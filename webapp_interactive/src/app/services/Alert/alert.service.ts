@@ -33,10 +33,10 @@ export class AlertService {
       userMessage = '⛔ Duplicate entry detected';
     }
     else {
-      userMessage =  backendMsg;
+      userMessage =  '⛔'+ backendMsg;
     }
 
-    this.snackBar.open('⛔ ' +userMessage, 'Close', {
+    this.snackBar.open(userMessage, 'Close', {
       duration: 5000,
       panelClass: ['error-snackbar']
     });

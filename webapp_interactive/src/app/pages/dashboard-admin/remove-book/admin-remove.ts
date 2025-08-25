@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {BookService} from '../../../services/Inventary/Book/book.service';
 import {Book} from '../../../models/inventary/book';
 import {BookCardComponent} from '../../../components/inventary/book-card/book-card';
 import {Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
 import {MatDivider} from '@angular/material/divider';
+import {AlertService} from '../../../services/Alert/alert.service';
 
 @Component({
   selector: 'admin-remove',
@@ -23,8 +23,8 @@ export class AdminRemoveComponent implements OnInit {
 
   constructor(
     private bookService: BookService,
-    private snackBar: MatSnackBar,
     private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -40,7 +40,7 @@ export class AdminRemoveComponent implements OnInit {
       next: (books) => this.books = books,
       error: (err) => {
         console.error('Error loading books:', err);
-        this.snackBar.open('Failed to load books', 'Close', { duration: 3000 });
+        this.alertService.error(err);
       }
     });
   }
@@ -54,11 +54,11 @@ export class AdminRemoveComponent implements OnInit {
       next: () => {
         // Remove the deleted book from the local array
         this.books = this.books.filter(book => book.id !== bookId);
-        this.snackBar.open('Book deleted successfully', 'Close', { duration: 3000 });
+        this.alertService.success('✅ Book deleted successfully');
       },
       error: (err) => {
         console.error('Error deleting book:', err);
-        this.snackBar.open('Failed to delete book', 'Close', { duration: 3000 });
+        this.alertService.error(err);
       }
     });
   }

@@ -14,4 +14,5 @@ public interface ICartItemsService {
     void clearCartItems(int id);
     void deleteCartItem(int id, int bookId) throws Exception;
     CartTotalPriceDTO getTotalPrice(int cartId) throws Exception;
+    void deleteByBookId(int bookId);
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BookService } from '../../../services/Inventary/Book/book.service';
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import {MatError, MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {FormsModule} from '@angular/forms';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
@@ -36,6 +36,7 @@ import {Router} from '@angular/router';
     MatCard,
     MatDivider,
     MatButtonToggle,
+    MatError,
 
   ],
 })

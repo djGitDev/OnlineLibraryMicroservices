@@ -14,6 +14,8 @@ import {PublisherService} from '../../../services/Inventary/Publisher/publisher.
 import {AuthorService} from '../../../services/Inventary/Author/author.service';
 import {CategoryService} from '../../../services/Inventary/Category/category.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {AlertService} from '../../../services/Alert/alert.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-admin-dashboard-user',
@@ -27,9 +29,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
     MatSelect,
     MatOption,
     FormsModule,
-    MatDatepicker,
-    MatDatepickerToggle,
-    MatDatepickerInput,
     MatNativeDateModule,
     MatInput,
     MatCardContent,
@@ -63,11 +62,16 @@ export class AdminAddComponent implements OnInit {
               private publisherService: PublisherService,
               private authorService: AuthorService,
               private categoryService: CategoryService,
-              private snackBar: MatSnackBar   // 👈 ajout
+              private alerteService : AlertService,
+              private router : Router,
   ) {}
 
   ngOnInit(): void {
     this.loadOptions();
+  }
+
+  goBackToAdminMenu() {
+    this.router.navigate(['/dashboard-admin']);
   }
 
   loadOptions() {
@@ -82,14 +86,12 @@ export class AdminAddComponent implements OnInit {
     this.bookService.addBook(this.newBook).subscribe({
       next: res => {
         console.log('✅ Book added', res);
-        this.snackBar.open('✅ Book added successfully', 'Close', {
-          duration: 3000, // 3 secondes
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-        });
+        this.alerteService.success('✅ Book added successfully');
         this.resetForm();
       },
-      error: err => console.error('❌ Erreur while adding book', err)
+      error: err => {
+        this.alerteService.error(err);
+      }
     });
   }
 
@@ -117,15 +119,26 @@ export class AdminAddComponent implements OnInit {
       this.categoryService.addCategory({ name }).subscribe(cat => this.categories.push(cat));
     }
   }
+
+  isValidDate(dateStr: string): boolean {
+    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return false;
+
+    const year = +match[1];
+    const month = +match[2];
+    const day = +match[3];
+
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    if (day > daysInMonth) return false;
+
+    const today = new Date();
+    const inputDate = new Date(year, month - 1, day);
+    if (inputDate > today) return false;
+
+    return true;
+  }
 }
 
-
-export const MY_DATE_FORMATS = {
-  parse: { dateInput: 'DD/MM/YYYY' },
-  display: {
-    dateInput: 'dd/MM/yyyy',
-    monthYearLabel: 'MMM yyyy',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM yyyy',
-  },
-};

@@ -1,41 +1,82 @@
-<!-- login.html -->
 <div class="login-container" style="max-width: 400px; margin: auto; padding-top: 50px;">
   <h2 style="text-align: center; margin-bottom: 30px;">Login</h2>
 
   <!-- Login form -->
-  <form (ngSubmit)="onLogin()">
-    <!-- Email -->
+  <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
+
+  <!-- Email -->
     <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">
       <mat-label>Email</mat-label>
+<!--      <input-->
+<!--        matInput-->
+<!--        type="email"-->
+<!--        name="email"-->
+<!--        required-->
+<!--        [(ngModel)]="email"-->
+<!--        placeholder="Enter your email"-->
+<!--      />-->
       <input
         matInput
         type="email"
         name="email"
         required
+        email
         [(ngModel)]="email"
         placeholder="Enter your email"
+        #emailCtrl="ngModel"
       />
+
+      @if (emailCtrl.invalid && emailCtrl.touched) {
+        <div style="color:red; font-size:12px; margin-top: 5px;">
+          Please enter a valid email
+        </div>
+      }
     </mat-form-field>
 
     <!-- Password -->
     <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">
       <mat-label>Password</mat-label>
+<!--      <input-->
+<!--        matInput-->
+<!--        type="password"-->
+<!--        name="password"-->
+<!--        required-->
+<!--        [(ngModel)]="password"-->
+<!--        placeholder="Enter your password"-->
+<!--      />-->
       <input
         matInput
         type="password"
         name="password"
         required
+        minlength="3"
         [(ngModel)]="password"
         placeholder="Enter your password"
+        #passwordCtrl="ngModel"
       />
+
+      @if (passwordCtrl.invalid && passwordCtrl.touched) {
+        <div style="color:red; font-size:12px; margin-top: 5px;">
+          Password is required (min 3 characters)
+        </div>
+      }
     </mat-form-field>
 
     <!-- Login button -->
+<!--    <button-->
+<!--      mat-raised-button-->
+<!--      color="primary"-->
+<!--      type="submit"-->
+<!--      style="width: 100%; margin-bottom: 15px;"-->
+<!--    >-->
+<!--      Login-->
+<!--    </button>-->
     <button
       mat-raised-button
       color="primary"
       type="submit"
       style="width: 100%; margin-bottom: 15px;"
+      [disabled]="loginForm.invalid"
     >
       Login
     </button>
@@ -61,3 +102,67 @@
     </a>
   </div>
 </div>
+
+
+
+
+<!--<div class="login-container" style="max-width: 400px; margin: auto; padding-top: 50px;">-->
+<!--  <h2 style="text-align: center; margin-bottom: 30px;">Login</h2>-->
+
+<!--  &lt;!&ndash; Login form &ndash;&gt;-->
+<!--  <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">-->
+
+<!--    &lt;!&ndash; Email &ndash;&gt;-->
+<!--    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">-->
+<!--      <mat-label>Email</mat-label>-->
+<!--      <input-->
+<!--        matInput-->
+<!--        type="email"-->
+<!--        name="email"-->
+<!--        required-->
+<!--        email-->
+<!--        [(ngModel)]="email"-->
+<!--        placeholder="Enter your email"-->
+<!--        #emailCtrl="ngModel"-->
+<!--      />-->
+
+<!--      @if (emailCtrl.invalid && emailCtrl.touched) {-->
+<!--        <div style="color:red; font-size:12px; margin-top: 5px;">-->
+<!--          Please enter a valid email-->
+<!--        </div>-->
+<!--      }-->
+<!--    </mat-form-field>-->
+
+<!--    &lt;!&ndash; Password &ndash;&gt;-->
+<!--    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 20px;">-->
+<!--      <mat-label>Password</mat-label>-->
+<!--      <input-->
+<!--        matInput-->
+<!--        type="password"-->
+<!--        name="password"-->
+<!--        required-->
+<!--        minlength="6"-->
+<!--        [(ngModel)]="password"-->
+<!--        placeholder="Enter your password"-->
+<!--        #passwordCtrl="ngModel"-->
+<!--      />-->
+
+<!--      @if (passwordCtrl.invalid && passwordCtrl.touched) {-->
+<!--        <div style="color:red; font-size:12px; margin-top: 5px;">-->
+<!--          Password is required (min 6 characters)-->
+<!--        </div>-->
+<!--      }-->
+<!--    </mat-form-field>-->
+
+<!--    &lt;!&ndash; Login button &ndash;&gt;-->
+<!--    <button-->
+<!--      mat-raised-button-->
+<!--      color="primary"-->
+<!--      type="submit"-->
+<!--      style="width: 100%; margin-bottom: 15px;"-->
+<!--      [disabled]="loginForm.invalid"-->
+<!--    >-->
+<!--      Login-->
+<!--    </button>-->
+<!--  </form>-->
+<!--</div>-->

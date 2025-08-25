@@ -1,5 +1,5 @@
 
-import {Component, model} from '@angular/core';
+import {Component, ElementRef, model, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { RegisterModel } from '../../models/register/register.model';
 import { UserFormComponent } from '../../components/register/user-form/user-form.component';
@@ -10,44 +10,70 @@ import { MatDividerModule } from '@angular/material/divider';
 import {AuthService} from '../../services/Profil/auth.service';
 import {User} from '../../models/register/user.model';
 import {Address} from '../../models/register/address.model';
+import {AlertService} from '../../services/Alert/alert.service';
+import {NgStyle} from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [FormsModule, UserFormComponent, AddressFormComponent, MatButtonModule, MatDividerModule]
+  imports: [FormsModule, UserFormComponent, AddressFormComponent, MatButtonModule, MatDividerModule, AddressFormComponent, NgStyle]
 })
 export class RegisterComponent {
   user: User = new User();
   address: Address = new Address();
+  isUserValid: boolean = false;
+  isAddressValid: boolean = false;
 
-  errorMessage: string = '';
-  successMessage: string = '';
+  @ViewChild(AddressFormComponent) confirmBtnAddress!: AddressFormComponent;
+  @ViewChild(UserFormComponent) confirmBtnUser!: UserFormComponent;
 
-  constructor(private router: Router, private authService:AuthService) {}
+
+  constructor(private router: Router, private authService:AuthService,private alertService: AlertService) {}
+
+  onUserReset() {
+    this.user = new User();
+    this.isUserValid = false;
+  }
+
+  onUserChange(user: User) {
+    this.user = user;
+    this.isUserValid = true;
+  }
+  onAddressChange(address: Address) {
+    this.address = address;
+    this.isAddressValid = true;
+  }
+  onAddressReset() {
+    this.address = new Address();
+    this.isAddressValid = false;
+  }
 
   onRegister() {
+    if (!this.isAddressValid || !this.isUserValid) {
+      this.alertService.alert('Please complete the address correctly.');
+      return;
+    }
     const register = new RegisterModel(this.user, this.address);
 
     this.authService.register(register).subscribe({
       next: (response) => {
-        this.successMessage = 'Inscription réussie !';
-        console.log('Réponse serveur:', response);
-        this.router.navigate(['/login']); // redirige vers login après succès
+        console.log('Backend response after success register:', response);
+        this.alertService.success('✅ Successfully registered.');
+        this.isAddressValid = false;
+        this.isUserValid = false;
+        this.router.navigate(['/login']);
       },
       error: (err) => {
-        // Gestion des erreurs HTTP
-        console.error('Erreur inscription:', err);
-        if (err.status === 400) {
-          this.errorMessage = 'Données invalides. Vérifie ton formulaire.';
-        } else if (err.status === 404) {
-          this.errorMessage = 'Serveur introuvable. Vérifie ton API.';
-        } else {
-          this.errorMessage = 'Erreur serveur. Réessaie plus tard.';
-        }
+        this.alertService.error(err);
+        this.isAddressValid = false;
+        this.isUserValid = false;
+        this.confirmBtnAddress.onConfirm();
+        this.confirmBtnUser.onConfirm()
       }
     });
+
   }
 
   goBackToLogin() {
@@ -55,4 +81,6 @@ export class RegisterComponent {
   }
 
   protected readonly model = model;
+
+
 }

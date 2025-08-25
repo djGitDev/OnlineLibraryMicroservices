@@ -3,12 +3,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {BookService} from '../../../services/Inventary/Book/book.service';
 import {Book} from '../../../models/inventary/book';
 import {BookCardComponent} from '../../../components/inventary/book-card/book-card';
+import {Router} from '@angular/router';
+import {MatButton} from '@angular/material/button';
+import {MatDivider} from '@angular/material/divider';
 
 @Component({
   selector: 'admin-remove',
   templateUrl: './admin-remove.html',
   imports: [
-    BookCardComponent
+    BookCardComponent,
+    MatButton,
+    MatDivider
   ],
   styleUrls: ['./admin-remove.css']
 })
@@ -18,11 +23,16 @@ export class AdminRemoveComponent implements OnInit {
 
   constructor(
     private bookService: BookService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.loadBooks();
+  }
+
+  goBackToAdminMenu() {
+    this.router.navigate(['/dashboard-admin']);
   }
 
   loadBooks(): void {

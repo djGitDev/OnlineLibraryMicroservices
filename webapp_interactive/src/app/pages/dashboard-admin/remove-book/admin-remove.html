@@ -14,4 +14,12 @@
   @if (books.length === 0) {
     <p style="text-align:center; margin-top:32px;">No books found.</p>
   }
+
+  <mat-divider style="margin:16px 0;"></mat-divider>
+
+  <button mat-raised-button
+          (click)="goBackToAdminMenu()"
+          style="width: 100%; color: red; margin-bottom: 16px;">
+    ← Back to Admin Menu
+  </button>
 </div>

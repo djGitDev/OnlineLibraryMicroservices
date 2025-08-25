@@ -104,6 +104,11 @@ public ClearBooksResponseDTO clearBooks(int userId, JsonNode booksNode) {
         }
     }
 
+    @Override
+    public void clearItemsByBookId(int bookId) {
+        cartItemService.deleteByBookId(bookId);
+    }
+
     private void processBooksRemoval(CartDAO cart, JsonNode booksNode) throws Exception {
         for (JsonNode bookNode : booksNode) {
             int bookId = bookNode.get("book_id").asInt();

@@ -7,33 +7,33 @@
         <!-- ISBN -->
         <mat-form-field appearance="outline" style="width:48%; margin:4px;">
           <mat-label>ISBN</mat-label>
-          <input matInput name="isbn" [(ngModel)]="newBook.isbn">
+          <input matInput name="isbn" [(ngModel)]="newBook.isbn" required>
         </mat-form-field>
 
         <!-- Title -->
         <mat-form-field appearance="outline" style="width:48%; margin:4px;">
           <mat-label>Title</mat-label>
-          <input matInput name="title" [(ngModel)]="newBook.title">
+          <input matInput name="title" [(ngModel)]="newBook.title" required>
         </mat-form-field>
 
-        <!-- Quantity (Obligatoire) -->
+        <!-- Quantity  -->
         <mat-form-field appearance="outline" style="width:30%; margin:4px;">
-          <mat-label>Quantity *</mat-label>
+          <mat-label>Quantity</mat-label>
           <input matInput type="number" name="quantity" [(ngModel)]="newBook.quantity" required>
         </mat-form-field>
 
-        <!-- Price (Obligatoire) -->
+        <!-- Price  -->
         <mat-form-field appearance="outline" style="width:30%; margin:4px;">
-          <mat-label>Price ($) *</mat-label>
+          <mat-label>Price ($)</mat-label>
           <input matInput type="number" step="0.01" name="price" [(ngModel)]="newBook.price" required>
         </mat-form-field>
 
-        <!-- Editor (Obligatoire) -->
+        <!-- Editor  -->
         <mat-form-field appearance="outline" style="width:34%; margin:4px;">
-          <mat-label>Editor *</mat-label>
+          <mat-label>Editor</mat-label>
           <mat-select name="publisherId" [(ngModel)]="newBook.publisherId" required>
             @for (pub of publishers; track pub.id){
-            <mat-option [value]="pub.id">{{ pub.name }}</mat-option>
+              <mat-option [value]="pub.id">{{ pub.name }}</mat-option>
             }
             <mat-button-toggle class="add-new-option" (click)="addPublisher()">
               <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
@@ -45,23 +45,33 @@
 
 
 
-        <!-- Divider après les champs obligatoires -->
+        <!-- Divider -->
         <mat-divider style="margin:16px 0;"></mat-divider>
 
         <!-- Release date -->
         <mat-form-field appearance="outline" style="width:48%; margin:4px;">
-          <mat-label>Release date</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="newBook.parutionDate" name="parutionDate">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
+          <mat-label>Date de parution</mat-label>
+          <input matInput
+                 name="parutionDate"
+                 [(ngModel)]="newBook.parutionDate"
+                 required
+                 #parutionDate="ngModel"
+                 pattern="^\d{4}-\d{2}-\d{2}$"
+                 placeholder="aaaa-mm-jj" />
+          @if ((parutionDate.invalid || !isValidDate(newBook.parutionDate)) && parutionDate.touched) {
+            <div style="color:red; font-size:12px; margin-top: 5px;">
+              aaaa-mm-jj (ex: 2023-12-31)
+            </div>
+          }
         </mat-form-field>
+
 
         <!-- Authors -->
         <mat-form-field appearance="outline" style="width:48%; margin:4px;">
           <mat-label>Authors</mat-label>
-          <mat-select name="authorIds" [(ngModel)]="newBook.authorIds" multiple>
+          <mat-select name="authorNames" [(ngModel)]="newBook.authorNames" multiple required>
             @for (author of authors; track author.id){
-            <mat-option [value]="author.name">{{ author.name }}</mat-option>
+              <mat-option [value]="author.name">{{ author.name }}</mat-option>
             }
             <mat-button-toggle class="add-new-option" (click)="addAuthor()">
               <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
@@ -74,9 +84,9 @@
         <!-- Categories -->
         <mat-form-field appearance="outline" style="width:48%; margin:4px;">
           <mat-label>Category</mat-label>
-          <mat-select name="categoryIds" [(ngModel)]="newBook.categoryIds" multiple>
+          <mat-select name="categoryNames" [(ngModel)]="newBook.categoryNames" multiple required>
             @for (cat of categories; track cat.id){
-            <mat-option [value]="cat.name">{{ cat.name }}</mat-option>
+              <mat-option [value]="cat.name">{{ cat.name }}</mat-option>
             }
             <mat-button-toggle class="add-new-option" (click)="addCategory()">
               <mat-icon style="vertical-align: middle; color:white; background-color:#4caf50; border-radius:50%; padding:2px;">add</mat-icon>
@@ -86,13 +96,12 @@
         </mat-form-field>
 
 
-        <!-- Divider avant Description -->
         <mat-divider style="margin:16px 0;"></mat-divider>
 
         <!-- Description -->
         <mat-form-field appearance="outline" style="width:100%; margin:4px;">
           <mat-label>Description</mat-label>
-          <textarea matInput rows="3" name="description" [(ngModel)]="newBook.description"></textarea>
+          <textarea matInput rows="3" name="description" [(ngModel)]="newBook.description" required></textarea>
         </mat-form-field>
 
         <!-- Divider avant boutons -->
@@ -109,4 +118,13 @@
       </form>
     </mat-card-content>
   </mat-card>
+
+  <mat-divider style="margin:16px 0;"></mat-divider>
+
+  <button mat-raised-button
+          (click)="goBackToAdminMenu()"
+          style="width: 100%; color: red; margin-bottom: 16px;">
+    ← Back to Admin Menu
+  </button>
 </div>
+

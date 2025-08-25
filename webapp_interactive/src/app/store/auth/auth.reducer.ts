@@ -9,4 +9,5 @@ export const authReducer = createReducer(
   on(loginSuccess, (state, { accessToken, email,userId , role }) => ({ ...state, accessToken, email,userId, role })),
   on(logout, state => ({ ...state, accessToken: null, email: null })),
   on(setCartId, (state, { cartId }) => ({ ...state, cartId })),
+
 );

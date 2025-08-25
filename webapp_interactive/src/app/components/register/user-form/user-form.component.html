@@ -1,40 +1,95 @@
+<!--<h3 style="margin: 16px 0 8px;">User</h3>-->
+<!--<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">-->
+<!--  &lt;!&ndash; First Name &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill">-->
+<!--    <mat-label>First name</mat-label>-->
+<!--    <input matInput [(ngModel)]="user.first_name" name="first_name" required>-->
+<!--  </mat-form-field>-->
+
+<!--  &lt;!&ndash; Last Name &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill">-->
+<!--    <mat-label>Last name</mat-label>-->
+<!--    <input matInput [(ngModel)]="user.last_name" name="last_name" required>-->
+<!--  </mat-form-field>-->
+
+<!--  &lt;!&ndash; Email &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill">-->
+<!--    <mat-label>Email</mat-label>-->
+<!--    <input matInput type="email" [(ngModel)]="user.email" name="email" required>-->
+<!--  </mat-form-field>-->
+
+<!--  &lt;!&ndash; Phone &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill">-->
+<!--    <mat-label>Phone</mat-label>-->
+<!--    <input matInput [(ngModel)]="user.phone" name="phone" required>-->
+<!--  </mat-form-field>-->
+
+<!--  &lt;!&ndash; Password &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill" style="grid-column: 1 / -1;">-->
+<!--    <mat-label>Password</mat-label>-->
+<!--    <input matInput type="password" [(ngModel)]="user.password" name="password" required>-->
+<!--  </mat-form-field>-->
+<!--  &lt;!&ndash; Role Select &ndash;&gt;-->
+<!--  <mat-form-field appearance="fill" style="grid-column: 1 / -1;">-->
+<!--    <mat-label>Role</mat-label>-->
+<!--    <mat-select [(ngModel)]="user.role" name="role">-->
+<!--      <mat-option value="ROLE_USER">User</mat-option>-->
+<!--      <mat-option value="ROLE_ADMIN">Admin</mat-option>-->
+<!--    </mat-select>-->
+<!--  </mat-form-field>-->
+<!--</div>-->
 <h3 style="margin: 16px 0 8px;">User</h3>
+
 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
   <!-- First Name -->
   <mat-form-field appearance="fill">
-    <mat-label>First name</mat-label>
-    <input matInput [(ngModel)]="user.first_name" name="first_name" required>
+    <mat-label>First Name</mat-label>
+    <input matInput [formControl]="firstNameControl" name="first_name">
   </mat-form-field>
 
   <!-- Last Name -->
   <mat-form-field appearance="fill">
-    <mat-label>Last name</mat-label>
-    <input matInput [(ngModel)]="user.last_name" name="last_name" required>
+    <mat-label>Last Name</mat-label>
+    <input matInput [formControl]="lastNameControl" name="last_name">
   </mat-form-field>
 
   <!-- Email -->
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" style="grid-column: 1 / -1;">
     <mat-label>Email</mat-label>
-    <input matInput type="email" [(ngModel)]="user.email" name="email" required>
+    <input matInput type="email" [formControl]="emailControl" name="email">
   </mat-form-field>
 
   <!-- Phone -->
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" style="grid-column: 1 / -1;">
     <mat-label>Phone</mat-label>
-    <input matInput [(ngModel)]="user.phone" name="phone" required>
+    <input matInput [formControl]="phoneControl" name="phone">
   </mat-form-field>
 
   <!-- Password -->
   <mat-form-field appearance="fill" style="grid-column: 1 / -1;">
     <mat-label>Password</mat-label>
-    <input matInput type="password" [(ngModel)]="user.password" name="password" required>
+    <input matInput type="password" [formControl]="passwordControl" name="password">
   </mat-form-field>
-  <!-- Role Select -->
+
+  <!-- Role -->
   <mat-form-field appearance="fill" style="grid-column: 1 / -1;">
     <mat-label>Role</mat-label>
-    <mat-select [(ngModel)]="user.role" name="role">
+    <mat-select [formControl]="roleControl" name="role">
       <mat-option value="ROLE_USER">User</mat-option>
       <mat-option value="ROLE_ADMIN">Admin</mat-option>
     </mat-select>
   </mat-form-field>
+
+  <!-- Confirm / Reset Button -->
+  <button  mat-raised-button color="primary"
+          [color]="isConfirmed ? 'warn' : 'primary'"
+          [disabled]="!isFormValid() && !isConfirmed"
+          (click)="onConfirm()"
+          [ngStyle]="{
+          'background-color':  'white',
+          'color': 'black'
+        }">
+    {{ isConfirmed ? '✅  Click to reset '  : 'Confirm User' }}
+  </button>
 </div>

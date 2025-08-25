@@ -29,4 +29,12 @@ public interface ICartItemRepository extends JpaRepository<CartItemDAO, Integer>
     @Modifying
     @Transactional
     @Query("DELETE FROM CartItemDAO c WHERE c.cartId = :cartId AND c.bookId = :bookId")
-    void deleteByCartIdAndBookId(int cartId, int bookId);}
+    void deleteByCartIdAndBookId(int cartId, int bookId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM CartItemDAO c WHERE c.bookId = :bookId")
+    void deleteByBookId(@Param("bookId") int bookId);
+
+}
+

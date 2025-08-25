@@ -6,6 +6,7 @@ import {MatIcon} from '@angular/material/icon';
 import {trigger, transition, style, animate, state, keyframes} from '@angular/animations';
 import {MatButton, MatFabButton, MatIconButton, MatMiniFabButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
+import {Book} from '../../models/inventary/book';
 
 
 @Component({
@@ -57,8 +58,10 @@ import {MatTooltip} from '@angular/material/tooltip';
   ]
 })
 export class CartComponent {
+
+  @Input() books: Book[] = [];
   @Input() cartItems: CartItem[] = [];
-  @Output() removeItemEvent = new EventEmitter<{ bookId: number, quantity: number }>();
+  @Output() changeQuantityItemEvent = new EventEmitter<{ bookId: number, quantity: number }>();
   @Output() paymentEvent = new EventEmitter<void>();
   @Output() cartUpdated = new EventEmitter<Map<number, CartItem>>();
 
@@ -81,16 +84,50 @@ export class CartComponent {
     this.cartUpdated.emit(cartMap);
   }
 
-  get total(): number {
-    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  get total(): string {
+    const total = this.cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
+    return Number.isInteger(total) ? total.toString() : total.toFixed(2);
   }
 
-  removeItem(id: number, quantity: number) {
-    this.removeItemEvent.emit({ bookId: id, quantity: quantity });
+  getBookQuantity(bookId: number): number {
+    return this.books.find(b => b.id === bookId)?.quantity || 0;
   }
+
+  addItem(id: number, quantity: number) {
+    this.changeQuantityItemEvent.emit({ bookId: id, quantity: -quantity });
+  }
+  removeItem(id: number, quantity: number) {
+    this.changeQuantityItemEvent.emit({ bookId: id, quantity: quantity });
+  }
+
 
   payment() {
     this.paymentEvent.emit();
     this.onCartUpdated();
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

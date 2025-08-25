@@ -35,7 +35,6 @@ public class BookRestController {
         this.mapper = mapper;
     }
 
-    // ================== Ajouter un Book ==================
     @Operation(
             summary = "Add a new book",
             description = "Creates a new book in the database",
@@ -95,6 +94,7 @@ public class BookRestController {
     @PostMapping("/add")
     public ResponseEntity<JsonNode> addBook(@RequestBody JsonNode body) {
         try {
+            logger.info("Adding new book: {}", body.toString());
             BookDTO bookDTO = mapper.treeToValue(body, BookDTO.class);
             BookResponseDTO savedBook = bookService.addBook(bookDTO);
             ObjectNode result = mapper.createObjectNode();
@@ -106,6 +106,74 @@ public class BookRestController {
             return errorResponse(e);
         }
     }
+
+    @Operation(
+            summary = "Remove a book",
+            description = "Deletes a book from the database by its ID",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "ID of the book to delete",
+                            required = true,
+                            example = "5",
+                            in = ParameterIn.PATH
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Book deleted successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "DeleteSuccessExample",
+                                            value = """
+                        {
+                          "status": "OK",
+                          "message": "Book deleted successfully"
+                        }"""
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Book not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "DeleteNotFoundExample",
+                                            value = """
+                        {
+                          "status": "FAILED",
+                          "message": "Book not found"
+                        }"""
+                                    )
+                            )
+                    )
+            }
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<JsonNode> removeBook(@PathVariable int id) {
+        try {
+            logger.info("Deleting book with ID {}", id);
+            boolean deleted = bookService.removeBook(id);
+            ObjectNode result = mapper.createObjectNode();
+            if (deleted) {
+                result.put("status", "OK");
+                result.put("message", "Book deleted successfully");
+                return ResponseEntity.ok(result);
+            } else {
+                result.put("status", "FAILED");
+                result.put("message", "Book not found");
+                return ResponseEntity.status(404).body(result);
+            }
+        } catch (Exception e) {
+            logger.error("Error deleting book with ID {}", id, e);
+            return errorResponse(e);
+        }
+    }
+
+
     @Operation(
             summary = "Get all books",
             description = "Retrieves a list of all books in the database",

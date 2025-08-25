@@ -1,38 +1,4 @@
-<!--<div class="cart-wrapper">-->
-<!--  &lt;!&ndash; Floating button &ndash;&gt;-->
-<!--  <button mat-fab color="primary" class="cart-toggle" (click)="toggleCart()">-->
-<!--    🛒 {{ cartItems.length }}-->
-<!--  </button>-->
 
-<!--  &lt;!&ndash; Floating cart &ndash;&gt;-->
-<!--  @if(isOpen) {-->
-<!--    <mat-card class="cart-content mat-elevation-z8">-->
-<!--      <mat-card-title>Shopping Cart</mat-card-title>-->
-<!--      <mat-divider></mat-divider>-->
-
-<!--      <mat-list>-->
-<!--        @for(item of cartItems; track item.bookId) {-->
-<!--          <mat-list-item class="cart-item">-->
-<!--            <div class="item-info">-->
-<!--              <span class="item-id">Book ID: {{ item.bookId }}</span>-->
-<!--              <span class="item-qty">Qty: {{ item.quantity }}</span>-->
-<!--            </div>-->
-<!--            <button mat-icon-button color="warn" (click)="removeItem(item.bookId,item.quantity)">-->
-<!--              <mat-icon>close</mat-icon>-->
-<!--            </button>-->
-<!--          </mat-list-item>-->
-<!--        }-->
-<!--      </mat-list>-->
-
-<!--      <mat-divider></mat-divider>-->
-
-<!--      <div class="cart-footer">-->
-<!--        <span>Total items: {{ total }}</span>-->
-<!--        <button mat-raised-button color="accent" (click)="payment()">Payment</button>-->
-<!--      </div>-->
-<!--    </mat-card>-->
-<!--  }-->
-<!--</div>-->
 <div class="cart-wrapper">
   <!-- Floating button avec badge animé -->
   <button mat-fab color="primary" class="cart-toggle" (click)="toggleCart()" [@bounce]="cartItems.length > 0 ? 'active' : 'inactive'">
@@ -62,38 +28,21 @@
       } @else {
         <mat-list class="cart-items-list">
           @for(item of cartItems; track item.bookId) {
-<!--            <mat-list-item class="cart-item" [@itemFade]>-->
-<!--              <div class="item-info">-->
-<!--                <span class="item-id">Book ID: {{ item.bookId }}</span>-->
-<!--                <div class="quantity-controls">-->
-<!--                  <button mat-icon-button (click)="removeItem(item.bookId, 1)" class="qty-btn" [disabled]="item.quantity <= 1">-->
-<!--                    <mat-icon>remove</mat-icon>-->
-<!--                  </button>-->
-<!--                  <span class="item-qty">{{ item.quantity }}</span>-->
-<!--                  <button mat-icon-button (click)="removeItem(item.bookId, -1)" class="qty-btn">-->
-<!--                    <mat-icon>add</mat-icon>-->
-<!--                  </button>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <button mat-icon-button color="warn" (click)="removeItem(item.bookId, item.quantity)" class="remove-btn" matTooltip="Remove all">-->
-<!--                <mat-icon>delete</mat-icon>-->
-<!--              </button>-->
-<!--            </mat-list-item>-->
             <div class="cart-item" [@itemFade]>
               <div class="item-info">
-                <span class="item-id">Book ID: {{ item.bookId }}</span>
+                <span class="item-id">{{ item.title }}</span>
                 <div class="quantity-section">
                   <div class="quantity-controls">
-                    <button mat-mini-fab (click)="removeItem(item.bookId, 1)" class="qty-btn" [disabled]="item.quantity <= 1">
+                    <button mat-mini-fab (click)="removeItem(item.bookId, 1)" class="qty-btn" [disabled]="item.quantity <= 0">
                       <mat-icon>remove</mat-icon>
                     </button>
-                    <span style="display:inline-block; width:10px;"></span> <!-- espace -->
+                    <span style="display:inline-block; width:10px;"></span>
                     <span class="item-qty">{{ item.quantity }}</span>
-                    <span style="display:inline-block; width:10px;"></span> <!-- espace -->
-                    <button mat-mini-fab (click)="removeItem(item.bookId, -1)" class="qty-btn">
+                    <span style="display:inline-block; width:10px;"></span>
+                    <button mat-mini-fab (click)="addItem(item.bookId, 1)" class="qty-btn" [disabled]="item.quantity >= getBookQuantity(item.bookId)">
                       <mat-icon>add</mat-icon>
                     </button>
-                    <span style="display:inline-block; width:40px;"></span> <!-- espace -->
+                    <span style="display:inline-block; width:40px;"></span>
                     <button mat-mini-fab color="warn" (click)="removeItem(item.bookId, item.quantity)" class="remove-btn" matTooltip="Remove all">
                     <mat-icon>delete</mat-icon>
                     </button>
@@ -110,15 +59,32 @@
 
         <div class="cart-footer">
           <div class="total-section">
-            <span class="total-label">Total items:</span>
-            <span class="total-value">{{ total }}</span>
+            <span class="total-label">Total :</span>
+            <span class="total-value">{{ total }} $</span>
           </div>
           <button mat-raised-button color="accent" (click)="payment()" class="payment-btn">
             <mat-icon>payment</mat-icon>
-            Checkout
+            Payment
           </button>
         </div>
       }
     </mat-card>
   }
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

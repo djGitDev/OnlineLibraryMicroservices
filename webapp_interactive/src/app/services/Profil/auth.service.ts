@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import {firstValueFrom, Observable, tap} from 'rxjs';
-import {environment} from '../../environments/environment';
-import {JsonConverter} from '../models/json.converter.util';
-import {RegisterModel} from '../models/register/register.model';
-import {Credentials} from '../models/login/credentials.model';
-import {Role} from '../models/Role';
+import {environment} from '../../../environments/environment';
+import {JsonConverter} from '../../models/json.converter.util';
+import {RegisterModel} from '../../models/register/register.model';
+import {Credentials} from '../../models/login/credentials.model';
+import {Role} from '../../models/Role';
 
 @Injectable({
   providedIn: 'root'
@@ -71,7 +71,7 @@ export class AuthService {
           app_jwt_token: string;
           user_email: string;
           user_id: number;
-          role: string; // <- string reçu du backend
+          role: string;
         } = event.data;
 
         window.removeEventListener('message', messageHandler);

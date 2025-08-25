@@ -71,7 +71,7 @@ export class AuthService {
           app_jwt_token: string;
           user_email: string;
           user_id: number;
-          role: string; // <- string reçu du backend
+          role: string;
         } = event.data;
 
         window.removeEventListener('message', messageHandler);

@@ -14,5 +14,6 @@ public interface ICartService {
     CartTotalPriceDTO getTotalPrice(int cartId) throws Exception;
     AddBookResponseDTO addSingleItemToCart(int userId, int bookId, int quantity, double price) throws Exception;
     ClearBooksResponseDTO clearItem(int userId, int bookId, int quantity);
+    void clearItemsByBookId(int bookId);
 }
 

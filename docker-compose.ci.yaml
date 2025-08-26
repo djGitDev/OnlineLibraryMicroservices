@@ -55,7 +55,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbProfilTest
+      - db-profil-test
 
   inventary:
     build: ./inventaryService
@@ -69,7 +69,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbInventary
+      - db-inventary
 
   payment:
     build: ./paymentService
@@ -80,7 +80,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbPaymentTest
+      - db-paymentTest
 
   order:
     build: ./orderService
@@ -91,7 +91,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbOrderTest
+      - db-order-test
 
   cart:
     build: ./cartService
@@ -102,7 +102,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbCartTest
+      - db-cart-test
 
   db-profil-test:
     image: postgres:17-alpine

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-inventary
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-inventary
+  template:
+    metadata:
+      labels:
+        app: db-inventary
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          env:
+            - name: POSTGRES_DB
+              value: InventaryServiceDB
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: mypass
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: inventary-storage
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                ["pg_isready", "-U", "postgres", "-d", "InventaryServiceDB"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: inventary-storage
+          emptyDir: {}

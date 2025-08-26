@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-cart-test
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-cart-test
+  template:
+    metadata:
+      labels:
+        app: db-cart-test
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          env:
+            - name: POSTGRES_DB
+              value: CartServiceTestDB
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: mypass
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: tmp-storage
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                ["pg_isready", "-U", "postgres", "-d", "CartServiceTestDB"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: tmp-storage
+          emptyDir: {}

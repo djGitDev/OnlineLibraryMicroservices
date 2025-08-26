@@ -80,7 +80,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - db-paymentTest
+      - db-payment-test
 
   order:
     build: ./orderService

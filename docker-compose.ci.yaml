@@ -185,7 +185,7 @@ services:
       timeout: 5s
       retries: 5    
 
-  db-cart-Test:
+  db-cart-test:
     image: postgres:17-alpine
     container_name: db-cart-test
     environment:

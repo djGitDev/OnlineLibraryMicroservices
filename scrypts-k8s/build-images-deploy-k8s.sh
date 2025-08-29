@@ -6,11 +6,11 @@ set -e
 # -----------------------------
 
 # Docker Hub credentials
-DOCKER_USER=
-#todo
 
+#todo mandatory 
+DOCKER_USER=
 DOCKER_PASS=
-#todo
+
 
 # List of service folders
 services=(
@@ -139,12 +139,6 @@ done
 
 echo -e "\n📦 Listing all pods..."
 kubectl get pods -A
-
-# Open Caddy in a new terminal
-echo -e "\n🌐 Opening Caddy service in a new terminal..."
-gnome-terminal -- bash -c "minikube service caddy -n app; exec bash" &
-
-sleep 2
 
 # Start port-forward in another terminal
 echo -e "\n🔑 Starting port-forward in a new terminal..."

@@ -3,10 +3,12 @@
 # -----------------------------
 
 # Docker Hub credentials
-$dockerUser =
-#todo
+
+#todo mandatory
+$dockerUser = 
 $dockerPass = 
-#todo
+
+
 
 # List of service folders (each folder contains its Dockerfile)
 $services = @(
@@ -148,11 +150,6 @@ do {
 
 Write-Host "`n📦 Listing all pods..."
 kubectl get pods -A
-
-Write-Host "`n🌐 Opening Caddy service in a new terminal..."
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "minikube service caddy -n app"
-
-Start-Sleep -Seconds 2
 
 Write-Host "`n🔑 Starting port-forward in a new terminal..."
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "kubectl port-forward svc/caddy 80:80 -n app"

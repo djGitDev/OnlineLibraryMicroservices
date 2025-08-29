@@ -3,7 +3,9 @@
 # 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Usage](#usage)
+- [Deployment](#deployment)
+  - [Deploy with Docker Compose](#deploy-with-docker-compose)
+  - [Deploy with Kubernetes](#deploy-with-kubernetes)
 - [Available Scripts](#available-scripts)
 - [End-to-End Workflow Test](#end-to-end-workflow-test)
 
@@ -14,6 +16,7 @@
 - Windows 10/11 64-bit
 - PowerShell 5.1+
 - WSL 2 enabled
+- At least 16 GB of RAM recommended for local deployment, especially when using Kubernetes/Minikube
 
 ### Required Software
 
@@ -30,20 +33,22 @@ wsl --install
 
 Install Docker Desktop.
 
-## Usage
+## Deployment
 
-### Prerequisites
+### 🚀 Deploy with Docker Compose
+
+#### Prerequisites
 
 - Docker Desktop installed and running
 - PowerShell execution enabled
 - Project dependencies initialized
 
-### Deployment Steps
+#### Deployment Steps
 
 1. **Execute the clean deployment script**:
 
 ```powershell
-./FullClean-Deploy-Docker.ps1
+./scrypts-docker-compose-powershell/FullClean-Deploy-Docker.ps1
 ```
 
 Wait for completion:
@@ -59,6 +64,48 @@ Wait for completion:
 Navigate to: http://localhost:80
 ```
 
+---
+
+### ☸️ Deploy with Kubernetes
+
+#### Prerequisites
+
+- Minikube or a Kubernetes cluster `https://minikube.sigs.k8s.io/docs/`
+- `kubectl` CLI installed and configured
+- You must have your **own Docker Hub registry**
+  - A valid **Docker Hub username**
+  - A **Docker Hub access token** (instead of password)
+  - Fill in the required `TODO` fields in the deployment script `build-images-deploy-k8s `with your registry, user, and token
+
+#### Deployment Steps
+
+1. **Execute the build images deployment script**:
+
+   The script will automatically perform the following steps:
+
+   1. 🔨 Build & push all microservice + official images to your Docker Hub (fill TODO with user/token).
+   2. ☸️ Start Minikube, create namespace, and apply all Kubernetes YAML manifests in order.
+   3. 🌐 Wait for pods (takes at least 8 min – please be patient), then auto port-forward Caddy → access app at http://localhost:80.
+
+   ```powershell
+   ./scrypts-k8s/build-images-deploy-k8s.ps1
+   ```
+
+2. **Check pods and services**:
+
+```powershell
+kubectl get pods -A
+kubectl get svc -A
+```
+
+Then open:
+
+```
+http://localhost:80
+```
+
+---
+
 ## Available Scripts
 
 ### 🚀 Docker Clean & Deploy Script
@@ -73,7 +120,7 @@ PowerShell script that checks Docker containers, volumes, and images status befo
 
 ```powershell
 Execute at project root (where docker-compose.yml is located)
-./FullClean-Deploy-Docker.ps1
+./scrypts-docker-compose-powershell/FullClean-Deploy-Docker.ps1
 ```
 
 ### 🐞 Debugging Container Logs Script
@@ -89,7 +136,7 @@ PowerShell script that displays logs from all running Docker containers.
 
 ```powershell
 Execute at project root (where script is located)
-./Display-Logs.ps1
+./scrypts-docker-compose-powershell/Display-Logs.ps1
 ```
 
 ### 🗃️ PostgreSQL Database Inspector Scripts
@@ -103,8 +150,9 @@ PowerShell scripts that display all created tables and data insertions from all 
 
 ```powershell
 Execute at project root (where script is located)
-./Display-DBTables.ps1
-./Display-DbTablesContains.ps1
+
+./scrypts-docker-compose-powershell/Display-DBTables.ps1
+./scrypts-docker-compose-powershell/Display-DbTablesContains.ps1
 ```
 
 # End-to-End Workflow Test
@@ -140,15 +188,15 @@ Cypress E2E test that validates the **entire workflow** of the system by verifyi
 - Direct access to:
   - **WebApp** (`webapp:5173`) – workflow initiation and UI verification
   - **Microservice DBs**:
-    - `dbProfilTest:5432` – user profiles
-    - `dbCartTest:5432` – shopping carts
-    - `dbPaymentTest:5432` – payments
-    - `dbOrderTest:5432` – orders & deliveries
+    - `db-profil-test:5432` – user profiles
+    - `db-cart-test:5432` – shopping carts
+    - `db-payment-test:5432` – payments
+    - `db-order-test:5432` – orders & deliveries
 
 ### **Network Isolation**
 
-- Same Docker network as services  
-- No external dependencies  
+- Same Docker network as services
+- No external dependencies
 - True inter-service communication validation
 
 ## Displaying Cypress UI on Docker Desktop

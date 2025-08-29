@@ -1,24 +1,34 @@
 # **Online Library Microservice (Linux)**
 
 ## 📋 Table of Contents
+
 - [Prerequisites](#prerequisites)
-- [Usage](#usage)
+- [Deployment](#deployment)
+  - [Deploy with Docker Compose](#deploy-with-docker-compose)
+  - [Deploy with Kubernetes](#deploy-with-kubernetes)
 - [Available Scripts](#available-scripts)
+- [End-to-End Workflow Test](#end-to-end-workflow-test)
 
 ---
 
 ## ⚙️ Prerequisites
 
 ### System Requirements
-- Linux (Ubuntu 20.04/22.04 or any compatible distribution)
-- Bash or Zsh
-- Minimum 4 GB RAM
+
+- Linux 64-bit
+- Bash shell
+- Docker 20+ installed
+- At least 8 GB of RAM recommended for local deployment, especially when using Kubernetes/Minikube
 
 ### Required Software
-- Docker  
-- Docker Compose  
+
+- Docker
+- Docker Compose
+- Minikube (for Kubernetes)
+- `kubectl` CLI
 
 #### Install Docker & Docker Compose:
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose
@@ -26,7 +36,8 @@ sudo systemctl enable docker
 sudo systemctl start docker
 ```
 
-*(Optional)* Allow running Docker without `sudo`:
+_(Optional)_ Allow running Docker without `sudo`:
+
 ```bash
 sudo usermod -aG docker $USER
 newgrp docker
@@ -34,54 +45,108 @@ newgrp docker
 
 ---
 
-## 📌 Usage
+## Deployment
 
-### Prerequisites
-- Docker installed and running  
+### 🚀 Deploy with Docker Compose
+
+#### Prerequisites
+
+- Docker installed and running
 - `docker-compose.yml` located in the project root
 
-### Deployment Steps
+#### Deployment Steps
 
 1. **Run the full clean deployment script**:
+
 ```bash
-./FullClean-Deploy-Docker.sh
+./scripts-docker-compose-bash/FullClean-Deploy-Docker.sh
 ```
 
 or simply:
+
 ```bash
 docker compose up -d
 ```
 
 Wait for completion:
+
 ```
 [✓] Containers started successfully
 [✓] Services are healthy
 ```
 
 2. **Open your browser**:
+
 ```
 Go to: http://localhost:80
 ```
 
 ---
 
+### ☸️ Deploy with Kubernetes
+
+#### Prerequisites
+
+- Minikube or a Kubernetes cluster
+- `kubectl` CLI installed and configured
+- You must have your **own Docker Hub registry**
+  - A valid **Docker Hub username**
+  - A **Docker Hub access token** (instead of password)
+  - Fill in the required `TODO` fields in the deployment script `build-images-deploy-k8s.sh` with your registry, user, and token
+
+#### Deployment Steps
+
+1. **Execute at project root:**
+
+​ The script will automatically perform the following steps:
+
+​ 🔨 Build & push all microservice + official images to your Docker Hub (fill TODO with user/token).
+
+​ ☸️ Start Minikube, create namespace, and apply all Kubernetes YAML manifests in order.
+
+​ 🌐 Wait for pods (takes at least 8 min – please be patient), then auto port-forward Caddy
+
+​ → access app at http://localhost:80.
+
+```bash
+./scripts-k8s/build-images-deploy-k8s.sh
+
+```
+
+2. **Check pods and services**:
+
+```
+kubectl get pods -A
+kubectl get svc -A
+```
+
+Then open:
+
+```
+http://localhost:80
+```
+
 ## 🛠️ Available Scripts
 
 ### 🚀 Docker Clean & Deploy Script
+
 ```bash
-./FullClean-Deploy-Docker.sh
+./scripts-docker-compose-bash/FullClean-Deploy-Docker.sh
 ```
 
 ### 🐞 Display Logs Script
+
 ```bash
-./Display-Logs.sh
+./scripts-docker-compose-bash/Display-Logs.sh
 ```
 
 ### 🗃️ Database Inspector Scripts
+
 ```bash
-./Display-DBTables.sh
-./Display-DbTablesContains.sh
+./scripts-docker-compose-bash/Display-DBTables.sh
+./scripts-docker-compose-bash/Display-DbTablesContains.sh
 ```
+
 # End-to-End Workflow Test
 
 ## Overview
@@ -115,17 +180,16 @@ Cypress E2E test that validates the **entire workflow** of the system by verifyi
 - Direct access to:
   - **WebApp** (`webapp:5173`) – workflow initiation and UI verification
   - **Microservice DBs**:
-    - `dbProfilTest:5432` – user profiles
-    - `dbCartTest:5432` – shopping carts
-    - `dbPaymentTest:5432` – payments
-    - `dbOrderTest:5432` – orders & deliveries
+    - `db-profil-test:5432` – user profiles
+    - `db-cart-test:5432` – shopping carts
+    - `db-payment-test:5432` – payments
+    - `db-order-test:5432` – orders & deliveries
 
 ### **Network Isolation**
 
-- Same Docker network as services  
-- No external dependencies  
+- Same Docker network as services
+- No external dependencies
 - True inter-service communication validation
-
 
 ## State Management
 

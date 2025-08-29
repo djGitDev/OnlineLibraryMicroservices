@@ -30,14 +30,6 @@ export class BookService {
       );
   }
 
-  // deleteBook(bookId: number): Observable<void> {
-  //   return this.http.delete<{status: string, message: string}>(`${this.apiUrlInventary}/${bookId}`)
-  //     .pipe(
-  //       tap(response => console.log('🗑️ Book deleted:', response)),
-  //       map(() => void 0)
-  //     );
-  // }
-
   deleteBook(bookId: number): Observable<void> {
     return this.http.delete<{ status: string, message: string }>(`${this.apiUrlInventary}/${bookId}`)
       .pipe(

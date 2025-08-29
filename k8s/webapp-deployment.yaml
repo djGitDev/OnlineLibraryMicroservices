@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-interactive
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp-interactive
+  template:
+    metadata:
+      labels:
+        app: webapp-interactive
+    spec:
+      containers:
+        - name: webapp-interactive
+          image: djgitdev/webapp_interactive:latest
+          ports:
+            - containerPort: 4200

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventary
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventary
+  template:
+    metadata:
+      labels:
+        app: inventary
+    spec:
+      containers:
+        - name: inventary
+          image: djgitdev/inventaryservice:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "dev"
+            - name: DB_URL
+              value: "jdbc:postgresql://dbInventary:5432/InventaryServiceDB"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "mypass"

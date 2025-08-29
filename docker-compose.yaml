@@ -203,7 +203,7 @@ services:
   #     timeout: 5s
   #     retries: 5
 
-  dbProfilTest:
+  db-profil-test:
     image: postgres:17-alpine
     container_name: db-profil-test
     environment:
@@ -224,7 +224,7 @@ services:
       timeout: 5s
       retries: 5
 
-  dbInventary:
+  db-inventary:
     image: postgres:17-alpine
     container_name: db-inventary
     restart: unless-stopped
@@ -266,7 +266,7 @@ services:
   #     timeout: 5s
   #     retries: 5 
 
-  dbPaymentTest:
+  db-payment-test:
     image: postgres:17-alpine
     container_name: db-payment-test
     environment:
@@ -309,7 +309,7 @@ services:
   #     timeout: 5s
   #     retries: 5 
 
-  dbOrderTest:
+  db-order-test:
     image: postgres:17-alpine
     container_name: db-order-test
     environment:
@@ -351,7 +351,7 @@ services:
   #     timeout: 5s
   #     retries: 5    
 
-  dbCartTest:
+  db-cart-test:
     image: postgres:17-alpine
     container_name: db-cart-test
     environment:

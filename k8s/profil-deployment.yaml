@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: profil
-          image: djgitdev/profilservice:latest
+          image: ${DOCKER_USER}/profilservice:latest
           ports:
             - containerPort: 8081
           env:

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: djgitdev/orderservice:latest
+          image: ${DOCKER_USER}/orderservice:latest
           ports:
             - containerPort: 8084
           env:

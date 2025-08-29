@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: inventary
-          image: djgitdev/inventaryservice:latest
+          image: ${DOCKER_USER}/inventaryservice:latest
           ports:
             - containerPort: 8082
           env:

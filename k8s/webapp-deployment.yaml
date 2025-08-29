@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: webapp-interactive
-          image: djgitdev/webapp_interactive:latest
+          image: ${DOCKER_USER}/webapp_interactive:latest
           ports:
             - containerPort: 4200

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: payment
-          image: djgitdev/paymentservice:latest
+          image: ${DOCKER_USER}/paymentservice:latest
           ports:
             - containerPort: 8083
           env:

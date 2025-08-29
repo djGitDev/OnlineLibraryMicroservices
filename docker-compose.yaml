@@ -1,4 +1,3 @@
-version: '3'
 
 services:
 
@@ -53,7 +52,7 @@ services:
       - app-network
 
   kafka:
-    image: bitnami/kafka:latest
+    image: bitnamilegacy/kafka:latest
     container_name: kafka
     ports:
       - "9092:9092"
@@ -116,7 +115,7 @@ services:
       - app-network
     depends_on:
       # - dbProfil
-      - dbProfilTest
+      - db-profil-test
 
 
   inventary:
@@ -131,7 +130,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbInventary
+      - db-inventary
 
   payment:
     build: ./paymentService
@@ -144,7 +143,7 @@ services:
       - app-network
     depends_on:
       # - dbPayment
-      - dbPaymentTest
+      - db-payment-test
 
   notification:
     build: ./notificationService
@@ -167,7 +166,7 @@ services:
       - app-network
     depends_on:
       # - dbOrder
-      - dbOrderTest
+      - db-order-test
 
   cart:
     build: ./cartService
@@ -180,7 +179,7 @@ services:
       - app-network
     depends_on:
       # - dbCart   
-      - dbCartTest    
+      - db-cart-test    
 
   # dbProfil:
   #   image: postgres:17-alpine

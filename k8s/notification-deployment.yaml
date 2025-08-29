@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: djgitdev/notificationservice:latest
+          image: ${DOCKER_USER}/notificationservice:latest
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"

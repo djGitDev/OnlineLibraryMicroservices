@@ -56,7 +56,7 @@ docker rmi -f $(docker images -aq)
 
 # 7. Service restart
 Write-Host "`nStarting services..." -ForegroundColor Cyan
-docker compose up -d
+docker compose -f ../docker-compose.yaml up -d
 
 # 8. Final report
 Write-Host "`n=== FINAL REPORT ===" -ForegroundColor Cyan

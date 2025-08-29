@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profil
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profil
+  template:
+    metadata:
+      labels:
+        app: profil
+    spec:
+      containers:
+        - name: profil
+          image: ${DOCKER_USER}/profilservice:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "test"

@@ -13,7 +13,7 @@ docker rm $(docker ps -aq)
 Write-Host "Container cleanup completed!" -ForegroundColor Green
 
 # 4. Start docker compose
-docker compose up -d
+docker compose -f ../docker-compose.yaml up -d
 
 # 5. Show running containers
 Write-Host "Running containers" -ForegroundColor Green

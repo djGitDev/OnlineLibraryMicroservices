@@ -1,4 +1,3 @@
-version: '3'
 
 services:
   webapp:
@@ -55,7 +54,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbProfilTest
+      - db-profil-test
 
   inventary:
     build: ./inventaryService
@@ -69,7 +68,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbInventary
+      - db-inventary
 
   payment:
     build: ./paymentService
@@ -80,7 +79,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbPaymentTest
+      - db-payment-test
 
   order:
     build: ./orderService
@@ -91,7 +90,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbOrderTest
+      - db-order-test
 
   cart:
     build: ./cartService
@@ -102,9 +101,9 @@ services:
     networks:
       - app-network
     depends_on:
-      - dbCartTest
+      - db-cart-test
 
-  dbProfilTest:
+  db-profil-test:
     image: postgres:17-alpine
     container_name: db-profil-test
     environment:
@@ -124,7 +123,7 @@ services:
       timeout: 5s
       retries: 5
 
-  dbInventary:
+  db-inventary:
     image: postgres:17-alpine
     container_name: db-inventary
     restart: unless-stopped
@@ -145,7 +144,7 @@ services:
       timeout: 5s
       retries: 5 
 
-  dbPaymentTest:
+  db-payment-test:
     image: postgres:17-alpine
     container_name: db-payment-test
     environment:
@@ -165,7 +164,7 @@ services:
       timeout: 5s
       retries: 5
 
-  dbOrderTest:
+  db-order-test:
     image: postgres:17-alpine
     container_name: db-order-test
     environment:
@@ -185,7 +184,7 @@ services:
       timeout: 5s
       retries: 5    
 
-  dbCartTest:
+  db-cart-test:
     image: postgres:17-alpine
     container_name: db-cart-test
     environment:
